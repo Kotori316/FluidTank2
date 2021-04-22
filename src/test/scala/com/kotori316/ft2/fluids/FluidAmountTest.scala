@@ -19,7 +19,8 @@ object FluidAmountTest {
 
   def fluidKeys(): Array[FluidKey] = {
     val nbt = Option(new CompoundNBT().tap(_.putInt("b", 6)))
-    Array(FluidKey.WATER, FluidKey.LAVA, FluidKey.EMPTY,
+    Array(
+      FluidKey.WATER, FluidKey.LAVA, FluidKey.EMPTY,
       FluidKey.WATER.copy(nbt = nbt), FluidKey.LAVA.copy(nbt = nbt), FluidKey.EMPTY.copy(nbt = nbt),
     )
   }
@@ -242,6 +243,8 @@ object FluidAmountTest {
       val a = FluidAmount.BUCKET_LAVA * 5
       val b = FluidAmount.BUCKET_WATER * 2
       assertEquals(b, a |-| a |+| b)
+      assertTrue(b === (a |-| a |+| b))
+      assertTrue(a === (b |-| b |+| a))
     }
   }
 }

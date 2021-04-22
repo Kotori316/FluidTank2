@@ -1,0 +1,496 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
+buildscript {
+    repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = "https://plugins.gradle.org/m2/" }
+        maven { url = 'https://repo.spongepowered.org/maven' }
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.4.0'
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+plugins {
+    id("maven-publish")
+    id "com.github.breadmoirai.github-release" version "2.2.12"
+}
+apply plugin: 'scala'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: "com.matthewprenger.cursegradle"
+apply plugin: "com.github.breadmoirai.github-release"
+apply plugin: 'org.spongepowered.mixin'
+//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+
+version = getProperty("modVersion")
+if (isInCI()) {
+    // In remote CI/CD environment
+    version = (getProperty("modVersion") + "_" + (System.getenv("GITHUB_SHA") ?: "NOT_GIT").substring(0, 7))
+}
+
+private static boolean isInCI() {
+    return Boolean.valueOf(System.getenv("GITHUB_ACTIONS")) || Boolean.valueOf(System.getenv("CI"))
+}
+
+group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "LargeFluidTank"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+
+static String mappingVersion() { return '20201028-1.16.3' }
+
+String forgeVersion() {
+    if (isInCI() && System.getenv("CI_FORGE") != null && "default" != System.getenv("CI_FORGE")) {
+        return "net.minecraftforge:forge:" + System.getenv("CI_FORGE")
+    } else {
+        // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
+        // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
+        // The user-dev artifact is a special name and will get all sorts of transformations applied to it.
+        def forge_prop = loadProperties("forge_version.properties")
+        return forge_prop.get("forge_version")
+    }
+}
+
+println("Java: ${System.getProperty('java.version')} JVM: ${System.getProperty('java.vm.version')}(${System.getProperty('java.vendor')}) Arch: ${System.getProperty('os.arch')}")
+
+minecraft {
+    mappings channel: 'snapshot', version: mappingVersion()
+
+    runs {
+        client {
+            workingDirectory project.file('Minecraft')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'mixin.env.disableRefMap', 'true'
+            property "mixin.debug.export", "true"
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                fluidtank {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run-server')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'mixin.env.disableRefMap', 'true'
+            property "mixin.debug.export", "true"
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                fluidtank {
+                    source sourceSets.main
+                }
+            }
+        }
+        data {
+            workingDirectory project.file('run-server')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'mixin.env.disableRefMap', 'true'
+            property "mixin.debug.export", "true"
+            property 'forge.logging.console.level', 'info'
+            forceExit false
+
+            if (isInCI())
+                args '--mod', "fluidtank", '--dev'
+            else
+                args '--mod', "fluidtank", '--all'
+
+            mods {
+                fluidtank {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+//    maven {
+//        name "BuildCraft"
+//        url = "https://mod-buildcraft.com/maven"
+//    }
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+        content {
+            it.includeGroup("mezz.jei")
+            it.includeModule("knightminer", "Inspirations")
+            it.includeModule("slimeknights.mantle", "Mantle")
+        }
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven.k-4u.nl"
+        url = "https://modmaven.dev/"
+    }
+    if (!isInCI()) {
+        maven {
+            name = "Hwyla"
+            url "https://maven.tehnut.info"
+            content {
+                includeModule("mcp.mobius.waila", "Hwyla")
+            }
+        }
+    }
+    maven { // The One Probe
+        name 'tterrag maven'
+        url "https://maven.tterrag.com/"
+        content {
+            it.includeModule("mcjty.theoneprobe", "TheOneProbe-1.16")
+        }
+    }
+    maven {
+        name = "Azure-SLP"
+        url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
+        content {
+            includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
+            includeModule("com.kotori316", "ScalableCatsForce-MixIn".toLowerCase())
+        }
+    }
+    maven {
+        url = "https://www.cursemaven.com"
+        content {
+            it.includeGroup("curse.maven")
+        }
+    }
+    maven {
+        name = "Mixin"
+        url = 'https://repo.spongepowered.org/maven'
+    }
+    repositories.stream().filter { it instanceof MavenArtifactRepository }.forEach { repo ->
+        repo.content {
+            excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
+        }
+    }
+}
+
+mixin {
+    add sourceSets.main, "mixins.slp.refmap.json"
+}
+
+private boolean hasGitHubToken() {
+    return project.hasProperty("githubToken") || System.getenv("REPO_TOKEN") != null
+}
+
+dependencies {
+    minecraft(forgeVersion())
+    implementation group: 'org.scala-lang', name: 'scala-library', version: '2.13.5'
+    implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.4.2'
+
+    if (!isInCI()) {
+        implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
+        runtimeOnly(fg.deobf("curse.maven:create-328085:3167531"))
+        runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
+        runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
+    }
+    implementation fg.deobf("mezz.jei:jei-1.16.4:7.6.0.58")
+    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.6-8")
+    implementation fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2")
+    compileOnly fg.deobf("curse.maven:look-at-that-355304:3035358")
+
+    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.5-build-1', classifier: 'dev')
+    // Mixin
+    annotationProcessor("org.spongepowered:mixin:0.8.2:processor")
+    // Test Dependencies.
+    String JUPITER_VERSION = '5.7.0'
+    testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
+    testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
+    testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
+    testImplementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.7.0')
+}
+
+// Example for how to get properties into the manifest for reading by the runtime..
+def jarAttributeMap = [
+        "Specification-Title"     : project.name,
+        "Specification-Vendor"    : "Kotori316",
+        "Specification-Version"   : "1", // We are version 1 of ourselves
+        "Implementation-Title"    : project.name,
+        "Implementation-Version"  : "${project.version}",
+        "Implementation-Vendor"   : "Kotori316",
+        "Implementation-Timestamp": ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT),
+        "MixinConfigs"            : "fluidtank.mixins.json"
+]
+jar {
+    manifest {
+        attributes(jarAttributeMap)
+    }
+}
+
+// Example configuration to allow publishing using the maven-publish task
+// we define a custom artifact that is sourced from the reobfJar output task
+// and then declare that to be published
+// Note you'll need to add a repository here
+def reobfFile = file("$buildDir/reobfJar/output.jar")
+def reobfArtifact = artifacts.add('default', reobfFile) {
+    type 'jar'
+    builtBy 'reobfJar'
+}
+
+def loadProperties(String filename) {
+    def props = new Properties()
+    file(filename).withInputStream {
+        props.load(it)
+    }
+    return props
+}
+
+task srcJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveClassifier.set('sources')
+}
+
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    archiveClassifier.set('deobf')
+    manifest {
+        attributes(jarAttributeMap)
+    }
+}
+
+// Tell the artifact system about our extra jars
+artifacts {
+    archives srcJar, deobfJar
+}
+
+test {
+    useJUnitPlatform()
+}
+
+curseforge {
+    apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : ""
+    project {
+        id = '291006'
+        changelogType = 'markdown'
+        changelog = getAllChangeLog()
+        releaseType = 'release'
+        addGameVersion '1.16.4'
+        addGameVersion '1.16.5'
+        mainArtifact jar
+        addArtifact deobfJar
+        addArtifact srcJar
+        relations {
+            requiredDependency 'scalable-cats-force'
+        }
+    }
+    options {
+        curseGradleOptions.debug = false // defaults to false
+        javaVersionAutoDetect = false
+    }
+}
+
+githubRelease {
+    repo.set('FluidTank')
+    token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
+    targetCommitish.set('1.16')
+    body.set(getLatestChangeLog())
+    releaseAssets = files(
+            jar.getArchiveFile().get(),
+            deobfJar.getArchiveFile().get(),
+            srcJar.getArchiveFile().get()
+    )
+}
+
+task signJar2() {
+    doLast {
+        ant.signjar(
+                jar: jar.getArchiveFile().get(),
+                alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
+                keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
+                storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
+                sigalg: "SHA1withRSA",
+                digestalg: "SHA-256",
+                tsaurl: "http://timestamp.digicert.com"
+        )
+        ant.signjar(
+                jar: deobfJar.getArchiveFile().get(),
+                alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
+                keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
+                storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
+                sigalg: "SHA1withRSA",
+                digestalg: "SHA-256",
+                tsaurl: "http://timestamp.digicert.com"
+        )
+    }
+    onlyIf {
+        project.hasProperty('keyStoreAlias') &&
+                project.hasProperty('keyStore') &&
+                project.hasProperty('keyStorePass')
+    }
+}
+
+if (!isInCI()) {
+    // Runs this task automatically when build is ran.
+    assemble.dependsOn(signJar2)
+} else {
+    // In CI
+    tasks.withType(JavaExec) {
+        // Avoid error of GL
+        systemProperty("fml.earlyprogresswindow", false)
+    }
+    // Remove HWYLA class.
+    sourceSets {
+        main {
+            scala {
+                srcDir 'src/main/scala'
+                exclude "/com/kotori316/fluidtank/integration/hwyla/**"
+            }
+        }
+    }
+}
+
+void moveOldLog() {
+    def new_log_file = file("changes.md")
+    def old_log_file = file("old_logs.md")
+
+    if (new_log_file.exists()) {
+        if (!old_log_file.exists())
+            old_log_file.createNewFile()
+        def combined = new_log_file.text +
+                System.lineSeparator() +
+                "Build with ${loadProperties("forge_version.properties").getProperty("forge_version")}, Mapping: ${mappingVersion()}" +
+                System.lineSeparator() * 2 +
+                old_log_file.text
+        old_log_file.setText(combined)
+    }
+}
+
+String getAllChangeLog() {
+    final old_log = file("old_logs.md")
+    final header_file = file("header.md")
+
+    def all_log = old_log.exists() ? old_log.text : "No change log provided."
+    def header = header_file.exists() ? header_file.text : "#Change Log"
+    return header + System.lineSeparator() + all_log
+}
+
+String getLatestChangeLog() {
+    final def log_file = file("changes.md")
+    final def header_file = file("header.md")
+    def log = log_file.exists() ? log_file.text : "No change log provided."
+    def header = header_file.exists() ? header_file.text : "#Change Log"
+    return header + System.lineSeparator() + log
+}
+
+task makeChangeLog() {
+    doLast {
+        moveOldLog()
+        // git commit and push to github
+
+//        ProcessBuilder committer = new ProcessBuilder("git", "commit", "-m", "v${project.version}")
+//        def process1 = committer.start()
+//        process1.waitFor(10L, TimeUnit.SECONDS)
+//        ProcessBuilder pusher = new ProcessBuilder("git", "push")
+//        def process2 = pusher.start()
+//        process2.waitFor(20L, TimeUnit.SECONDS)
+    }
+}
+
+def minecraftVersion = forgeVersion().substring(forgeVersion().lastIndexOf(":") + 1).split("-")[0]
+task checkMethod() {
+    doLast {
+        System.out.println("Forge: ${forgeVersion()}")
+        System.out.println("CI_FORGE: ${System.getenv("CI_FORGE")}, latest: ${"latest" == System.getenv("CI_FORGE")}")
+        System.out.println("Minecraft $minecraftVersion")
+        System.out.println("Is In CI ${isInCI()}")
+        System.out.println("FilePath ${jar.getArchiveFile().get()}")
+        System.out.println("FilePath ${srcJar.getArchiveFile().get()}")
+        System.out.println("FilePath ${deobfJar.getArchiveFile().get()}")
+        System.out.println("Name $project.name")
+        System.out.println("BaseName $archivesBaseName")
+        System.out.println("ModVersion-fromProperty ${getProperty("modVersion")}")
+        System.out.println("ModVersion-fromProject ${project.version}")
+        println("*" * 20)
+        println("changes.md")
+        println(getLatestChangeLog())
+        println("*" * 20)
+        println("hasGitHubToken ${hasGitHubToken()}")
+        println("hasSignToken ${project.hasProperty("keyStore")}")
+        println("hasCurseForgeToken ${project.hasProperty("curseforge_additional-enchanted-miner_key")}")
+        println("*" * 20)
+        println("All Changes")
+//        println(getAllChangeLog())
+        println("*" * 20)
+        println("FindProperty of githubToken: project.findProperty(\"githubToken\") != null ${project.findProperty("githubToken") != null}")
+        println("FindProperty of gpr.user ${project.findProperty("gpr.user")}")
+        println("Username ${project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: "NULL"}")
+//        println("Property of gpr.user ${project.property("gpr.user")}") // FAILED
+        println("*" * 20)
+        println("Repository")
+        getProject().getRepositories().stream().forEach { n -> println("${n.name} $n ${n instanceof MavenArtifactRepository ? n.getUrl() : "Not maven"}") }
+        println("Dependency" + System.lineSeparator() + "*" * 20)
+        getProject().getConfigurations().each { config ->
+            println(config.getName())
+            config.getAllDependencies().each { println(it) }
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Kotori316/FluidTank")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
+                password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
+            }
+        }
+        maven {
+            name = "BuildDir"
+            url = "$buildDir/repo"
+        }
+        maven {
+            name = "AzureRepository"
+            url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
+            credentials {
+                username = project.findProperty("azureUserName") ?: System.getenv("AZURE_USER_NAME") ?: ""
+                password = project.findProperty("azureToken") ?: System.getenv("AZURE_TOKEN") ?: "TOKEN"
+            }
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "fluidtank"
+            artifact srcJar {
+                archiveClassifier.set('sources')
+                archiveExtension.set('jar')
+            }
+            artifact deobfJar {
+                archiveClassifier.set('deobf')
+                archiveExtension.set('jar')
+            }
+            artifact reobfArtifact
+            pom {
+                def v = forgeVersion()
+                name = archivesBaseName
+                description = "FluidTank for Minecraft $minecraftVersion, build with forge $v"
+                url = 'https://github.com/Kotori316/FluidTank'
+                packaging = "jar"
+            }
+        }
+    }
+}
+
+task copyToDrive(type: Copy, dependsOn: "build") {
+    def PATH_NAME = "drive_path"
+    from(jar.getArchiveFile(), deobfJar.getArchiveFile(), srcJar.getArchiveFile())
+    into(file(java.util.Optional.ofNullable(System.getenv(PATH_NAME)).orElse(".")))
+    onlyIf {
+        System.getenv(PATH_NAME) != null &&
+                Files.exists(Paths.get(System.getenv(PATH_NAME)))
+    }
+}

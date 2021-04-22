@@ -1,0 +1,22 @@
+package com.kotori316.ft2.fluids
+
+import cats.kernel.laws.discipline.GroupTests
+import com.kotori316.ft2.BeforeAllTest
+import net.minecraft.fluid.Fluids
+import org.scalacheck._
+import com.kotori316.ft2.fluids._
+
+object GroupLawTest {
+
+  implicit val arb: Arbitrary[FluidAmount] = Arbitrary[FluidAmount] {
+    for {
+      f <- Gen.oneOf(Seq(Fluids.LAVA, Fluids.WATER, Fluids.EMPTY))
+      l <- Arbitrary.arbitrary[Long]
+    } yield FluidAmount(FluidKey(f, None), l)
+  }
+
+  def main(args: Array[String]): Unit = {
+    BeforeAllTest.setup()
+    GroupTests[FluidAmount].group.all.check()
+  }
+}

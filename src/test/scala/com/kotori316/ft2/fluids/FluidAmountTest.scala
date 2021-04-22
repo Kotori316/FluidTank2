@@ -15,11 +15,7 @@ import org.junit.jupiter.params.provider.{MethodSource, ValueSource}
 import scala.util.chaining._
 
 object FluidAmountTest {
-  def empties(): Array[FluidAmount] = Array(
-    FluidAmount.EMPTY,
-    FluidAmount(FluidKey.WATER, 0L),
-    FluidAmount(FluidKey.LAVA, 0L),
-  )
+  def empties(): Array[FluidAmount] = fluidKeys().map(k => FluidAmount(k, 0L))
 
   def fluidKeys(): Array[FluidKey] = {
     val nbt = Option(new CompoundNBT().tap(_.putInt("b", 6)))

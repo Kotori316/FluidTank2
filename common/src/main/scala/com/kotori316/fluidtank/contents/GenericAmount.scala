@@ -1,10 +1,9 @@
 package com.kotori316.fluidtank.contents
 
-import cats.Hash
 import cats.implicits.{catsSyntaxEq, catsSyntaxGroup, catsSyntaxSemigroup}
+import cats.{Hash, Show}
 import com.kotori316.fluidtank.MCImplicits.*
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.Component
 
 import java.util.Objects
 import scala.math.Ordering.Implicits.infixOrderingOps
@@ -61,4 +60,14 @@ case class GenericAmount[ContentType](content: ContentType, amount: GenericUnit,
   override def hashCode(): Int = Objects.hash(this.content, this.amount.value, this.nbt)
 
   override def toString: String = s"GenericAmount{content=${access.asString(content)}, amount=${amount.value}, nbt=$nbt}"
+
+  private def show: String = {
+    val key = access.getKey(this.content)
+    val amount = this.amount.asDisplay
+    s"{$key, $amount mB, nbt=$nbt}"
+  }
+}
+
+object GenericAmount {
+  implicit final def showGenericAmount[A]: Show[GenericAmount[A]] = _.show
 }

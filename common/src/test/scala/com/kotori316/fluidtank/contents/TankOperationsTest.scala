@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.contents
 
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.*
 
 import scala.jdk.javaapi.CollectionConverters
 
@@ -284,6 +284,90 @@ class TankOperationsTest {
       val (_, rest, result) = op.run(DefaultTransferEnv, GenericAmount("a", GenericUnit(500), None))
       assertEquals(GenericAmount("a", GenericUnit(500), None), rest)
       assertEquals(tank, result)
+    }
+  }
+
+  @Nested
+  class LogTest {
+    @Test
+    def fillFluid(): Unit = {
+      val tank = createTank("a", 100, 1000)
+      val op = tank.fillOp
+      val fill = GenericAmount("a", GenericUnit(500), None)
+      val (log, rest, newTank) = op.run(DefaultTransferEnv, fill)
+      assertTrue(rest.isEmpty)
+
+      log.headOption match {
+        case Some(FluidTransferLog.FillFluid(toFill, filled, before, after)) =>
+          assertAll(
+            () => assertEquals(fill, toFill),
+            () => assertEquals(fill, filled),
+            () => assertEquals(tank, before),
+            () => assertEquals(newTank, after),
+          )
+        case _ => fail(s"Expect FluidTransferLog.FillFluid but $log")
+      }
+    }
+
+    @Test
+    def fillFailed(): Unit = {
+      val tank = createTank("a", 100, 1000)
+      val op = tank.fillOp
+      val fill = GenericAmount("b", GenericUnit(500), None)
+      val (log, rest, newTank) = op.run(DefaultTransferEnv, fill)
+      assertTrue(rest.nonEmpty)
+
+      log.headOption match {
+        case Some(FluidTransferLog.FillFailed(f, t)) =>
+          assertAll(
+            () => assertEquals(fill, rest),
+            () => assertEquals(fill, f),
+            () => assertEquals(tank, newTank),
+            () => assertEquals(tank, t),
+          )
+        case _ => fail(s"Expect FluidTransferLog.FillFailed but $log")
+      }
+    }
+
+    @Test
+    def drainFluid(): Unit = {
+      val tank = createTank("a", 100, 1000)
+      val op = tank.drainOp
+      val drain = GenericAmount("a", GenericUnit(500), None)
+      val (log, rest, newTank) = op.run(DefaultTransferEnv, drain)
+      assertTrue(rest.nonEmpty)
+
+      log.headOption match {
+        case Some(FluidTransferLog.DrainFluid(toDrain, drained, before, after)) =>
+          assertAll(
+            () => assertEquals(drain, toDrain),
+            () => assertEquals(tank.content, drained),
+            () => assertEquals(tank, before),
+            () => assertEquals(newTank, after),
+            () => assertEquals(GenericAmount("a", GenericUnit(400), None), rest)
+          )
+        case _ => fail(s"Expect FluidTransferLog.DrainFluid but $log")
+      }
+    }
+
+    @Test
+    def drainFailed(): Unit = {
+      val tank = createTank("a", 100, 1000)
+      val op = tank.drainOp
+      val drain = GenericAmount("b", GenericUnit(500), None)
+      val (log, rest, newTank) = op.run(DefaultTransferEnv, drain)
+      assertTrue(rest.nonEmpty)
+
+      log.headOption match {
+        case Some(FluidTransferLog.DrainFailed(f, t)) =>
+          assertAll(
+            () => assertEquals(drain, rest),
+            () => assertEquals(drain, f),
+            () => assertEquals(tank, newTank),
+            () => assertEquals(tank, t),
+          )
+        case _ => fail(s"Expect FluidTransferLog.DrainFailed but $log")
+      }
     }
   }
 }

@@ -1,8 +1,8 @@
 package com.kotori316.fluidtank.contents
 
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.function.Executable
-import org.junit.jupiter.api.*
 
 import scala.jdk.javaapi.CollectionConverters
 
@@ -165,6 +165,48 @@ class ListTankOperationsTest {
         assertEquals(f, rest)
         assertEquals(tanks, result)
       })))
+    }
+  }
+
+  @Nested
+  class LogTest {
+    @Test
+    def fill1Tank(): Unit = {
+      val tanks = createTanks(("", 0, 1000), ("", 0, 1000))
+      val op = Operations.fillList(tanks)
+
+      val (log, _, _) = op.run(DefaultTransferEnv, GenericAmount("a", GenericUnit(1000), None))
+
+      assertTrue(log.sizeCompare(2) == 0, s"Size must be 2, $log")
+
+      assertTrue(log.takeWhile(_.isValidTransfer).sizeCompare(1) == 0, s"Only first log is valid transfer")
+    }
+
+    @Test
+    def fill2Tanks(): Unit = {
+      val tanks = createTanks(("", 0, 1000), ("", 0, 1000))
+      val op = Operations.fillList(tanks)
+      val (log, _, _) = op.run(DefaultTransferEnv, GenericAmount("a", GenericUnit(1001), None))
+      assertTrue(log.sizeCompare(2) == 0, s"Size must be 2, $log")
+      assertTrue(log.takeWhile(_.isValidTransfer).sizeCompare(2) == 0, s"2 logs are valid")
+    }
+
+    @Test
+    def drain1Tank(): Unit = {
+      val tanks = createTanks(("a", 100, 1000), ("a", 1000, 1000))
+      val op = Operations.drainList(tanks)
+      val (log, _, _) = op.run(DefaultTransferEnv, GenericAmount("a", GenericUnit(100), None))
+      assertTrue(log.sizeCompare(2) == 0, s"Size must be 2, $log")
+      assertTrue(log.takeWhile(_.isValidTransfer).sizeCompare(1) == 0, s"Only first log is valid transfer")
+    }
+
+    @Test
+    def drain2Tank(): Unit = {
+      val tanks = createTanks(("a", 100, 1000), ("a", 1000, 1000))
+      val op = Operations.drainList(tanks)
+      val (log, _, _) = op.run(DefaultTransferEnv, GenericAmount("a", GenericUnit(101), None))
+      assertTrue(log.sizeCompare(2) == 0, s"Size must be 2, $log")
+      assertTrue(log.takeWhile(_.isValidTransfer).sizeCompare(2) == 0, s"2 logs are valid")
     }
   }
 }

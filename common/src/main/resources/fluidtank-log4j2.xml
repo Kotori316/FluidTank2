@@ -5,7 +5,7 @@
     <Appenders>
         <RollingRandomAccessFile name="DebugFile" fileName="logs/fluidtank-debug.log"
                                  filePattern="logs/fluidtank-debug/fluidtank-debug-%d{yyyy-MM-dd}-%i.log.gz">
-            <PatternLayout pattern="[%d{yyyy-MM-dd'T'HH:mm:ss'.'nnn}][%level{length=1}][%logger/%markerSimpleName]: %m%n%xEx"/>
+            <PatternLayout pattern="[%d{yyyy-MM-dd'T'HH:mm:ss.nnn}][%level{length=1}][%logger/%markerSimpleName]: %m%n%xEx"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
                 <OnStartupTriggeringPolicy/>

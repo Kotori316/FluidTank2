@@ -2,6 +2,8 @@ package com.kotori316.fluidtank.fabric;
 
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.PlatformAccess;
+import com.kotori316.fluidtank.cat.BlockChestAsTank;
+import com.kotori316.fluidtank.cat.ItemChestAsTank;
 import com.kotori316.fluidtank.config.PlatformConfigAccess;
 import com.kotori316.fluidtank.fabric.config.FabricPlatformConfigAccess;
 import com.kotori316.fluidtank.fabric.integration.ae2.AE2FluidTankIntegration;
@@ -17,6 +19,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -59,6 +62,8 @@ public final class FluidTank implements ModInitializer {
             BlockEntityType.Builder.of(TileVoidTank::new, BLOCK_VOID_TANK).build(DSL.emptyPartType());
     public static final LootItemFunctionType TANK_LOOT_FUNCTION = new LootItemFunctionType(new TankLootFunction.TankLootSerializer());
     public static final RecipeSerializer<TierRecipe> TIER_RECIPE_SERIALIZER = TierRecipeFabric.SERIALIZER;
+    public static final BlockChestAsTank BLOCK_CAT = new BlockChestAsTank();
+    public static final BlockItem ITEM_CAT = new ItemChestAsTank(BLOCK_CAT);
 
     private static void registerObjects() {
         Stream.concat(TANK_MAP.entrySet().stream(), Stream.of(Map.entry(Tier.CREATIVE, BLOCK_CREATIVE_TANK), Map.entry(Tier.VOID, BLOCK_VOID_TANK)))
@@ -68,6 +73,8 @@ public final class FluidTank implements ModInitializer {
                 .forEach((c, t) -> Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, new ResourceLocation(FluidTankCommon.modId, c.getSimpleName().toLowerCase(Locale.ROOT)), t));
         Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, new ResourceLocation(FluidTankCommon.modId, TankLootFunction.NAME), TANK_LOOT_FUNCTION);
         Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, TierRecipe.SerializerBase.LOCATION, TIER_RECIPE_SERIALIZER);
+        Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(FluidTankCommon.modId, BlockChestAsTank.NAME()), BLOCK_CAT);
+        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(FluidTankCommon.modId, BlockChestAsTank.NAME()), ITEM_CAT);
         var builder = FabricItemGroup.builder();
         createTab(builder);
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, new ResourceLocation(FluidTankCommon.modId, FluidTankCommon.modId), builder.build());
@@ -80,6 +87,7 @@ public final class FluidTank implements ModInitializer {
             // Tanks
             TANK_ITEM_MAP.values().stream().sorted(Comparator.comparing(i -> i.blockTank().tier()))
                     .forEach(output::accept);
+            output.accept(ITEM_CAT);
         });
     }
 }

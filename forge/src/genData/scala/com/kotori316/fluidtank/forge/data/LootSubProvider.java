@@ -25,6 +25,7 @@ final class LootSubProvider extends BlockLootSubProvider {
 
         FluidTank.TANK_MAP.values().stream().map(RegistryObject::get).forEach(b -> this.add(b, tankContent(b)));
         Stream.of(FluidTank.BLOCK_CREATIVE_TANK, FluidTank.BLOCK_VOID_TANK).map(RegistryObject::get).forEach(b -> this.add(b, tankContent(b)));
+        this.add(FluidTank.BLOCK_CAT.get(), this::createSingleItemTable);
     }
 
     @Override
@@ -32,6 +33,7 @@ final class LootSubProvider extends BlockLootSubProvider {
         var list = new ArrayList<Block>(FluidTank.TANK_MAP.values().stream().map(RegistryObject::get).toList());
         list.add(FluidTank.BLOCK_CREATIVE_TANK.get());
         list.add(FluidTank.BLOCK_VOID_TANK.get());
+        list.add(FluidTank.BLOCK_CAT.get());
         return list;
     }
 

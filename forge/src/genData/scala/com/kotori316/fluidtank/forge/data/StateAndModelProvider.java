@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.forge.data;
 
 import com.kotori316.fluidtank.FluidTankCommon;
+import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.forge.FluidTank;
 import com.kotori316.fluidtank.tank.BlockTank;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -29,7 +30,7 @@ final class StateAndModelProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         FluidTankCommon.LOGGER.info(FluidTankDataProvider.MARKER(), "Generating state and model");
-        // catBlock();
+        catBlock();
         // sourceBlock();
         tankBase();
         FluidTank.TANK_MAP.values().stream().map(RegistryObject::get).forEach(this::tank);
@@ -41,11 +42,11 @@ final class StateAndModelProvider extends BlockStateProvider {
         // StreamConverters.asJavaSeqStream(ModObjects.itemReservoirs()).forEach(this::reservoir);
     }
 
-    /*void catBlock() {
-        this.directionalBlock(ModObjects.blockCat(), models().cubeTop(BlockCAT.NAME(),
+    void catBlock() {
+        this.directionalBlock(FluidTank.BLOCK_CAT.get(), models().cubeTop(BlockChestAsTank.NAME(),
             blockTexture("cat_side"), blockTexture("cat_front")));
-        this.itemModels().withExistingParent("item/" + BlockCAT.NAME(), new ResourceLocation(FluidTankCommon.modId, "block/" + BlockCAT.NAME()));
-    }*/
+        this.itemModels().withExistingParent("item/" + BlockChestAsTank.NAME(), new ResourceLocation(FluidTankCommon.modId, "block/" + BlockChestAsTank.NAME()));
+    }
 
     /*void sourceBlock() {
         var builder = getVariantBuilder(ModObjects.blockSource());

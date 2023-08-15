@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "fluidtank:block/chest_as_tank",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "fluidtank:block/chest_as_tank",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "fluidtank:block/chest_as_tank",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "fluidtank:block/chest_as_tank",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "fluidtank:block/chest_as_tank"
+    },
+    "facing=west": {
+      "model": "fluidtank:block/chest_as_tank",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

@@ -24,6 +24,7 @@ loom {
         client {
             configName = "Fabric Client"
             runDir = "run"
+            source sourceSets.test
         }
         server {
             configName = "Fabric Server"

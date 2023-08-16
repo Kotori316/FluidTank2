@@ -5,6 +5,7 @@ import com.kotori316.fluidtank.PlatformAccess;
 import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.cat.ItemChestAsTank;
 import com.kotori316.fluidtank.config.PlatformConfigAccess;
+import com.kotori316.fluidtank.fabric.cat.ChestAsTankStorage;
 import com.kotori316.fluidtank.fabric.config.FabricPlatformConfigAccess;
 import com.kotori316.fluidtank.fabric.integration.ae2.AE2FluidTankIntegration;
 import com.kotori316.fluidtank.fabric.message.PacketHandler;
@@ -42,6 +43,7 @@ public final class FluidTank implements ModInitializer {
         PlatformConfigAccess.setInstance(new FabricPlatformConfigAccess());
         registerObjects();
         ConnectionStorage.register();
+        ChestAsTankStorage.register();
         AE2FluidTankIntegration.onAPIAvailable();
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize finished {}", FluidTankCommon.modId);
     }

@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.fabric;
 import com.kotori316.fluidtank.PlatformAccess;
 import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
+import com.kotori316.fluidtank.fabric.cat.ChestAsTankStorage;
 import com.kotori316.fluidtank.fabric.fluid.FabricConverter;
 import com.kotori316.fluidtank.fluids.*;
 import com.kotori316.fluidtank.tank.BlockTank;
@@ -221,6 +222,6 @@ final class FabricPlatformAccess implements PlatformAccess {
 
     @Override
     public @NotNull List<GenericAmount<FluidLike>> getCATFluids(Level level, BlockPos pos) {
-        return List.of();
+        return ChestAsTankStorage.getCATFluids(level, pos);
     }
 }

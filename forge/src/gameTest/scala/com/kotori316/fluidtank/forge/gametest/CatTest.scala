@@ -11,7 +11,6 @@ import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, Test
 import net.minecraft.world.item.{Item, Items}
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.block.entity.HopperBlockEntity
-import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraftforge.common.capabilities.ForgeCapabilities
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.gametest.{GameTestHolder, PrefixGameTestTemplate}
@@ -50,7 +49,10 @@ class CatTest {
     val pos = new BlockPos(2, 2, 2)
     val cat = assertInstanceOf(classOf[EntityChestAsTank], helper.getBlockEntity(pos))
 
-    cat.getCapability(ForgeCapabilities.FLUID_HANDLER).orElseThrow(() => fail("CAT must create proxy handler"))
+    cat.getCapability(ForgeCapabilities.FLUID_HANDLER).orElseThrow(() => {
+      GameTestUtil.throwExceptionAt(helper, pos, "CAT must create proxy handler")
+      new AssertionError()
+    })
   }
 
   def fillLava(helper: GameTestHelper): Unit = {
@@ -100,13 +102,7 @@ class CatTest {
 
   private def fillMore(helper: GameTestHelper, fluid: FluidAmount, expectItemCount: Int, expectItem: Item, rot: Rotation): Unit = {
     try {
-      val pos = new BlockPos(2, 2, 2)
-      val preState = helper.getBlockState(pos)
-      helper.setBlock(pos, preState.setValue(BlockStateProperties.FACING, rot.rotate(preState.getValue(BlockStateProperties.FACING))))
-      val cat = assertInstanceOf(classOf[EntityChestAsTank], helper.getBlockEntity(pos))
-
-      val handler = cat.getCapability(ForgeCapabilities.FLUID_HANDLER)
-        .orElseThrow(() => fail("CAT must create proxy handler, " + helper.getBlockState(pos)))
+      val handler = getHandler(helper)
 
       val filled = handler.fill(fluid.toStack, IFluidHandler.FluidAction.EXECUTE)
       assertEquals(2000, filled)

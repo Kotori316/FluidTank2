@@ -10,7 +10,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
-import net.minecraft.world.level.block.{Block, EntityBlock}
+import net.minecraft.world.level.block.{Block, EntityBlock, Mirror, Rotation}
 import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.{InteractionHand, InteractionResult}
@@ -57,6 +57,16 @@ class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
     } else {
       InteractionResult.PASS
     }
+  }
+
+  //noinspection ScalaDeprecation,deprecation
+  override def rotate(state: BlockState, rotation: Rotation): BlockState = {
+    state.setValue(BlockStateProperties.FACING, rotation.rotate(state.getValue(BlockStateProperties.FACING)))
+  }
+
+  //noinspection ScalaDeprecation,deprecation
+  override def mirror(state: BlockState, mirror: Mirror): BlockState = {
+    this.rotate(state, mirror.getRotation(state.getValue(BlockStateProperties.FACING)))
   }
 }
 

@@ -116,10 +116,6 @@ final class CatTest extends FabricGameTest {
 
   private def fillMore(helper: GameTestHelper, fluid: FluidAmount, expectItemCount: Int, expectItem: Item, rot: Rotation): Unit = {
     try {
-      val pos = new BlockPos(2, 2, 2)
-      val preState = helper.getBlockState(pos)
-      helper.setBlock(pos, preState.setValue(BlockStateProperties.FACING, rot.rotate(preState.getValue(BlockStateProperties.FACING))))
-
       val handler = getStorage(helper)
 
       Using(Transaction.openOuter()) { tr =>

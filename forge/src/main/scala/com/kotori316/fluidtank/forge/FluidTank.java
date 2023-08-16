@@ -5,6 +5,7 @@ import com.kotori316.fluidtank.PlatformAccess;
 import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.cat.ItemChestAsTank;
 import com.kotori316.fluidtank.config.PlatformConfigAccess;
+import com.kotori316.fluidtank.forge.cat.EntityChestAsTank;
 import com.kotori316.fluidtank.forge.config.ForgePlatformConfigAccess;
 import com.kotori316.fluidtank.forge.integration.ae2.AE2FluidTankIntegration;
 import com.kotori316.fluidtank.forge.integration.top.FluidTankTopPlugin;
@@ -113,6 +114,9 @@ public final class FluidTank {
     });
     public static final RegistryObject<BlockChestAsTank> BLOCK_CAT = BLOCK_REGISTER.register(BlockChestAsTank.NAME(), BlockChestAsTank::new);
     public static final RegistryObject<BlockItem> ITEM_CAT = ITEM_REGISTER.register(BlockChestAsTank.NAME(), () -> new ItemChestAsTank(BLOCK_CAT.get()));
+    public static final RegistryObject<BlockEntityType<EntityChestAsTank>> TILE_CAT =
+        BLOCK_ENTITY_REGISTER.register(BlockChestAsTank.NAME(), () ->
+            BlockEntityType.Builder.of(EntityChestAsTank::new, BLOCK_CAT.get()).build(DSL.emptyPartType()));
 
     public static final class LazyHolder {
 

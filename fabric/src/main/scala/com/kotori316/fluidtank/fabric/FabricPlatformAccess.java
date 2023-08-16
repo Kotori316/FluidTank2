@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.mixin.transfer.BucketItemAccessor;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
@@ -26,7 +27,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
@@ -35,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import scala.Option;
 import scala.jdk.javaapi.OptionConverters;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -206,5 +211,16 @@ final class FabricPlatformAccess implements PlatformAccess {
     @Override
     public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
         return stack.getRecipeRemainder();
+    }
+
+    @Override
+    public @Nullable BlockEntity createCATEntity(BlockPos pos, BlockState state) {
+        // Not necessary as fabric can attach storage to block
+        return null;
+    }
+
+    @Override
+    public @NotNull List<GenericAmount<FluidLike>> getCATFluids(Level level, BlockPos pos) {
+        return List.of();
     }
 }

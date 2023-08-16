@@ -4,10 +4,12 @@ import com.kotori316.fluidtank.PlatformAccess;
 import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
 import com.kotori316.fluidtank.fluids.*;
+import com.kotori316.fluidtank.forge.cat.EntityChestAsTank;
 import com.kotori316.fluidtank.forge.fluid.ForgeConverter;
 import com.kotori316.fluidtank.tank.BlockTank;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
@@ -18,7 +20,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
@@ -31,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import scala.Option;
 import scala.jdk.javaapi.OptionConverters;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -59,15 +65,15 @@ final class ForgePlatformAccess implements PlatformAccess {
             return FluidAmountUtil.EMPTY();
         }
         return FluidUtil.getFluidContained(stack)
-                .map(ForgeConverter::toAmount)
-                .orElse(FluidAmountUtil.EMPTY());
+            .map(ForgeConverter::toAmount)
+            .orElse(FluidAmountUtil.EMPTY());
     }
 
     @Override
     public boolean isFluidContainer(ItemStack stack) {
         return FluidUtil.getFluidHandler(stack).isPresent() ||
-                stack.getItem() instanceof PotionItem ||
-                stack.is(Items.GLASS_BOTTLE);
+            stack.getItem() instanceof PotionItem ||
+            stack.is(Items.GLASS_BOTTLE);
     }
 
     @Override
@@ -87,8 +93,8 @@ final class ForgePlatformAccess implements PlatformAccess {
             // Potion
             if (fluidContainer.is(Items.GLASS_BOTTLE) && toFill.hasOneBottle()) {
                 var filledItem = PotionUtils.setPotion(
-                        new ItemStack(vanillaPotion.potionType().getItem()),
-                        OptionConverters.toJava(toFill.nbt()).map(PotionUtils::getPotion).orElse(Potions.EMPTY)
+                    new ItemStack(vanillaPotion.potionType().getItem()),
+                    OptionConverters.toJava(toFill.nbt()).map(PotionUtils::getPotion).orElse(Potions.EMPTY)
                 );
                 var filledAmount = toFill.setAmount(GenericUnit.ONE_BOTTLE());
                 return new TransferStack(filledAmount, filledItem);
@@ -98,11 +104,11 @@ final class ForgePlatformAccess implements PlatformAccess {
             }
         }
         return FluidUtil.getFluidHandler(ItemHandlerHelper.copyStackWithSize(fluidContainer, 1))
-                .map(h -> {
-                    int filledAmount = h.fill(ForgeConverter.toStack(toFill), IFluidHandler.FluidAction.EXECUTE);
-                    return new TransferStack(toFill.setAmount(GenericUnit.fromForge(filledAmount)), h.getContainer());
-                })
-                .orElse(new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer));
+            .map(h -> {
+                int filledAmount = h.fill(ForgeConverter.toStack(toFill), IFluidHandler.FluidAction.EXECUTE);
+                return new TransferStack(toFill.setAmount(GenericUnit.fromForge(filledAmount)), h.getContainer());
+            })
+            .orElse(new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer));
     }
 
     @Override
@@ -119,11 +125,11 @@ final class ForgePlatformAccess implements PlatformAccess {
             }
         }
         return FluidUtil.getFluidHandler(ItemHandlerHelper.copyStackWithSize(fluidContainer, 1))
-                .map(h -> {
-                    var drained = h.drain(ForgeConverter.toStack(toDrain), IFluidHandler.FluidAction.EXECUTE);
-                    return new TransferStack(ForgeConverter.toAmount(drained), h.getContainer());
-                })
-                .orElse(new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer));
+            .map(h -> {
+                var drained = h.drain(ForgeConverter.toStack(toDrain), IFluidHandler.FluidAction.EXECUTE);
+                return new TransferStack(ForgeConverter.toAmount(drained), h.getContainer());
+            })
+            .orElse(new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer));
     }
 
     @Override
@@ -159,11 +165,25 @@ final class ForgePlatformAccess implements PlatformAccess {
     @Override
     public Map<Tier, Supplier<? extends BlockTank>> getTankBlockMap() {
         return Stream.concat(FluidTank.TANK_MAP.entrySet().stream(), Stream.of(Map.entry(Tier.CREATIVE, FluidTank.BLOCK_CREATIVE_TANK), Map.entry(Tier.VOID, FluidTank.BLOCK_VOID_TANK)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override
     public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
         return stack.getCraftingRemainingItem();
+    }
+
+    @Override
+    public BlockEntity createCATEntity(BlockPos pos, BlockState state) {
+        return new EntityChestAsTank(pos, state);
+    }
+
+    @Override
+    public List<GenericAmount<FluidLike>> getCATFluids(Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof EntityChestAsTank cat) {
+            return cat.getFluids().orElse(List.of());
+        } else {
+            return List.of();
+        }
     }
 }

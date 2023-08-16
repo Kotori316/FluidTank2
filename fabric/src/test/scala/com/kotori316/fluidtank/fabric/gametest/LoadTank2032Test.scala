@@ -9,7 +9,7 @@ import com.kotori316.fluidtank.tank.Tier
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.{GameTest, GameTestGenerator, GameTestHelper, TestFunction}
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.{assertEquals, assertFalse, assertInstanceOf, assertTrue, fail}
 import org.junit.platform.commons.support.ReflectionSupport
 
 import scala.jdk.javaapi.CollectionConverters

@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.tank
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, PlatformFluidAccess}
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.*
+import net.minecraft.world.item.{BlockItem, Item, ItemStack, Rarity, TooltipFlag}
 import net.minecraft.world.level.Level
 
 import java.util

@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.entity.HopperBlockEntity
 import net.minecraftforge.common.capabilities.ForgeCapabilities
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.gametest.{GameTestHolder, PrefixGameTestTemplate}
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.{assertEquals, assertInstanceOf, assertNotNull, assertTrue}
 
 import java.util.Locale
 import scala.jdk.CollectionConverters.{ListHasAsScala, SeqHasAsJava}
@@ -95,12 +95,12 @@ class CatTest {
     } yield {
       new TestFunction(BATCH, s"cat_test_${kind.content.getKey.getPath}_${amount}_${rot.name()}".toLowerCase(Locale.ROOT),
         FluidTankCommon.modId + ":cat_test", rot, 100, 0, true,
-        g => fillMore(g, fluid, count, bucket, rot))
+        g => fillMore(g, fluid, count, bucket))
     }
     t.asJava
   }
 
-  private def fillMore(helper: GameTestHelper, fluid: FluidAmount, expectItemCount: Int, expectItem: Item, rot: Rotation): Unit = {
+  private def fillMore(helper: GameTestHelper, fluid: FluidAmount, expectItemCount: Int, expectItem: Item): Unit = {
     try {
       val handler = getHandler(helper)
 
@@ -153,27 +153,29 @@ class CatTest {
     helper.succeed()
   }
 
-  def drainWater(helper: GameTestHelper): Unit = {
-    val toDrain = FluidAmountUtil.BUCKET_WATER
-    val handler = getHandler(helper)
-    val drained = handler.drain(toDrain.toStack, IFluidHandler.FluidAction.EXECUTE)
-    assertEquals(toDrain, drained.toAmount)
-
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
-    assertEquals(3, chest.countItem(Items.BUCKET))
-    assertEquals(1, chest.countItem(Items.WATER_BUCKET))
-    helper.succeed()
+  @GameTestGenerator
+  def drainWater(): java.util.List[TestFunction] = {
+    val t = for {
+      a <- 1000 to 3000 by 500
+    } yield {
+      val waterBucket = math.max(2 - a / 1000, 0)
+      val emptyBucket = 4 - waterBucket
+      val drained = math.min(1000 * (a / 1000), 2000)
+      val toDrain = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(a))
+      GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH, s"cat_test_drain_${toDrain.content.getKey.getPath}_$a",
+        "cat_test", g => drainWater(g, toDrain, waterBucket, emptyBucket, drained))
+    }
+    t.asJava
   }
 
-  def drainWater2(helper: GameTestHelper): Unit = {
-    val toDrain = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(2000))
+  private def drainWater(helper: GameTestHelper, toDrain: FluidAmount, filledBucket: Int, emptyBucket: Int, drainedAmount: Int): Unit = {
     val handler = getHandler(helper)
     val drained = handler.drain(toDrain.toStack, IFluidHandler.FluidAction.EXECUTE)
-    assertEquals(toDrain, drained.toAmount)
+    assertEquals(toDrain.setAmount(GenericUnit.fromForge(drainedAmount)), drained.toAmount)
 
     val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
-    assertEquals(4, chest.countItem(Items.BUCKET))
-    assertEquals(0, chest.countItem(Items.WATER_BUCKET))
+    assertEquals(emptyBucket, chest.countItem(Items.BUCKET))
+    assertEquals(filledBucket, chest.countItem(Items.WATER_BUCKET))
     helper.succeed()
   }
 

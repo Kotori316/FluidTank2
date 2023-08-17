@@ -13,7 +13,6 @@ import net.minecraft.gametest.framework.{GameTest, GameTestGenerator, GameTestHe
 import net.minecraft.world.item.{Item, Items}
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.block.entity.HopperBlockEntity
-import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.material.Fluids
 import org.junit.jupiter.api.Assertions.{assertEquals, assertInstanceOf, assertNotNull, assertTrue}
 import org.junit.platform.commons.support.ReflectionSupport
@@ -109,12 +108,12 @@ final class CatTest extends FabricGameTest {
     } yield {
       new TestFunction(BATCH, s"cat_test_${kind.content.getKey.getPath}_${amount}_${rot.name()}".toLowerCase(Locale.ROOT),
         "cat_test", rot, 100, 0, true,
-        g => fillMore(g, fluid, count, bucket, rot))
+        g => fillMore(g, fluid, count, bucket))
     }
     CollectionConverters.asJava(t)
   }
 
-  private def fillMore(helper: GameTestHelper, fluid: FluidAmount, expectItemCount: Int, expectItem: Item, rot: Rotation): Unit = {
+  private def fillMore(helper: GameTestHelper, fluid: FluidAmount, expectItemCount: Int, expectItem: Item): Unit = {
     try {
       val handler = getStorage(helper)
 
@@ -137,6 +136,28 @@ final class CatTest extends FabricGameTest {
     }
   }
 
+  @GameTestGenerator
+  def fillFail(): java.util.List[TestFunction] = {
+    CollectionConverters.asJava(for {
+      kind <- Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
+      a <- Seq(0, 500, 999)
+      amount = GenericUnit.fromForge(a)
+      fluid = kind.setAmount(amount)
+    } yield GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH,
+      s"cat_test_fill_fail_${fluid.content.getKey.getPath}_$a".toLowerCase(Locale.ROOT),
+      "cat_test", g => fillFail(g, fluid)
+    ))
+  }
+
+  private def fillFail(helper: GameTestHelper, amount: FluidAmount): Unit = {
+    val storage = getStorage(helper)
+    Using(Transaction.openOuter()) { tr =>
+      val filled = storage.insert(FabricConverter.toVariant(amount, Fluids.EMPTY), FabricConverter.fabricAmount(amount), tr)
+      assertEquals(0, filled)
+    }
+    helper.succeed()
+  }
+
   def fillSimulate(helper: GameTestHelper): Unit = {
     val toFill = FluidAmountUtil.BUCKET_WATER
     val handler = getStorage(helper)
@@ -154,19 +175,32 @@ final class CatTest extends FabricGameTest {
     helper.succeed()
   }
 
-  def drainWater(helper: GameTestHelper): Unit = {
-    val toDrain = FluidAmountUtil.BUCKET_WATER
+  @GameTestGenerator
+  def drainWater(): java.util.List[TestFunction] = {
+   CollectionConverters.asJava(for {
+     a <- 1000 to 3000 by 500
+   } yield {
+     val waterBucket = math.max(2 - a / 1000, 0)
+     val emptyBucket = 4 - waterBucket
+     val drained = math.min(1000 * (a / 1000), 2000)
+     val toDrain = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(a))
+     GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH, s"cat_test_drain_${toDrain.content.getKey.getPath}_$a",
+       "cat_test", g => drainWater(g, toDrain, waterBucket, emptyBucket, drained))
+   })
+  }
+
+  private def drainWater(helper: GameTestHelper, toDrain: FluidAmount, filledBucket: Int, emptyBucket: Int, drainedAmount: Int): Unit = {
     val handler = getStorage(helper)
 
     Using(Transaction.openOuter()) { tr =>
       val drained = handler.extract(FabricConverter.toVariant(toDrain, Fluids.EMPTY), FabricConverter.fabricAmount(toDrain), tr)
-      assertEquals(FabricConverter.fabricAmount(toDrain), drained)
+      assertEquals(drainedAmount * 81, drained)
       tr.commit()
     }
 
     val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
-    assertEquals(3, chest.countItem(Items.BUCKET))
-    assertEquals(1, chest.countItem(Items.WATER_BUCKET))
+    assertEquals(emptyBucket, chest.countItem(Items.BUCKET))
+    assertEquals(filledBucket, chest.countItem(Items.WATER_BUCKET))
     helper.succeed()
   }
 

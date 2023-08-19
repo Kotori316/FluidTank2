@@ -7,12 +7,18 @@ import net.minecraft.server.Bootstrap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public abstract class BeforeMC {
+    private static final AtomicBoolean initialized = new AtomicBoolean(false);
+
     @BeforeAll
     public static void setup() {
-        SharedConstants.tryDetectVersion();
-        Bootstrap.bootStrap();
-        PlatformConfigAccess.setInstance(ConfigData::DEFAULT);
+        if (!initialized.getAndSet(true)) {
+            SharedConstants.tryDetectVersion();
+            Bootstrap.bootStrap();
+            PlatformConfigAccess.setInstance(ConfigData::DEFAULT);
+        }
     }
 
     public static void assertEqualHelper(Object expected, Object actual) {

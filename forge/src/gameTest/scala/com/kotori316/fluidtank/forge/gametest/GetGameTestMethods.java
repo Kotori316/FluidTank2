@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.forge.gametest;
 
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.testutil.GameTestUtil;
+import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraftforge.fml.common.Mod;
@@ -58,6 +59,7 @@ public class GetGameTestMethods {
         return Stream.of(clazz.getDeclaredMethods())
             .filter(m -> m.getReturnType() == Void.TYPE)
             .filter(m -> Arrays.equals(m.getParameterTypes(), new Class<?>[]{GameTestHelper.class}))
+            .filter(m -> !m.isAnnotationPresent(GameTest.class))
             .filter(m -> (m.getModifiers() & (Modifier.PRIVATE | Modifier.STATIC)) == 0);
     }
 

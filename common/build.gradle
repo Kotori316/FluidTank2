@@ -2,7 +2,7 @@ plugins {
     id("com.kotori316.common")
     id("architectury-plugin").version("3.4-SNAPSHOT")
     id("dev.architectury.loom").version("1.4-SNAPSHOT")
-    id("com.kotori316.plugin.cf").version("1.+")
+    id("com.kotori316.plugin.cf").version("2.+")
 }
 
 architectury {

@@ -21,7 +21,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - run: chmod +x ./gradlew
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           cache-read-only: ${{ github.event_name != 'push' }}
           gradle-home-cache-cleanup: true
@@ -55,7 +55,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - run: chmod +x ./gradlew
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           cache-read-only: ${{ github.event_name != 'push' }}
           gradle-home-cache-cleanup: true
@@ -85,12 +85,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - run: chmod +x ./gradlew
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           cache-read-only: ${{ github.event_name != 'push' }}
           gradle-home-cache-cleanup: true
       - name: Compile
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: :forge:genDataClasses
       - name: Prepare Run

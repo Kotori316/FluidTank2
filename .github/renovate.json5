@@ -1,53 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended",
-    ":prHourlyLimitNone"
-  ],
-  "packageRules": [
-    {
-      "matchManagers": [
-        "gradle"
-      ],
-      "matchPackagePatterns": [
-        "curse.maven"
-      ],
-      "enabled": false
-    },
-    {
-      "matchManagers": [
-        "gradle"
-      ],
-      "matchPackagePatterns": [
-        "org.typelevel",
-        "net.minecraftforge:forge",
-        "net.fabricmc.fabric-api",
-        "dev.architectury.loom",
-        "architectury-plugin"
-      ],
-      "enabled": false
-    },
-    {
-      "matchManagers": [
-        "github-actions"
-      ],
-      "automerge": true
-    },
-    {
-      "matchManagers": [
-        "gradle"
-      ],
-      "matchPackagePatterns": [
-        "^com.kotori316:test-utility",
-        "^com.kotori316:debug-utility",
-        "^com.kotori316:VersionCheckerMod"
-      ],
-      registryUrls: [
-        "https://maven.kotori316.com"
-      ],
-      "automerge": true
-    }
-  ],
-  "automergeStrategy": "merge-commit",
-  "platformCommit": true
+    "github>Kotori316/common-script:renovate-default"
+  ]
 }

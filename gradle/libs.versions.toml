@@ -1,5 +1,5 @@
 [versions]
-plugin_architectury = "3.4-SNAPSHOT"
+plugin_architectury = "3.4.151"
 plugin_loom = "1.5-SNAPSHOT"
 plugin_cf = "2.3"
 plugin_shadow = "8.+"

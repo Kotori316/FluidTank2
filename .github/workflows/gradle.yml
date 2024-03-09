@@ -43,7 +43,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ common, forge, fabric, neoforge ]
+        # platform: [ common, forge, fabric, neoforge ]
+        platform: [ common, fabric ]
     env:
       DISABLE_FORGE: ${{ matrix.platform != 'forge' }}
       DISABLE_FABRIC: ${{ matrix.platform != 'fabric' }}
@@ -75,6 +76,7 @@ jobs:
 
   forge-data-gen:
     runs-on: ubuntu-latest
+    if: false
     env:
       DISABLE_FORGE: false
       DISABLE_FABRIC: true

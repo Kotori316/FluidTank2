@@ -7,7 +7,7 @@ import com.kotori316.fluidtank.connection.Connection
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank, TankUtil}
 import com.kotori316.fluidtank.fluids.*
 import com.kotori316.fluidtank.tank.TileTank.{KEY_STACK_NAME, KEY_TANK, KEY_TIER}
-import net.minecraft.core.BlockPos
+import net.minecraft.core.{BlockPos, HolderLookup}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
@@ -43,23 +43,23 @@ class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: BlockPos, s
   def getTank: Tank[FluidLike] = this.tank
 
   // Override of BlockEntity
-  override def load(tag: CompoundTag): Unit = {
-    super.load(tag)
+  override def load(tag: CompoundTag, provider: HolderLookup.Provider): Unit = {
+    super.load(tag, provider)
     this.setTank(TankUtil.load(tag.getCompound(KEY_TANK)))
     this.tier = Tier.valueOf(tag.getString(KEY_TIER))
     this.customName = Option.when(tag.contains(KEY_STACK_NAME))(
-      Component.Serializer.fromJson(tag.getString(KEY_STACK_NAME))
+      Component.Serializer.fromJson(tag.getString(KEY_STACK_NAME), provider)
     )
   }
 
-  override def saveAdditional(tag: CompoundTag): Unit = {
+  override def saveAdditional(tag: CompoundTag, provider: HolderLookup.Provider): Unit = {
     tag.put(KEY_TANK, TankUtil.save(this.tank))
     tag.putString(KEY_TIER, this.tier.name())
-    this.customName.foreach(c => tag.putString(KEY_STACK_NAME, Component.Serializer.toJson(c)))
-    super.saveAdditional(tag)
+    this.customName.foreach(c => tag.putString(KEY_STACK_NAME, Component.Serializer.toJson(c, provider)))
+    super.saveAdditional(tag, provider)
   }
 
-  override def getUpdateTag: CompoundTag = this.saveWithoutMetadata()
+  override def getUpdateTag(provider: HolderLookup.Provider): CompoundTag = this.saveWithoutMetadata(provider)
 
   override def getUpdatePacket: ClientboundBlockEntityDataPacket = ClientboundBlockEntityDataPacket.create(this)
 

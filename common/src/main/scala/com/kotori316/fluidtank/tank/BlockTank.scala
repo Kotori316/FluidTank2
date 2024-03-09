@@ -5,10 +5,12 @@ import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.MCImplicits.showPos
 import com.kotori316.fluidtank.fluids.{PlatformFluidAccess, TransferFluid}
 import com.mojang.serialization.MapCodec
-import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.{BlockPos, Direction, HolderLookup}
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.{BlockItem, Item, ItemStack}
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.{Item, ItemStack}
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityTicker, BlockEntityType}
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
 import net.minecraft.world.level.block.{Block, EntityBlock}
@@ -16,7 +18,7 @@ import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.level.{BlockGetter, Level, LevelReader}
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.{CollisionContext, VoxelShape}
-import net.minecraft.world.{InteractionHand, InteractionResult}
+import net.minecraft.world.{InteractionHand, InteractionResult, ItemInteractionResult}
 import org.jetbrains.annotations.Nullable
 
 import scala.annotation.nowarn
@@ -43,37 +45,44 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
   //noinspection ScalaDeprecation,deprecation
   override final def skipRendering(state: BlockState, adjacentBlockState: BlockState, side: Direction) = true
 
-  //noinspection ScalaDeprecation,deprecation
-  override def use(state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
+  override def useWithoutItem(blockState: BlockState, level: Level, pos: BlockPos, player: Player, blockHitResult: BlockHitResult): InteractionResult = {
     level.getBlockEntity(pos) match {
       case tank: TileTank =>
-        val stack = player.getItemInHand(hand)
-        if (player.getMainHandItem.isEmpty) {
-          if (!level.isClientSide) {
-            player.displayClientMessage(tank.getConnection.getTextComponent, true)
-          }
-          InteractionResult.SUCCESS
-        } else if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
+        if (!level.isClientSide) {
+          player.displayClientMessage(tank.getConnection.getTextComponent, true)
+        }
+        InteractionResult.SUCCESS
+      case tile =>
+        FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {}", pos.show, tile)
+        super.useWithoutItem(blockState, level, pos, player, blockHitResult)
+    }
+  }
+
+  //noinspection ScalaDeprecation,deprecation
+  override def useItemOn(stack: ItemStack, state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): ItemInteractionResult = {
+    level.getBlockEntity(pos) match {
+      case tank: TileTank =>
+        if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
           // Move tank content
           if (PlatformFluidAccess.getInstance().isFluidContainer(stack)) {
             if (!level.isClientSide) {
               /*return*/
               TransferFluid.transferFluid(tank.getConnection, stack, player, hand)
-                .map { r => TransferFluid.setItem(player, hand, r, pos); InteractionResult.CONSUME }
-                .getOrElse(InteractionResult.PASS)
+                .map { r => TransferFluid.setItem(player, hand, r, pos); ItemInteractionResult.CONSUME }
+                .getOrElse(ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION)
             } else {
               /*return*/
-              InteractionResult.sidedSuccess(level.isClientSide)
+              ItemInteractionResult.sidedSuccess(level.isClientSide)
             }
           } else {
-            InteractionResult.PASS
+            ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
           }
         } else {
-          InteractionResult.PASS
+          ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
         }
       case tile =>
         FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {}", pos.show, tile)
-        InteractionResult.PASS
+        ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
     }
   }
 
@@ -108,18 +117,18 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
     }
   }
 
-  def saveTankNBT(tileEntity: BlockEntity, stack: ItemStack): Unit = {
+  def saveTankNBT(tileEntity: BlockEntity, stack: ItemStack, provider: HolderLookup.Provider): Unit = {
     tileEntity match {
       case tank: TileTank =>
-        if (!tank.getTank.isEmpty) stack.addTagElement(BlockItem.BLOCK_ENTITY_TAG, tank.saveWithoutMetadata())
-        if (tank.hasCustomName) stack.setHoverName(tank.getCustomName)
+        if (!tank.getTank.isEmpty) stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tank.saveWithoutMetadata(provider))) // stack.addTagElement(BlockItem.BLOCK_ENTITY_TAG, tank.saveWithoutMetadata())
+        if (tank.hasCustomName) stack.set(DataComponents.CUSTOM_NAME, tank.getCustomName)
       case _ => // should be unreachable
     }
   }
 
   override def getCloneItemStack(level: LevelReader, pos: BlockPos, state: BlockState): ItemStack = {
     val stack = super.getCloneItemStack(level, pos, state)
-    saveTankNBT(level.getBlockEntity(pos), stack)
+    saveTankNBT(level.getBlockEntity(pos), stack, level.registryAccess())
     stack
   }
 

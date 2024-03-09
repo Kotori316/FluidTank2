@@ -1,13 +1,14 @@
 package com.kotori316.fluidtank.reservoir
 
 import cats.implicits.catsSyntaxGroup
-import com.kotori316.fluidtank.contents.{GenericUnit, Tank, TankUtil}
-import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, FluidLike, PlatformFluidAccess, PotionType, VanillaFluid, VanillaPotion, fluidAccess}
-import com.kotori316.fluidtank.tank.{Tier, TileTank}
+import com.kotori316.fluidtank.contents.{GenericUnit, Tank}
+import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, FluidLike, PlatformFluidAccess, PotionType, VanillaFluid, VanillaPotion}
+import com.kotori316.fluidtank.item.PlatformItemAccess
+import com.kotori316.fluidtank.tank.Tier
+import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.alchemy.PotionUtils
 import net.minecraft.world.item.{Item, ItemStack, ItemUtils, Rarity, TooltipFlag, UseAnim}
 import net.minecraft.world.level.block.BucketPickup
 import net.minecraft.world.level.{ClipContext, Level}
@@ -16,6 +17,8 @@ import net.minecraft.world.{InteractionHand, InteractionResultHolder}
 
 import java.util
 import java.util.Locale
+import scala.jdk.CollectionConverters.IterableHasAsScala
+import scala.jdk.OptionConverters.RichOptional
 
 class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(1)) {
   override def toString: String = s"ItemReservoir(${tier.name().toLowerCase(Locale.ROOT)})"
@@ -55,10 +58,13 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
     val content = tank.content
     content.content match {
       case _: VanillaPotion if content.hasOneBottle =>
-        val effects = PotionUtils.getAllEffects(content.nbt.orNull)
-        effects.forEach { e =>
-          if (e.getEffect.isInstantenous) {
-            e.getEffect.applyInstantenousEffect(livingEntity, livingEntity, livingEntity, e.getAmplifier, 1.0)
+        for {
+          patch <- content.componentPatch.iterator
+          content <- Option(patch.get(DataComponents.POTION_CONTENTS)).flatMap(_.toScala).iterator
+          e <- content.getAllEffects.asScala
+        } {
+          if (e.getEffect.value().isInstantenous) {
+            e.getEffect.value().applyInstantenousEffect(livingEntity, livingEntity, livingEntity, e.getAmplifier, 1.0)
           } else {
             livingEntity.addEffect(e)
           }
@@ -71,7 +77,7 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
   }
 
   override def getRarity(stack: ItemStack): Rarity = {
-    if (stack.getTagElement(TileTank.KEY_TANK) != null) Rarity.UNCOMMON
+    if (stack.has(PlatformItemAccess.getInstance().fluidTankComponentType())) Rarity.UNCOMMON
     else super.getRarity(stack)
   }
 
@@ -89,19 +95,14 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
   }
 
   def getTank(stack: ItemStack): Tank[FluidLike] = {
-    val tag = stack.getTagElement(TileTank.KEY_TANK)
-    if (tag == null) {
-      Tank(FluidAmountUtil.EMPTY, GenericUnit(tier.getCapacity))
-    } else {
-      TankUtil.load(tag)
-    }
+    stack.getOrDefault(PlatformItemAccess.getInstance().fluidTankComponentType(), Tank(FluidAmountUtil.EMPTY, GenericUnit(tier.getCapacity)))
   }
 
   def saveTank(stack: ItemStack, tank: Tank[FluidLike]): Unit = {
     if (tank.isEmpty) {
-      stack.removeTagKey(TileTank.KEY_TANK)
+      stack.remove(PlatformItemAccess.getInstance().fluidTankComponentType())
     } else {
-      stack.addTagElement(TileTank.KEY_TANK, TankUtil.save(tank))
+      stack.set(PlatformItemAccess.getInstance().fluidTankComponentType(), tank)
     }
   }
 

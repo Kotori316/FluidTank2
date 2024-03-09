@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.fluids
 
 import com.kotori316.fluidtank.BeforeMC
 import com.kotori316.fluidtank.contents.{GenericAmount, GenericUnit, gaString}
-import net.minecraft.world.item.alchemy.{PotionUtils, Potions}
+import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.item.{Item, ItemStack, Items}
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -88,7 +88,7 @@ class FluidAmountUtilTest extends BeforeMC {
     def fromWaterBottle(): Unit = {
       val fluid = FluidAmountUtil.fromItem(PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER))
       assertEquals(FluidLike.POTION_NORMAL, fluid.content)
-      assertTrue(fluid.nbt.nonEmpty)
+      assertTrue(fluid.componentPatch.nonEmpty)
       assertEquals(GenericUnit.ONE_BOTTLE, fluid.amount)
     }
   }

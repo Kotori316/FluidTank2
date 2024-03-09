@@ -2,11 +2,11 @@ package com.kotori316.fluidtank.fluids
 
 import cats.Hash
 import com.kotori316.fluidtank.FluidTankCommon
+import net.minecraft.core.component.{DataComponentMap, DataComponents}
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.item.alchemy.PotionUtils
+import net.minecraft.world.item.alchemy.{Potion, PotionContents}
 import net.minecraft.world.level.material.{Fluid, Fluids}
 
 import java.util.Locale
@@ -31,10 +31,10 @@ case class VanillaPotion(potionType: PotionType) extends FluidLike {
     new ResourceLocation(FluidTankCommon.modId, ("potion_" + potionType.name()).toLowerCase(Locale.ROOT))
   }
 
-  def getVanillaPotionName(nbt: Option[CompoundTag]): Component = {
-    val potion = PotionUtils.getPotion(nbt.orNull)
+  def getVanillaPotionName(nbt: Option[DataComponentMap]): Component = {
+    val potion = nbt.map(_.get(DataComponents.POTION_CONTENTS)).getOrElse(PotionContents.EMPTY)
     val prefix = potionType.getItem.getDescriptionId + ".effect."
-    Component.translatable(potion.getName(prefix))
+    Component.translatable(Potion.getName(potion.potion(), prefix))
   }
 }
 

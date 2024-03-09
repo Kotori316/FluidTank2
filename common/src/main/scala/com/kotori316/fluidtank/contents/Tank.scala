@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank.contents
 
+import com.mojang.serialization.Codec
+
 import java.util.Objects
 
 class Tank[A](val content: GenericAmount[A], val capacity: GenericUnit) {
@@ -38,4 +40,8 @@ class Tank[A](val content: GenericAmount[A], val capacity: GenericUnit) {
 
 object Tank {
   def apply[A](content: GenericAmount[A], capacity: GenericUnit): Tank[A] = new Tank(content, capacity)
+
+  def codec[A](implicit access: GenericAccess[A]): Codec[Tank[A]] = {
+    CodecHelper.createTankCodec(access)
+  }
 }

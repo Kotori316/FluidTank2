@@ -8,17 +8,11 @@ import com.kotori316.fluidtank.tank.TileTank;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public class FluidTankContentMessage implements IMessage<FluidTankContentMessage> {
-    static final StreamCodec<FriendlyByteBuf, FluidTankContentMessage> STREAM_CODEC = CustomPacketPayload.codec(
-        FluidTankContentMessage::write, FluidTankContentMessage::new
-    );
-    static final CustomPacketPayload.Type<FluidTankContentMessage> TYPE = new Type<>(IMessage.createIdentifier(FluidTankContentMessage.class));
+public abstract class FluidTankContentMessage implements IMessage<FluidTankContentMessage> {
 
     private final BlockPos pos;
     private final ResourceKey<Level> dim;
@@ -34,11 +28,6 @@ public class FluidTankContentMessage implements IMessage<FluidTankContentMessage
         this.pos = buf.readBlockPos();
         this.dim = buf.readResourceKey(Registries.DIMENSION);
         this.tank = TankUtil.load(buf.readNbt(), FluidAmountUtil.access());
-    }
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
     }
 
     @Override

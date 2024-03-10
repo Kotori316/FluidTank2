@@ -4,11 +4,12 @@ import com.kotori316.fluidtank.FluidTankCommon;
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.fabricmc.fabric.impl.recipe.ingredient.builtin.AnyIngredient;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -36,6 +37,9 @@ public final class IgnoreUnknownTagIngredientFabric extends AnyIngredient {
     static final class Serializer implements CustomIngredientSerializer<IgnoreUnknownTagIngredientFabric> {
         static final Codec<IgnoreUnknownTagIngredientFabric> ALLOW_EMPTY = createCodec(true);
         static final Codec<IgnoreUnknownTagIngredientFabric> NON_EMPTY = createCodec(false);
+        static final StreamCodec<RegistryFriendlyByteBuf, IgnoreUnknownTagIngredientFabric> STREAM_CODEC =
+            Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list())
+                .map(IgnoreUnknownTagIngredientFabric::new, IgnoreUnknownTagIngredientFabric::getBase);
 
         @Override
         public ResourceLocation getIdentifier() {
@@ -48,14 +52,8 @@ public final class IgnoreUnknownTagIngredientFabric extends AnyIngredient {
         }
 
         @Override
-        public IgnoreUnknownTagIngredientFabric read(FriendlyByteBuf buf) {
-            var base = buf.readCollection(ArrayList::new, Ingredient::fromNetwork);
-            return new IgnoreUnknownTagIngredientFabric(base);
-        }
-
-        @Override
-        public void write(FriendlyByteBuf buf, IgnoreUnknownTagIngredientFabric ingredient) {
-            buf.writeCollection(ingredient.getBase(), (b, i) -> i.toNetwork(b));
+        public StreamCodec<RegistryFriendlyByteBuf, IgnoreUnknownTagIngredientFabric> getPacketCodec() {
+            return STREAM_CODEC;
         }
 
         static Codec<IgnoreUnknownTagIngredientFabric> createCodec(boolean allowEmpty) {

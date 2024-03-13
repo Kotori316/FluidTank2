@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.gametest.v1.FabricGameTest
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.{Block, Blocks}
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals}
 
@@ -63,7 +64,7 @@ final class TankPlacementTest extends FabricGameTest {
     val tankTile = TankTest.placeTank(helper, pos, tier)
     tankTile.getConnection.getHandler.fill(fillContent, execute = true)
 
-    val drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel, helper.absolutePos(pos), tankTile, helper.makeMockPlayer(), ItemStack.EMPTY)
+    val drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel, helper.absolutePos(pos), tankTile, helper.makeMockPlayer(GameType.CREATIVE), ItemStack.EMPTY)
     assertEquals(1, drops.size, "Drop was " + drops)
 
     val stack = drops.get(0)

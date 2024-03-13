@@ -66,7 +66,7 @@ final class TankPlacementTest {
     val tankTile = TankTest.placeTank(helper, pos, tier)
     tankTile.getConnection.getHandler.fill(fillContent, execute = true)
 
-    val drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel, helper.absolutePos(pos), tankTile, helper.makeMockPlayer(), ItemStack.EMPTY)
+    val drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel, helper.absolutePos(pos), tankTile, helper.makeMockPlayer(GameType.CREATIVE), ItemStack.EMPTY)
     assertEquals(1, drops.size, "Drop was " + drops)
 
     val stack = drops.get(0)
@@ -85,7 +85,7 @@ final class TankPlacementTest {
     tankTile.getConnection.getHandler.fill(fillContent, execute = true)
 
     val stack = helper.getBlockState(pos).getCloneItemStack(
-      new BlockHitResult(Vec3.atCenterOf(helper.absolutePos(pos)), Direction.UP, helper.absolutePos(pos), true), helper.getLevel, helper.absolutePos(pos), helper.makeMockPlayer()
+      new BlockHitResult(Vec3.atCenterOf(helper.absolutePos(pos)), Direction.UP, helper.absolutePos(pos), true), helper.getLevel, helper.absolutePos(pos), helper.makeMockPlayer(GameType.CREATIVE)
     )
     val handler = new TankFluidItemHandler(tier, stack)
     assertAll(

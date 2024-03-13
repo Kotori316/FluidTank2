@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.potions
 import com.kotori316.fluidtank.BeforeMC
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, FluidLike, PotionType}
-import net.minecraft.world.item.alchemy.{PotionUtils, Potions}
+import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.item.{ItemStack, Items}
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.{DynamicNode, DynamicTest, Nested, Test, TestFactory}
@@ -62,14 +62,14 @@ class PotionFluidHandlerTest extends BeforeMC {
       val result = handler.fill(toFill, FluidLike.of(PotionType.NORMAL))
 
       assertAll(
-        () => assertTrue(ItemStack.matches(result.toReplace, PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.INVISIBILITY))),
+        () => assertTrue(ItemStack.matches(result.toReplace, PotionContents.createItemStack(Items.POTION, Potions.INVISIBILITY))),
         () => assertEquals(toFill, result.moved())
       )
     }
 
     @Test
     def fillFilledBottle(): Unit = {
-      val stack = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.INVISIBILITY)
+      val stack = PotionContents.createItemStack(Items.POTION, Potions.INVISIBILITY)
       val handler = PotionFluidHandler(stack)
       val result = handler.fill(toFill, FluidLike.of(PotionType.NORMAL))
 
@@ -82,7 +82,7 @@ class PotionFluidHandlerTest extends BeforeMC {
 
     @Test
     def fillDifferentPotion(): Unit = {
-      val stack = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.NIGHT_VISION)
+      val stack = PotionContents.createItemStack(Items.POTION, Potions.NIGHT_VISION)
       val handler = PotionFluidHandler(stack)
       val result = handler.fill(toFill, FluidLike.of(PotionType.NORMAL))
 
@@ -98,7 +98,7 @@ class PotionFluidHandlerTest extends BeforeMC {
       val stack = new ItemStack(Items.GLASS_BOTTLE)
       val handler = PotionFluidHandler(stack)
       val expectedStack = PotionUtils.setCustomEffects(
-        PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.LONG_NIGHT_VISION),
+        PotionContents.createItemStack(Items.POTION, Potions.LONG_NIGHT_VISION),
         Potions.LONG_WATER_BREATHING.getEffects)
       val toFill = FluidAmountUtil.from(FluidLike.of(PotionType.NORMAL), GenericUnit.ONE_BOTTLE, Option(expectedStack.getTag))
 
@@ -143,7 +143,7 @@ class PotionFluidHandlerTest extends BeforeMC {
 
     @Test
     def drainPotionSuccess(): Unit = {
-      val stack = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.INVISIBILITY)
+      val stack = PotionContents.createItemStack(Items.POTION, Potions.INVISIBILITY)
       val handler = PotionFluidHandler(stack)
       val result = handler.drain(toDrain, FluidLike.of(PotionType.NORMAL))
 
@@ -156,7 +156,7 @@ class PotionFluidHandlerTest extends BeforeMC {
 
     @Test
     def drainPotionFail(): Unit = {
-      val stack = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.NIGHT_VISION)
+      val stack = PotionContents.createItemStack(Items.POTION, Potions.NIGHT_VISION)
       val handler = PotionFluidHandler(stack)
       val result = handler.drain(toDrain, FluidLike.of(PotionType.NORMAL))
 
@@ -170,7 +170,7 @@ class PotionFluidHandlerTest extends BeforeMC {
     @Test
     def drainMultiEffectSuccess(): Unit = {
       val stack = PotionUtils.setCustomEffects(
-        PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.LONG_NIGHT_VISION),
+        PotionContents.createItemStack(Items.POTION, Potions.LONG_NIGHT_VISION),
         Potions.LONG_WATER_BREATHING.getEffects)
       val handler = PotionFluidHandler(stack)
       val toDrain = FluidAmountUtil.from(FluidLike.of(PotionType.NORMAL), GenericUnit.ONE_BOTTLE, Option(stack.getTag))
@@ -186,7 +186,7 @@ class PotionFluidHandlerTest extends BeforeMC {
     @Test
     def drainMultiEffectFail1(): Unit = {
       val stack = PotionUtils.setCustomEffects(
-        PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.LONG_NIGHT_VISION),
+        PotionContents.createItemStack(Items.POTION, Potions.LONG_NIGHT_VISION),
         Potions.LONG_WATER_BREATHING.getEffects)
       val handler = PotionFluidHandler(stack)
       val toDrain = FluidAmountUtil.from(PotionType.NORMAL, Potions.LONG_NIGHT_VISION, GenericUnit.ONE_BOTTLE)
@@ -208,8 +208,8 @@ class PotionFluidHandlerTest extends BeforeMC {
         i <- Array(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION)
         potion <- Array(Potions.INVISIBILITY, Potions.WATER, Potions.NIGHT_VISION, Potions.LONG_NIGHT_VISION)
       } yield {
-        DynamicTest.dynamicTest(s"${i}_${potion.getName("")}", () => {
-          val stack = PotionUtils.setPotion(new ItemStack(i), potion)
+        DynamicTest.dynamicTest(s"${i}_${Potion.getName(Option(potion).toJava, "")}", () => {
+          val stack = PotionContents.createItemStack(i, potion)
           val handler = PotionFluidHandler(stack)
           val expected = FluidAmountUtil.from(PotionType.fromItemUnsafe(i), potion, GenericUnit.ONE_BOTTLE)
 
@@ -220,7 +220,7 @@ class PotionFluidHandlerTest extends BeforeMC {
 
     @Test
     def multiEffectTurtle(): Unit = {
-      val stack = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.STRONG_TURTLE_MASTER)
+      val stack = PotionContents.createItemStack(Items.POTION, Potions.STRONG_TURTLE_MASTER)
       val handler = PotionFluidHandler(stack)
       val expected = FluidAmountUtil.from(PotionType.NORMAL, Potions.STRONG_TURTLE_MASTER, GenericUnit.ONE_BOTTLE)
 
@@ -230,7 +230,7 @@ class PotionFluidHandlerTest extends BeforeMC {
     @Test
     def multiEffectUserDefine(): Unit = {
       val stack = PotionUtils.setCustomEffects(
-        PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.LONG_NIGHT_VISION),
+        PotionContents.createItemStack(Items.POTION, Potions.LONG_NIGHT_VISION),
         Potions.LONG_WATER_BREATHING.getEffects)
       val handler = PotionFluidHandler(stack)
       val content = handler.getContent

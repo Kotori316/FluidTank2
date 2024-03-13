@@ -47,7 +47,7 @@ final class ForgePlatformAccessTest extends BeforeMC {
         i <- Seq(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION)
         name = i.toString + " " + p.getName("")
       } yield DynamicTest.dynamicTest(name, () => {
-        val potion = PotionUtils.setPotion(new ItemStack(i), p)
+        val potion = PotionContents.createItemStack(i, p)
         val fluid = ACCESS.getFluidContained(potion)
         val expected = FluidAmountUtil.from(FluidLike.of(PotionType.fromItemUnsafe(i)), GenericUnit.ONE_BOTTLE, Option.apply(potion.getTag))
         assertEquals(expected, fluid)
@@ -64,7 +64,7 @@ final class ForgePlatformAccessTest extends BeforeMC {
           Seq(Items.WATER_BUCKET, Items.LAVA_BUCKET, Items.GLASS_BOTTLE).map(i => new ItemStack(i)),
           Seq(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION).flatMap { i =>
             CollectionConverters.asScala(ForgeRegistries.POTIONS.getValues)
-              .map(p => PotionUtils.setPotion(new ItemStack(i), p))
+              .map(p => PotionContents.createItemStack(i, p))
           }
         )
         name = s.toString + " " + s.getTag

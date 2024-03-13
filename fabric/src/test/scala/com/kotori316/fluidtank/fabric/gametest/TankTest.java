@@ -12,21 +12,24 @@ import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.GameType;
 import org.junit.platform.commons.support.ReflectionSupport;
-import scala.Option;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.kotori316.fluidtank.fabric.BeforeMC.assertEqualHelper;
@@ -42,21 +45,21 @@ public final class TankTest implements FabricGameTest {
     public List<TestFunction> fillTest() {
         // no args
         var noArgs = Stream.of(getClass().getDeclaredMethods())
-                .filter(m -> m.getReturnType() == Void.TYPE)
-                .filter(m -> !m.isAnnotationPresent(GameTest.class))
-                .filter(m -> m.getParameterCount() == 0)
-                .filter(m -> (m.getModifiers() & (Modifier.PUBLIC | Modifier.PRIVATE | Modifier.STATIC)) == 0)
-                .map(m -> GameTestUtil.create(FluidTankCommon.modId, BATCH,
-                        getClass().getSimpleName() + "_" + m.getName(),
-                        () -> ReflectionSupport.invokeMethod(m, this)));
+            .filter(m -> m.getReturnType() == Void.TYPE)
+            .filter(m -> !m.isAnnotationPresent(GameTest.class))
+            .filter(m -> m.getParameterCount() == 0)
+            .filter(m -> (m.getModifiers() & (Modifier.PUBLIC | Modifier.PRIVATE | Modifier.STATIC)) == 0)
+            .map(m -> GameTestUtil.create(FluidTankCommon.modId, BATCH,
+                getClass().getSimpleName() + "_" + m.getName(),
+                () -> ReflectionSupport.invokeMethod(m, this)));
         var withHelper = Stream.of(getClass().getDeclaredMethods())
-                .filter(m -> m.getReturnType() == Void.TYPE)
-                .filter(m -> !m.isAnnotationPresent(GameTest.class))
-                .filter(m -> Arrays.equals(m.getParameterTypes(), new Class<?>[]{GameTestHelper.class}))
-                .filter(m -> (m.getModifiers() & (Modifier.PUBLIC | Modifier.PRIVATE | Modifier.STATIC)) == 0)
-                .map(m -> GameTestUtil.create(FluidTankCommon.modId, BATCH,
-                        getClass().getSimpleName() + "_" + m.getName(),
-                        g -> ReflectionSupport.invokeMethod(m, this, g)));
+            .filter(m -> m.getReturnType() == Void.TYPE)
+            .filter(m -> !m.isAnnotationPresent(GameTest.class))
+            .filter(m -> Arrays.equals(m.getParameterTypes(), new Class<?>[]{GameTestHelper.class}))
+            .filter(m -> (m.getModifiers() & (Modifier.PUBLIC | Modifier.PRIVATE | Modifier.STATIC)) == 0)
+            .map(m -> GameTestUtil.create(FluidTankCommon.modId, BATCH,
+                getClass().getSimpleName() + "_" + m.getName(),
+                g -> ReflectionSupport.invokeMethod(m, this, g)));
         return Stream.concat(noArgs, withHelper).toList();
     }
 
@@ -107,7 +110,7 @@ public final class TankTest implements FabricGameTest {
         var basePos = BlockPos.ZERO.above();
         var tile = placeTank(helper, basePos, Tier.WOOD);
 
-        var player = helper.makeMockPlayer();
+        var player = helper.makeMockPlayer(GameType.CREATIVE);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
         helper.useBlock(basePos, player);
 
@@ -120,12 +123,12 @@ public final class TankTest implements FabricGameTest {
         var basePos = BlockPos.ZERO.above();
         var tile = placeTank(helper, basePos, Tier.STONE);
 
-        var player = helper.makeMockSurvivalPlayer();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
         helper.useBlock(basePos, player);
         assertEquals(FluidAmountUtil.BUCKET_WATER(), tile.getTank().content());
         assertEquals(Items.BUCKET, player.getItemInHand(InteractionHand.MAIN_HAND).getItem(),
-                "Inventory item must be consumed and replaced.");
+            "Inventory item must be consumed and replaced.");
         helper.succeed();
     }
 
@@ -134,7 +137,7 @@ public final class TankTest implements FabricGameTest {
         var tile = placeTank(helper, basePos, Tier.WOOD);
         tile.getConnection().getHandler().fill(FluidAmountUtil.BUCKET_WATER(), true);
 
-        var player = helper.makeMockPlayer();
+        var player = helper.makeMockPlayer(GameType.CREATIVE);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BUCKET));
         helper.useBlock(basePos, player);
 
@@ -148,7 +151,7 @@ public final class TankTest implements FabricGameTest {
         var tile = placeTank(helper, basePos, Tier.WOOD);
         tile.getConnection().getHandler().fill(FluidAmountUtil.BUCKET_WATER(), true);
 
-        var player = helper.makeMockSurvivalPlayer();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BUCKET));
         helper.useBlock(basePos, player);
 
@@ -162,7 +165,7 @@ public final class TankTest implements FabricGameTest {
         var tile = placeTank(helper, basePos, Tier.WOOD);
         tile.getConnection().getHandler().fill(FluidAmountUtil.BUCKET_WATER(), true);
 
-        var player = helper.makeMockSurvivalPlayer();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BUCKET, 10));
         assertEquals(0, player.getInventory().countItem(Items.WATER_BUCKET), "Test assumption");
         helper.useBlock(basePos, player);
@@ -179,7 +182,7 @@ public final class TankTest implements FabricGameTest {
         var tile = placeTank(helper, basePos, Tier.WOOD);
         tile.getConnection().getHandler().fill(FluidAmountUtil.BUCKET_WATER(), true);
 
-        var player = helper.makeMockSurvivalPlayer();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.LAVA_BUCKET));
         helper.useBlock(basePos, player);
 
@@ -222,8 +225,8 @@ public final class TankTest implements FabricGameTest {
         var basePos = BlockPos.ZERO.above();
         var tile = placeTank(helper, basePos, Tier.WOOD);
 
-        var player = helper.makeMockPlayer();
-        player.setItemInHand(InteractionHand.MAIN_HAND, PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.LONG_INVISIBILITY));
+        var player = helper.makeMockPlayer(GameType.CREATIVE);
+        player.setItemInHand(InteractionHand.MAIN_HAND, PotionContents.createItemStack(Items.POTION, Potions.LONG_INVISIBILITY));
         helper.useBlock(basePos, player);
 
         var expected = FluidAmountUtil.from(PotionType.NORMAL, Potions.LONG_INVISIBILITY, GenericUnit.ONE_BOTTLE());
@@ -238,8 +241,8 @@ public final class TankTest implements FabricGameTest {
         var content = FluidAmountUtil.from(PotionType.SPLASH, Potions.LONG_INVISIBILITY, GenericUnit.ONE_BOTTLE());
         tile.getConnection().getHandler().fill(content, true);
 
-        var player = helper.makeMockPlayer();
-        var potionStack = PotionUtils.setPotion(new ItemStack(Items.SPLASH_POTION), Potions.LONG_INVISIBILITY);
+        var player = helper.makeMockPlayer(GameType.CREATIVE);
+        var potionStack = PotionContents.createItemStack(Items.SPLASH_POTION, Potions.LONG_INVISIBILITY);
         player.setItemInHand(InteractionHand.MAIN_HAND, potionStack);
         helper.useBlock(basePos, player);
 
@@ -255,8 +258,8 @@ public final class TankTest implements FabricGameTest {
         var content = FluidAmountUtil.from(PotionType.SPLASH, Potions.INVISIBILITY, GenericUnit.ONE_BOTTLE());
         tile.getConnection().getHandler().fill(content, true);
 
-        var player = helper.makeMockPlayer();
-        var potionStack = PotionUtils.setPotion(new ItemStack(Items.SPLASH_POTION), Potions.LONG_INVISIBILITY);
+        var player = helper.makeMockPlayer(GameType.CREATIVE);
+        var potionStack = PotionContents.createItemStack(Items.SPLASH_POTION, Potions.LONG_INVISIBILITY);
         player.setItemInHand(InteractionHand.MAIN_HAND, potionStack);
         helper.useBlock(basePos, player);
 
@@ -270,8 +273,8 @@ public final class TankTest implements FabricGameTest {
         var basePos = BlockPos.ZERO.above();
         var tile = placeTank(helper, basePos, Tier.WOOD);
 
-        var player = helper.makeMockSurvivalPlayer();
-        player.setItemInHand(InteractionHand.MAIN_HAND, PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.LONG_INVISIBILITY));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, PotionContents.createItemStack(Items.POTION, Potions.LONG_INVISIBILITY));
         helper.useBlock(basePos, player);
 
         var expected = FluidAmountUtil.from(PotionType.NORMAL, Potions.LONG_INVISIBILITY, GenericUnit.ONE_BOTTLE());
@@ -286,8 +289,8 @@ public final class TankTest implements FabricGameTest {
         var content = FluidAmountUtil.from(PotionType.SPLASH, Potions.LONG_INVISIBILITY, GenericUnit.ONE_BOTTLE());
         tile.getConnection().getHandler().fill(content, true);
 
-        var player = helper.makeMockSurvivalPlayer();
-        var potionStack = PotionUtils.setPotion(new ItemStack(Items.SPLASH_POTION), Potions.LONG_INVISIBILITY);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var potionStack = PotionContents.createItemStack(Items.SPLASH_POTION, Potions.LONG_INVISIBILITY);
         player.setItemInHand(InteractionHand.MAIN_HAND, potionStack);
         helper.useBlock(basePos, player);
 
@@ -302,8 +305,8 @@ public final class TankTest implements FabricGameTest {
         var content = FluidAmountUtil.from(PotionType.SPLASH, Potions.INVISIBILITY, GenericUnit.ONE_BOTTLE());
         tile.getConnection().getHandler().fill(content, true);
 
-        var player = helper.makeMockSurvivalPlayer();
-        var potionStack = PotionUtils.setPotion(new ItemStack(Items.SPLASH_POTION), Potions.LONG_INVISIBILITY);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var potionStack = PotionContents.createItemStack(Items.SPLASH_POTION, Potions.LONG_INVISIBILITY);
         player.setItemInHand(InteractionHand.MAIN_HAND, potionStack);
         helper.useBlock(basePos, player);
 
@@ -318,7 +321,7 @@ public final class TankTest implements FabricGameTest {
         var content = FluidAmountUtil.from(PotionType.NORMAL, Potions.LONG_INVISIBILITY, GenericUnit.ONE_BOTTLE());
         tile.getConnection().getHandler().fill(content, true);
 
-        var player = helper.makeMockPlayer();
+        var player = helper.makeMockPlayer(GameType.CREATIVE);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.GLASS_BOTTLE));
         helper.useBlock(basePos, player);
 
@@ -334,7 +337,7 @@ public final class TankTest implements FabricGameTest {
         var content = FluidAmountUtil.from(PotionType.NORMAL, Potions.LONG_INVISIBILITY, GenericUnit.fromForge(20000));
         tile.getConnection().getHandler().fill(content, true);
 
-        var player = helper.makeMockPlayer();
+        var player = helper.makeMockPlayer(GameType.CREATIVE);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.GLASS_BOTTLE));
         helper.useBlock(basePos, player);
 
@@ -346,46 +349,46 @@ public final class TankTest implements FabricGameTest {
     @GameTestGenerator
     public List<TestFunction> drainPotionSurvival1() {
         return Stream.of(PotionType.values()).flatMap(t ->
-                Stream.of(Potions.LONG_INVISIBILITY, Potions.WATER, Potions.EMPTY, Potions.NIGHT_VISION).map(p ->
-                        GameTestUtil.create(FluidTankCommon.modId, BATCH,
-                                "drainPotionSurvival1_" + t.name().toLowerCase(Locale.ROOT) + "_" + p.getName(""),
-                                g -> drainPotionSurvival1(g, t, p))
-                )).toList();
+            Stream.of(Potions.LONG_INVISIBILITY, Potions.WATER, Potions.AWKWARD, Potions.NIGHT_VISION).map(p ->
+                GameTestUtil.create(FluidTankCommon.modId, BATCH,
+                    "drainPotionSurvival1_" + t.name().toLowerCase(Locale.ROOT) + "_" + Potion.getName(Optional.of(p), ""),
+                    g -> drainPotionSurvival1(g, t, p))
+            )).toList();
     }
 
-    static void drainPotionSurvival1(GameTestHelper helper, PotionType potionType, Potion potion) {
+    static void drainPotionSurvival1(GameTestHelper helper, PotionType potionType, Holder<Potion> potion) {
         var basePos = BlockPos.ZERO.above();
         var tile = placeTank(helper, basePos, Tier.WOOD);
         var content = FluidAmountUtil.from(potionType, potion, GenericUnit.ONE_BOTTLE());
         tile.getConnection().getHandler().fill(content, true);
 
-        var player = helper.makeMockSurvivalPlayer();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.GLASS_BOTTLE));
         helper.useBlock(basePos, player);
 
         assertTrue(tile.getTank().isEmpty());
-        assertTrue(ItemStack.matches(PotionUtils.setPotion(new ItemStack(potionType.getItem()), potion),
-                player.getItemInHand(InteractionHand.MAIN_HAND)));
+        assertTrue(ItemStack.matches(PotionContents.createItemStack(potionType.getItem(), potion),
+            player.getItemInHand(InteractionHand.MAIN_HAND)));
         helper.succeed();
     }
 
     @GameTestGenerator
     public List<TestFunction> drainPotionFailSurvival() {
         return Stream.of(PotionType.values()).flatMap(t ->
-                Stream.of(Potions.LONG_INVISIBILITY, Potions.WATER, Potions.EMPTY, Potions.NIGHT_VISION).map(p ->
-                        GameTestUtil.create(FluidTankCommon.modId, BATCH,
-                                "drainPotionFailSurvival" + "_" + t.name().toLowerCase(Locale.ROOT) + "_" + p.getName(""),
-                                g -> drainPotionSurvival1(g, t, p))
-                )).toList();
+            Stream.of(Potions.LONG_INVISIBILITY, Potions.WATER, Potions.AWKWARD, Potions.NIGHT_VISION).map(p ->
+                GameTestUtil.create(FluidTankCommon.modId, BATCH,
+                    "drainPotionFailSurvival" + "_" + t.name().toLowerCase(Locale.ROOT) + "_" + Potion.getName(Optional.of(p), ""),
+                    g -> drainPotionSurvival1(g, t, p))
+            )).toList();
     }
 
-    static void drainPotionFailSurvival(GameTestHelper helper, PotionType potionType, Potion potion) {
+    static void drainPotionFailSurvival(GameTestHelper helper, PotionType potionType, Holder<Potion> potion) {
         var basePos = BlockPos.ZERO.above();
         var tile = placeTank(helper, basePos, Tier.WOOD);
         var content = FluidAmountUtil.from(potionType, potion, GenericUnit.ONE_BOTTLE());
         tile.getConnection().getHandler().fill(content, true);
 
-        var player = helper.makeMockSurvivalPlayer();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BUCKET));
         helper.useBlock(basePos, player);
 
@@ -397,15 +400,15 @@ public final class TankTest implements FabricGameTest {
     void fillMultiEffectPotion(GameTestHelper helper) {
         var basePos = BlockPos.ZERO.above();
         var tile = placeTank(helper, basePos, Tier.WOOD);
-        var potionStack = PotionUtils.setCustomEffects(
-            PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.NIGHT_VISION),
-            Potions.REGENERATION.getEffects()
+        var potionStack = new ItemStack(Items.POTION);
+        potionStack.set(DataComponents.POTION_CONTENTS,
+            new PotionContents(Optional.of(Potions.NIGHT_VISION), Optional.empty(), Potions.REGENERATION.value().getEffects())
         );
-        var player = helper.makeMockSurvivalPlayer();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, potionStack.copy());
         helper.useBlock(basePos, player);
 
-        var content = FluidAmountUtil.from(FluidLike.POTION_NORMAL(), GenericUnit.ONE_BOTTLE(), Option.apply(potionStack.getTag()));
+        var content = FluidAmountUtil.from(FluidLike.POTION_NORMAL(), GenericUnit.ONE_BOTTLE(), potionStack.getComponentsPatch());
         assertEquals(content, tile.getTank().content());
         assertEqualHelper(Items.GLASS_BOTTLE, player.getItemInHand(InteractionHand.MAIN_HAND).getItem());
         helper.succeed();
@@ -414,14 +417,14 @@ public final class TankTest implements FabricGameTest {
     void drainMultiEffectPotion(GameTestHelper helper) {
         var basePos = BlockPos.ZERO.above();
         var tile = placeTank(helper, basePos, Tier.WOOD);
-        var potionStack = PotionUtils.setCustomEffects(
-            PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.NIGHT_VISION),
-            Potions.REGENERATION.getEffects()
+        var potionStack = new ItemStack(Items.POTION);
+        potionStack.set(DataComponents.POTION_CONTENTS,
+            new PotionContents(Optional.of(Potions.NIGHT_VISION), Optional.empty(), Potions.REGENERATION.value().getEffects())
         );
-        var content = FluidAmountUtil.from(FluidLike.POTION_NORMAL(), GenericUnit.ONE_BUCKET(), Option.apply(potionStack.getTag()));
+        var content = FluidAmountUtil.from(FluidLike.POTION_NORMAL(), GenericUnit.ONE_BUCKET(), potionStack.getComponentsPatch());
         tile.getConnection().getHandler().fill(content, true);
 
-        var player = helper.makeMockSurvivalPlayer();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.GLASS_BOTTLE));
         helper.useBlock(basePos, player);
 

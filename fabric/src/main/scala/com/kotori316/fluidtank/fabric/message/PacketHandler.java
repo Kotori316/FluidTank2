@@ -4,6 +4,7 @@ import com.kotori316.fluidtank.message.IMessage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerLevel;
@@ -22,6 +23,8 @@ public final class PacketHandler {
     @Environment(EnvType.CLIENT)
     public static class Client {
         public static void initClient() {
+            PayloadTypeRegistry.playS2C().register(FluidTankContentMessageFabric.TYPE, FluidTankContentMessageFabric.STREAM_CODEC);
+
             ClientPlayNetworking.registerGlobalReceiver(FluidTankContentMessageFabric.TYPE, FluidTankContentMessageFabric.HandlerHolder.HANDLER);
         }
     }

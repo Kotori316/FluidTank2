@@ -33,7 +33,7 @@ class PlatformAccessTest {
   }
 
   def fillBucketWater(helper: GameTestHelper): Unit = {
-    val player = helper.makeMockSurvivalPlayer
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = new ItemStack(Items.BUCKET)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
@@ -45,7 +45,7 @@ class PlatformAccessTest {
   }
 
   def fillBucketLava(helper: GameTestHelper): Unit = {
-    val player = helper.makeMockSurvivalPlayer
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = new ItemStack(Items.BUCKET)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
@@ -58,7 +58,7 @@ class PlatformAccessTest {
   }
 
   def drainWaterBucket(helper: GameTestHelper): Unit = {
-    val player = helper.makeMockSurvivalPlayer
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = new ItemStack(Items.WATER_BUCKET)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
@@ -71,7 +71,7 @@ class PlatformAccessTest {
   }
 
   def drainLavaBucket(helper: GameTestHelper): Unit = {
-    val player = helper.makeMockSurvivalPlayer
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = new ItemStack(Items.LAVA_BUCKET)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
@@ -88,7 +88,7 @@ class PlatformAccessTest {
   }
 
   def fillFail1(helper: GameTestHelper): Unit = {
-    val player = helper.makeMockSurvivalPlayer
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = new ItemStack(Items.BUCKET)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
@@ -102,7 +102,7 @@ class PlatformAccessTest {
   }
 
   def fillFail2(helper: GameTestHelper): Unit = {
-    val player = helper.makeMockSurvivalPlayer
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = new ItemStack(Items.GLASS_BOTTLE)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
@@ -126,7 +126,7 @@ class PlatformAccessTest {
   def fillPotion(): java.util.List[TestFunction] = CollectionConverters.asJava(
     potions().map { case (potionType, potion) =>
       GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "fill_potion_%s_%s".formatted(potionType.name(), potion.getName("")).toLowerCase(Locale.ROOT),
+        "fill_potion_%s_%s".formatted(potionType.name(), Potion.getName(Option(potion).toJava, "")).toLowerCase(Locale.ROOT),
         GameTestUtil.NO_PLACE_STRUCTURE,
         g => fillPotion(g, potionType, potion))
     }
@@ -136,7 +136,7 @@ class PlatformAccessTest {
   def fillFailPotionWithAmount(): java.util.List[TestFunction] = CollectionConverters.asJava(
     potions().map { case (potionType, potion) =>
       GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "fill_fail1_potion_%s_%s".formatted(potionType.name(), potion.getName("")).toLowerCase(Locale.ROOT),
+        "fill_fail1_potion_%s_%s".formatted(potionType.name(), Potion.getName(Option(potion).toJava, "")).toLowerCase(Locale.ROOT),
         GameTestUtil.NO_PLACE_STRUCTURE,
         g => fillFailPotionWithAmount(g, potionType, potion))
     }
@@ -146,7 +146,7 @@ class PlatformAccessTest {
   def drainPotion(): java.util.List[TestFunction] = CollectionConverters.asJava(
     potions().map { case (potionType, potion) =>
       GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "drain_potion_%s_%s".formatted(potionType.name(), potion.getName("")).toLowerCase(Locale.ROOT),
+        "drain_potion_%s_%s".formatted(potionType.name(), Potion.getName(Option(potion).toJava, "")).toLowerCase(Locale.ROOT),
         GameTestUtil.NO_PLACE_STRUCTURE,
         g => drainPotion(g, potionType, potion))
     }
@@ -156,14 +156,14 @@ class PlatformAccessTest {
   def drainFailPotionWithAmount(): java.util.List[TestFunction] = CollectionConverters.asJava(
     potions().map { case (potionType, potion) =>
       GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "drain_fail1_potion_%s_%s".formatted(potionType.name(), potion.getName("")).toLowerCase(Locale.ROOT),
+        "drain_fail1_potion_%s_%s".formatted(potionType.name(), Potion.getName(Option(potion).toJava, "")).toLowerCase(Locale.ROOT),
         GameTestUtil.NO_PLACE_STRUCTURE,
         g => drainFailPotionWithAmount(g, potionType, potion))
     }
   )
 
   private def fillPotion(helper: GameTestHelper, potionType: PotionType, potion: Potion): Unit = {
-    val player = helper.makeMockSurvivalPlayer
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = new ItemStack(Items.GLASS_BOTTLE)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
@@ -171,13 +171,13 @@ class PlatformAccessTest {
     val transferred = ACCESS.fillItem(toFill, stack, player, InteractionHand.MAIN_HAND, true)
     assertTrue(transferred.shouldMove, "Forge module didn't move items")
     assertEquals(toFill, transferred.moved)
-    val expected = PotionUtils.setPotion(new ItemStack(potionType.getItem), potion)
-    assertTrue(ItemStack.isSameItemSameTags(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getTag, transferred.toReplace.getTag))
+    val expected = PotionContents.createItemStack(potionType.getItem, potion)
+    assertTrue(ItemStack.isSameItemSameComponents(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getComponents, transferred.toReplace.getComponents))
     helper.succeed()
   }
 
   private def fillFailPotionWithAmount(helper: GameTestHelper, potionType: PotionType, potion: Potion): Unit = {
-    val player = helper.makeMockSurvivalPlayer
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = new ItemStack(Items.GLASS_BOTTLE)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
@@ -186,13 +186,13 @@ class PlatformAccessTest {
     assertFalse(transferred.shouldMove, "Transfer failed, so nothing to move")
     assertTrue(transferred.moved.isEmpty)
     val expected = new ItemStack(Items.GLASS_BOTTLE)
-    assertTrue(ItemStack.isSameItemSameTags(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getTag, transferred.toReplace.getTag))
+    assertTrue(ItemStack.isSameItemSameComponents(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getComponents, transferred.toReplace.getComponents))
     helper.succeed()
   }
 
   private def drainPotion(helper: GameTestHelper, potionType: PotionType, potion: Potion): Unit = {
-    val player = helper.makeMockSurvivalPlayer
-    val stack = PotionUtils.setPotion(new ItemStack(potionType.getItem), potion)
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
+    val stack = PotionContents.createItemStack(potionType.getItem, potion)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
     val toDrain = potionFluid(potionType, potion)
@@ -200,13 +200,13 @@ class PlatformAccessTest {
     assertTrue(transferred.shouldMove, "Forge module didn't move items")
     assertEquals(toDrain, transferred.moved)
     val expected = Items.GLASS_BOTTLE.getDefaultInstance
-    assertTrue(ItemStack.isSameItemSameTags(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getTag, transferred.toReplace.getTag))
+    assertTrue(ItemStack.isSameItemSameComponents(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getComponents, transferred.toReplace.getComponents))
     helper.succeed()
   }
 
   private def drainFailPotionWithAmount(helper: GameTestHelper, potionType: PotionType, potion: Potion): Unit = {
-    val player = helper.makeMockSurvivalPlayer
-    val stack = PotionUtils.setPotion(new ItemStack(potionType.getItem), potion)
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
+    val stack = PotionContents.createItemStack(potionType.getItem, potion)
     val expected = stack.copy
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
@@ -214,7 +214,7 @@ class PlatformAccessTest {
     val transferred = ACCESS.drainItem(toDrain, stack, player, InteractionHand.MAIN_HAND, true)
     assertFalse(transferred.shouldMove(), "Transfer failed, so nothing to move")
     assertTrue(transferred.moved.isEmpty)
-    assertTrue(ItemStack.isSameItemSameTags(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getTag, transferred.toReplace.getTag))
+    assertTrue(ItemStack.isSameItemSameComponents(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getComponents, transferred.toReplace.getComponents))
     helper.succeed()
   }
 }

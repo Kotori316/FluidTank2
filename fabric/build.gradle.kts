@@ -68,7 +68,7 @@ dependencies {
     shadowCommon(project(path = ":common", configuration = "transformProductionFabric")) { isTransitive = false }
 
     // Other mods
-    modImplementation(
+    modCompileOnly(
         group = "curse.maven",
         name = "jade-324717",
         version = project.property("jade_fabric_id").toString()

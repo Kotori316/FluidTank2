@@ -183,7 +183,7 @@ final class TankFluidItemHandlerTest extends BeforeMC {
       val stack = RecipeInventoryUtil.getFilledTankStack(tier, FluidAmountUtil.BUCKET_WATER)
       val handler = new TankFluidItemHandler(tier, stack)
       CustomData.update(DataComponents.BLOCK_ENTITY_DATA, handler.getContainer,
-        n => n.putString("unknownTag", "unknownTag"))
+        n => n.putString("unknownTagKey", "unknownTag"))
       Using(Transaction.openOuter()) { transaction =>
         val drained = handler.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BUCKET, transaction)
         assertEquals(FluidConstants.BUCKET, drained)
@@ -191,7 +191,74 @@ final class TankFluidItemHandlerTest extends BeforeMC {
       }
 
       assertTrue(handler.getTank.isEmpty, "Tank: " + handler.getTank)
+      assertFalse(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA).contains(TileTank.KEY_TANK))
+      assertTrue(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA).contains("unknownTagKey"))
+    }
+
+    @Test
+    def drainSimulate1(): Unit = {
+      val tier = Tier.WOOD
+      val stack = RecipeInventoryUtil.getFilledTankStack(tier, FluidAmountUtil.BUCKET_WATER)
+      val handler = new TankFluidItemHandler(tier, stack)
+
+      Using(Transaction.openOuter()) { transaction =>
+        assertEquals(FluidVariant.of(Fluids.WATER), handler.getResource)
+        val drained = handler.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BUCKET, transaction)
+        assertEquals(FluidConstants.BUCKET, drained)
+        transaction.abort()
+      }
+
+      assertEquals(FluidVariant.of(Fluids.WATER), handler.getResource)
+      assertTrue(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA).contains(TileTank.KEY_TANK))
+    }
+
+    @Test
+    def drainExecute1(): Unit = {
+      val tier = Tier.WOOD
+      val stack = RecipeInventoryUtil.getFilledTankStack(tier, FluidAmountUtil.BUCKET_WATER)
+      val handler = new TankFluidItemHandler(tier, stack)
+
+      Using(Transaction.openOuter()) { transaction =>
+        assertEquals(FluidVariant.of(Fluids.WATER), handler.getResource)
+        val drained = handler.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BUCKET, transaction)
+        assertEquals(FluidConstants.BUCKET, drained)
+        transaction.commit()
+      }
+
+      assertEquals(FluidVariant.blank, handler.getResource)
+      assertTrue(handler.getTank.isEmpty)
       assertNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
+    }
+
+    @Test
+    def drainFail1(): Unit = {
+      val tier = Tier.WOOD
+      val stack = RecipeInventoryUtil.getFilledTankStack(tier, FluidAmountUtil.BUCKET_LAVA)
+      val handler = new TankFluidItemHandler(tier, stack)
+
+      Using(Transaction.openOuter()) { transaction =>
+        assertEquals(FluidVariant.of(Fluids.WATER), handler.getResource)
+        val drained = handler.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BUCKET, transaction)
+        assertEquals(0, drained)
+        transaction.commit()
+      }
+      assertEquals(FluidVariant.of(Fluids.LAVA), handler.getResource)
+      assertEquals(FluidAmountUtil.BUCKET_LAVA, handler.getTank.content)
+    }
+
+    @Test
+    def drainExecute2(): Unit = {
+      val tier = Tier.WOOD
+      val stack = RecipeInventoryUtil.getFilledTankStack(tier, FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(2000)))
+      val handler = new TankFluidItemHandler(tier, stack)
+      Using(Transaction.openOuter()) { transaction =>
+        assertEquals(FluidVariant.of(Fluids.WATER), handler.getResource)
+        val drained = handler.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BUCKET, transaction)
+        assertEquals(FluidConstants.BUCKET, drained)
+        transaction.commit()
+      }
+      assertEquals(FluidVariant.of(Fluids.WATER), handler.getResource)
+      assertEquals(FluidAmountUtil.BUCKET_WATER, handler.getTank.content)
     }
   }
 }

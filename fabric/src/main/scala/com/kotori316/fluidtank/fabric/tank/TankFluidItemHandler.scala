@@ -12,6 +12,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.core.{HolderLookup, RegistryAccess}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.level.material.Fluids
 import org.jetbrains.annotations.{NotNull, Nullable}
 
@@ -38,11 +39,7 @@ class TankFluidItemHandler(tier: Tier, stack: ItemStack) extends SingleFluidStor
   }
 
   private def saveTag(): Unit = {
-    val tag = Option(getContainer.get(DataComponents.BLOCK_ENTITY_DATA)).map(_.copyTag()).getOrElse(new CompoundTag())
-    writeNbt(tag, RegistryAccess.EMPTY)
-    if (tag.isEmpty || this.amount <= 0 || this.isResourceBlank) {
-      getContainer.remove(DataComponents.BLOCK_ENTITY_DATA)
-    }
+    CustomData.update(DataComponents.BLOCK_ENTITY_DATA, getContainer, tag => writeNbt(tag, RegistryAccess.EMPTY))
   }
 
   override def readNbt(@Nullable nbt: CompoundTag, wrapperLookup: HolderLookup.Provider): Unit = {

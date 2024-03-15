@@ -3,7 +3,9 @@ package com.kotori316.fluidtank.fluids
 import cats.implicits.catsSyntaxEq
 import com.kotori316.fluidtank.BeforeMC
 import com.kotori316.fluidtank.contents.GenericUnit
+import net.minecraft.core.component.{DataComponentPatch, DataComponents}
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.item.component.CustomData
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.{DynamicNode, DynamicTest, Test, TestFactory}
 
@@ -33,9 +35,9 @@ class FluidKeyTest extends BeforeMC {
       FluidLikeKey(FluidLike.FLUID_EMPTY, Option.empty),
       FluidLikeKey(FluidLike.FLUID_LAVA, Option.empty),
       FluidLikeKey(FluidLike.POTION_NORMAL, Option.empty),
-      FluidLikeKey(FluidLike.POTION_NORMAL, Option(new CompoundTag())),
-      FluidLikeKey(FluidLike.POTION_SPLASH, Option(new CompoundTag())),
-      FluidLikeKey(FluidLike.POTION_LINGERING, Option(new CompoundTag())),
+      FluidLikeKey(FluidLike.POTION_NORMAL, Option(DataComponentPatch.EMPTY)),
+      FluidLikeKey(FluidLike.POTION_SPLASH, Option(DataComponentPatch.EMPTY)),
+      FluidLikeKey(FluidLike.POTION_LINGERING, Option(DataComponentPatch.EMPTY)),
     )
     keys.combinations(2)
       .map { case s1 +: s2 +: _ =>
@@ -58,11 +60,11 @@ class FluidKeyTest extends BeforeMC {
     val tag = new CompoundTag()
     tag.putString("A", "a")
     val expected: CompoundTag = tag.copy()
-    val key = FluidLikeKey(FluidLike.FLUID_EMPTY, Option(tag))
+    val key = FluidLikeKey(FluidLike.FLUID_EMPTY, Option(DataComponentPatch.builder().set(DataComponents.CUSTOM_DATA, CustomData.of(tag)).build()))
     tag.putString("A", "b")
 
-    assertEquals(FluidLikeKey(FluidLike.FLUID_EMPTY, Option(expected)), key)
-    assertNotEquals(FluidLikeKey(FluidLike.FLUID_EMPTY, Option(tag)), key)
+    assertEquals(FluidLikeKey(FluidLike.FLUID_EMPTY, Option(DataComponentPatch.builder().set(DataComponents.CUSTOM_DATA, CustomData.of(expected)).build())), key)
+    assertNotEquals(FluidLikeKey(FluidLike.FLUID_EMPTY, Option(DataComponentPatch.builder().set(DataComponents.CUSTOM_DATA, CustomData.of(tag)).build())), key)
   }
 
   @Test

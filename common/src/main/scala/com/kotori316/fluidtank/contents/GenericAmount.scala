@@ -60,7 +60,7 @@ case class GenericAmount[ContentType](content: ContentType, amount: GenericUnit,
 
   override def hashCode(): Int = Objects.hash(this.content, this.amount.value, this.componentPatch)
 
-  override def toString: String = s"GenericAmount{content=${access.asString(content)}, amount=${amount.value}, nbt=$componentPatch}"
+  override def toString: String = s"GenericAmount{content=${access.asString(content)}, amount=${amount.value}, component=$componentPatch}"
 
   private def show: String = {
     val key = access.getKey(this.content)

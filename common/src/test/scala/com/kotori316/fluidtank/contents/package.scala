@@ -2,6 +2,7 @@ package com.kotori316.fluidtank
 
 import cats.data.Chain
 import cats.{Monad, MonoidK}
+import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.resources.ResourceLocation
 
 import scala.reflect.ClassTag

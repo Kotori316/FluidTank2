@@ -1,8 +1,9 @@
 package com.kotori316.fluidtank.contents
 
 import com.mojang.serialization.Codec
+import net.minecraft.Util
 import net.minecraft.core.component.DataComponentPatch
-import net.minecraft.nbt.{CompoundTag, Tag as NbtTag}
+import net.minecraft.nbt.{CompoundTag, NbtOps, Tag as NbtTag}
 import net.minecraft.resources.ResourceLocation
 
 import scala.reflect.ClassTag
@@ -39,7 +40,7 @@ trait GenericAccess[A] {
 
     tag.putString(KEY_CONTENT, getKey(amount.content).toString)
     tag.putByteArray(KEY_AMOUNT_GENERIC, amount.amount.asByteArray)
-    // amount.componentPatch.foreach(t => tag.put(KEY_TAG, t))
+    amount.componentPatch.foreach(t => tag.put(KEY_TAG, Util.getOrThrow(DataComponentPatch.CODEC.encodeStart(NbtOps.INSTANCE, t), s => new RuntimeException(s))))
 
     tag
   }
@@ -55,8 +56,9 @@ trait GenericAccess[A] {
       else if (tag.contains(KEY_FABRIC_AMOUNT)) GenericUnit.fromFabric(tag.getLong(KEY_FABRIC_AMOUNT))
       else GenericUnit.fromForge(tag.getLong(KEY_FORGE_AMOUNT))
     }
-    // val contentTag: Option[CompoundTag] = Option.when(tag.contains(KEY_TAG))(tag.getCompound(KEY_TAG))
-    newInstance(content, amount, None)
+    val component: Option[DataComponentPatch] = Option.when(tag.contains(KEY_TAG))(tag.getCompound(KEY_TAG))
+      .map(t => Util.getOrThrow(DataComponentPatch.CODEC.decode(NbtOps.INSTANCE, t).map(_.getFirst), s => new RuntimeException(s)))
+    newInstance(content, amount, component)
   }
 
   def classTag: ClassTag[A]

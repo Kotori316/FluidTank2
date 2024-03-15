@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.fluids
 
 import com.kotori316.fluidtank.BeforeMC
 import com.kotori316.fluidtank.contents.{GenericAmount, GenericUnit, gaString}
+import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.alchemy.{PotionContents, Potions}
 import net.minecraft.world.item.{Item, ItemStack, Items}
 import org.junit.jupiter.api.*
@@ -120,7 +121,7 @@ class FluidAmountUtilTest extends BeforeMC {
       assertEquals(fluid.setAmount(GenericUnit.ONE_BOTTLE), filled.moved())
       assertTrue(filled.shouldMove())
       assertEquals(potionItem, filled.toReplace.getItem)
-      assertEquals(Potions.WATER, PotionUtils.getPotion(filled.toReplace))
+      assertEquals(new PotionContents(Potions.WATER), filled.toReplace.get(DataComponents.POTION_CONTENTS))
     }
   }
 }

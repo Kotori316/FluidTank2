@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.crafting.Ingredient;
+import org.apache.logging.log4j.util.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,8 +54,12 @@ class PlatformItemAccessHolder {
     @NotNull
     static PlatformItemAccess access = new Default();
 
-
     private static class Default implements PlatformItemAccess {
+        Lazy<DataComponentType<Tank<FluidLike>>> dataComponentTypeLazy = Lazy.lazy(() -> {
+            var builder = DataComponentType.<Tank<FluidLike>>builder()
+                .persistent(Tank.codec(FluidAmountUtil.access()));
+            return builder.build();
+        });
 
         @Override
         public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
@@ -70,9 +75,7 @@ class PlatformItemAccessHolder {
 
         @Override
         public DataComponentType<Tank<FluidLike>> fluidTankComponentType() {
-            var builder = DataComponentType.<Tank<FluidLike>>builder()
-                .persistent(Tank.codec(FluidAmountUtil.access()));
-            return builder.build();
+            return dataComponentTypeLazy.get();
         }
     }
 }

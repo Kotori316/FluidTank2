@@ -44,4 +44,6 @@ object Tank {
   def codec[A](implicit access: GenericAccess[A]): Codec[Tank[A]] = {
     CodecHelper.createTankCodec(access)
   }
+
+  final val COMPONENT_NAME = "component_fluid_tank"
 }

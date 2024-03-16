@@ -100,6 +100,7 @@ public final class FluidTank implements ModInitializer {
         createTab(builder);
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, new ResourceLocation(FluidTankCommon.modId, FluidTankCommon.modId), builder.build());
         CustomIngredientSerializer.register(IgnoreUnknownTagIngredientFabric.SERIALIZER);
+        Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, new ResourceLocation(FluidTankCommon.modId, Tank.COMPONENT_NAME()), FLUID_TANK_DATA_COMPONENT);
     }
 
     private static void createTab(CreativeModeTab.Builder builder) {

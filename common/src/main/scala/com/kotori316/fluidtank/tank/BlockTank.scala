@@ -120,7 +120,7 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
   def saveTankNBT(tileEntity: BlockEntity, stack: ItemStack, provider: HolderLookup.Provider): Unit = {
     tileEntity match {
       case tank: TileTank =>
-        if (!tank.getTank.isEmpty) stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tank.saveWithoutMetadata(provider))) // stack.addTagElement(BlockItem.BLOCK_ENTITY_TAG, tank.saveWithoutMetadata())
+        if (!tank.getTank.isEmpty) stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tank.saveWithId(provider)))
         if (tank.hasCustomName) stack.set(DataComponents.CUSTOM_NAME, tank.getCustomName)
       case _ => // should be unreachable
     }

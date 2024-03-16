@@ -432,6 +432,21 @@ public final class TankTest implements FabricGameTest {
         helper.succeed();
     }
 
+    void saveNbt(GameTestHelper helper) {
+        var basePos = BlockPos.ZERO.above();
+        var tile = placeTank(helper, basePos, Tier.WOOD);
+        var content = FluidAmountUtil.BUCKET_WATER();
+        tile.getConnection().getHandler().fill(content, true);
+        var block = getBlock(Tier.WOOD);
+        var stack = new ItemStack(block);
+        block.saveTankNBT(tile, stack, helper.getLevel().registryAccess());
+        var data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
+        assertNotNull(data);
+        assertTrue(data.contains("id"), "Saved nbt must have id field since 1.20.5");
+
+        helper.succeed();
+    }
+
     @Override
     public void invokeTestMethod(GameTestHelper context, Method method) {
         method.setAccessible(true);

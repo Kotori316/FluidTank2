@@ -51,6 +51,7 @@ public final class FluidTank implements ModInitializer {
         registerObjects();
         ConnectionStorage.register();
         ChestAsTankStorage.register();
+        FabricTankItemStorage.register();
         ReservoirFluidStorage.register();
         AE2FluidTankIntegration.onAPIAvailable();
         ServerLifecycleEvents.SERVER_STARTED.register(FluidTank::onServerStart);

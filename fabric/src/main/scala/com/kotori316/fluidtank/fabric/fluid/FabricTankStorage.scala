@@ -6,16 +6,19 @@ import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
+import net.fabricmc.fabric.api.transfer.v1.transaction.{Transaction, TransactionContext}
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.material.Fluids
+import org.jetbrains.annotations.VisibleForTesting
+
+import scala.util.Using
 
 //noinspection UnstableApiUsage
-abstract class FabricTankStorage(protected final val context: ContainerItemContext) extends SingleSlotStorage[FluidVariant]{
+abstract class FabricTankStorage(protected final val context: ContainerItemContext) extends SingleSlotStorage[FluidVariant] {
 
   def getTank: Tank[FluidLike]
 
   def saveTank(newTank: Tank[FluidLike]): ItemVariant
-
 
   override def insert(resource: FluidVariant, maxAmount: Long, transaction: TransactionContext): Long = {
     val tank = getTank
@@ -46,4 +49,17 @@ abstract class FabricTankStorage(protected final val context: ContainerItemConte
 
   override def getCapacity: Long = getTank.capacity.asFabric
 
+  @VisibleForTesting
+  def fill(amount: FluidAmount): Unit = {
+    Using(Transaction.openOuter()) { transaction =>
+      val tank = getTank
+      move(tank, tank.fillOp, amount, transaction)
+      transaction.commit()
+    }
+  }
+
+  @VisibleForTesting
+  def getStack: ItemStack = {
+    context.getItemVariant.toStack(context.getAmount.toInt)
+  }
 }

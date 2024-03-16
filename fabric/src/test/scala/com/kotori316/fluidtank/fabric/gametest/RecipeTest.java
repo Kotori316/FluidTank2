@@ -217,8 +217,9 @@ public final class RecipeTest implements FabricGameTest {
         var deserialized = TierRecipeFabric.SERIALIZER.fromNetwork(buffer);
         assertNotNull(deserialized);
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), deserialized.getResultItem(RegistryAccess.EMPTY)))
+            () -> assertTrue(ItemStack.matches(recipe.getResultItem(helper.getLevel().registryAccess()), deserialized.getResultItem(helper.getLevel().registryAccess())))
         );
+        helper.succeed();
     }
 
     void getRecipeFromJson(GameTestHelper helper) {
@@ -237,8 +238,9 @@ public final class RecipeTest implements FabricGameTest {
             Tier.STONE, TierRecipeFabric.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), read.getResultItem(RegistryAccess.EMPTY)))
+            () -> assertTrue(ItemStack.matches(recipe.getResultItem(helper.getLevel().registryAccess()), read.getResultItem(helper.getLevel().registryAccess())))
         );
+        helper.succeed();
     }
 
     @GameTestGenerator
@@ -263,6 +265,7 @@ public final class RecipeTest implements FabricGameTest {
         try {
             var json = GsonHelper.parse(Files.newBufferedReader(path));
             assertDoesNotThrow(() -> managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_load"), json, helper.getLevel().registryAccess()));
+            helper.succeed();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

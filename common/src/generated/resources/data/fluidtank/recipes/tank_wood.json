@@ -77,6 +77,6 @@
     "xxx"
   ],
   "result": {
-    "item": "fluidtank:tank_wood"
+    "id": "fluidtank:tank_wood"
   }
 }

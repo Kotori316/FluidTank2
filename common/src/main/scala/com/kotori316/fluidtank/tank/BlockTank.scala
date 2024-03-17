@@ -78,7 +78,8 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
             ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
           }
         } else {
-          ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+          // Skip useWithoutItem, then place tank
+          ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
         }
       case tile =>
         FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {}", pos.show, tile)

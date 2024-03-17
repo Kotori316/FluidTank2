@@ -8,11 +8,13 @@ import com.kotori316.fluidtank.fabric.tank.FabricTankItemStorage
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
 import com.kotori316.fluidtank.tank.Tier
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest
-import net.minecraft.core.BlockPos
+import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
+import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.{Block, Blocks}
+import net.minecraft.world.phys.{BlockHitResult, Vec3}
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals}
 
 import java.util.Locale
@@ -93,6 +95,36 @@ final class TankPlacementTest extends FabricGameTest {
       () => assertEquals(1, stack.getCount),
       () => assertEquals(fillContent, handler.getTank.content),
     )
+    helper.succeed()
+  }
+
+  @GameTestGenerator
+  def placeTankAboveTank(): java.util.List[TestFunction] = {
+    val tests = for {
+      t <- Seq(Tier.WOOD, Tier.STONE, Tier.STAR)
+      f <- Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
+      testName = s"tank_place_tank_above_tank_${t}_${f.content.getKey.getPath}".toLowerCase(Locale.ROOT)
+    } yield GameTestUtil.create(FluidTankCommon.modId, BATCH_NAME, testName, g => testPlaceTankAboveTank(g, t, f))
+
+    CollectionConverters.asJava(tests)
+  }
+
+  private def testPlaceTankAboveTank(helper: GameTestHelper, tier: Tier, tankContent: FluidAmount): Unit = {
+    val pos = BlockPos.ZERO.above()
+    val tankTile = TankTest.placeTank(helper, pos, tier)
+    tankTile.getConnection.getHandler.fill(tankContent, execute = true)
+
+    val stack = new ItemStack(TankTest.getBlock(tier))
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
+    player.setItemInHand(InteractionHand.MAIN_HAND, stack)
+
+    val absolutePos = helper.absolutePos(pos)
+    helper.useBlock(pos, player, new BlockHitResult(Vec3.atBottomCenterOf(absolutePos.above()), Direction.UP, absolutePos, false))
+
+    helper.assertBlockPresent(TankTest.getBlock(tier), pos.above())
+    assertEquals(2, tankTile.getConnection.getTiles.size)
+    assertEquals(Option(tankContent), tankTile.getConnection.getContent)
+
     helper.succeed()
   }
 }

@@ -71,7 +71,7 @@ final class TankTest {
 
     static void wrapDefaultConfig(Runnable r) {
         var currentConfig = PlatformConfigAccess.getInstance();
-        PlatformConfigAccess.setInstance(ConfigData::DEFAULT);
+        PlatformConfigAccess.setInstance(ConfigData::FOR_TEST);
         try {
             r.run();
         } finally {

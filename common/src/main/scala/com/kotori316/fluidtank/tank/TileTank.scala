@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.tank
 
 import cats.implicits.toShow
-import com.kotori316.fluidtank.FluidTankCommon
+import com.kotori316.fluidtank.DebugLogging
 import com.kotori316.fluidtank.MCImplicits.*
 import com.kotori316.fluidtank.connection.Connection
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank, TankUtil}
@@ -84,7 +84,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: BlockPos, s
 
   def onBlockPlacedBy(): Unit = {
     {
-      FluidTankCommon.LOGGER.debug(FluidTankCommon.MARKER_TANK,
+      DebugLogging.LOGGER.debug(
         "Connection {} loaded in onBlockPlacedBy. At={}, connection={}",
         if (this.connection.isDummy) "will be" else "won't",
         this.getBlockPos.show, this.connection)
@@ -112,7 +112,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: BlockPos, s
     // Do nothing if the connection is already created.
     if (this.connection.isDummy) {
       // Create connection if this tank has invalid one.
-      FluidTankCommon.LOGGER.debug(FluidTankCommon.MARKER_TANK,
+      DebugLogging.LOGGER.debug(
         "Connection {} loaded in onLoading. At={}, tank={}",
         "will be",
         this.getBlockPos.show, this.getTank)

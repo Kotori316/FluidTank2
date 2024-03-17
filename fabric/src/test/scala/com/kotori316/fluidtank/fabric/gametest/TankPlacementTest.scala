@@ -3,7 +3,8 @@ package com.kotori316.fluidtank.fabric.gametest
 import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fabric.FluidTank
-import com.kotori316.fluidtank.fabric.tank.TankFluidItemHandler
+import com.kotori316.fluidtank.fabric.recipe.ModifiableSingleItemStorage
+import com.kotori316.fluidtank.fabric.tank.FabricTankItemStorage
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
 import com.kotori316.fluidtank.tank.Tier
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest
@@ -68,7 +69,7 @@ final class TankPlacementTest extends FabricGameTest {
     assertEquals(1, drops.size, "Drop was " + drops)
 
     val stack = drops.get(0)
-    val handler = new TankFluidItemHandler(tier, stack)
+    val handler = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
     assertAll(
       () => assertEquals(FluidTank.TANK_MAP.get(tier).itemBlock, stack.getItem),
       () => assertEquals(1, stack.getCount),
@@ -86,7 +87,7 @@ final class TankPlacementTest extends FabricGameTest {
     val stack = state.getBlock.getCloneItemStack(
       helper.getLevel, helper.absolutePos(pos), state
     )
-    val handler = new TankFluidItemHandler(tier, stack)
+    val handler = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
     assertAll(
       () => assertEquals(FluidTank.TANK_MAP.get(tier).itemBlock, stack.getItem),
       () => assertEquals(1, stack.getCount),

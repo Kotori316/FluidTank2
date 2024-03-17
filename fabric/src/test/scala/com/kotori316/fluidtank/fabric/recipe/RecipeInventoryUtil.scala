@@ -1,8 +1,11 @@
 package com.kotori316.fluidtank.fabric.recipe
 
 import com.kotori316.fluidtank.fabric.FluidTank
-import com.kotori316.fluidtank.fabric.tank.TankFluidItemHandler
+import com.kotori316.fluidtank.fabric.fluid.FabricTankStorage
+import com.kotori316.fluidtank.fabric.reservoir.ReservoirFluidStorage
+import com.kotori316.fluidtank.fabric.tank.FabricTankItemStorage
 import com.kotori316.fluidtank.fluids.FluidAmount
+import com.kotori316.fluidtank.reservoir.ItemReservoir
 import com.kotori316.fluidtank.tank.{ItemBlockTank, Tier}
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Player
@@ -28,17 +31,17 @@ object RecipeInventoryUtil {
     cf
   }
 
-  def getFluidHandler(stack: ItemStack): TankFluidItemHandler = stack.getItem match {
-    case tank: ItemBlockTank => new TankFluidItemHandler(tank.blockTank.tier, stack)
-    // case reservoir: ReservoirItem => new TankItemFluidHandler(reservoir.tier, stack)
+  def getFluidHandler(stack: ItemStack): FabricTankStorage = stack.getItem match {
+    case _: ItemBlockTank => new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
+    case _: ItemReservoir => new ReservoirFluidStorage(ModifiableSingleItemStorage.getContext(stack))
     case _ => throw new IllegalArgumentException(s"Stack $stack has no valid handler")
   }
 
   def getFilledTankStack(tier: Tier, fluid: FluidAmount): ItemStack = {
     val stack = new ItemStack(FluidTank.TANK_MAP.get(tier))
     val handler = getFluidHandler(stack)
-    handler.fill(fluid, execute = true)
-    stack
+    handler.fill(fluid)
+    handler.getStack
   }
 
   final class DummyContainer extends AbstractContainerMenu(null, 35) {

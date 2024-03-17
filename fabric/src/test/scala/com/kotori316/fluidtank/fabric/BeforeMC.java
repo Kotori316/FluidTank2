@@ -20,7 +20,7 @@ public abstract class BeforeMC {
         if (!initialized.getAndSet(true)) {
             SharedConstants.tryDetectVersion();
             Bootstrap.bootStrap();
-            PlatformConfigAccess.setInstance(ConfigData::DEFAULT);
+            PlatformConfigAccess.setInstance(ConfigData::FOR_TEST);
             CustomIngredientSerializer.register(IgnoreUnknownTagIngredientFabric.SERIALIZER);
         }
     }

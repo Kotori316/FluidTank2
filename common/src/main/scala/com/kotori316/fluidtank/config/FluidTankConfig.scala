@@ -13,11 +13,11 @@ import scala.util.{Failure, Success, Try, Using}
 object FluidTankConfig {
   type E = LoadError
 
-  def loadFile(basePath: Path, fileName: String): IorNec[E, ConfigData] = {
+  def loadFile(basePath: Path, fileName: String, forTest: Boolean = false): IorNec[E, ConfigData] = {
     val configPath = basePath.resolve(fileName)
     val json = getFileContent(configPath)
     json match {
-      case Ior.Left(a: NonEmptyChain[E]) => Ior.both(a, ConfigData.DEFAULT)
+      case Ior.Left(a: NonEmptyChain[E]) => Ior.both(a, if (forTest) ConfigData.FOR_TEST else ConfigData.DEFAULT)
       case r@Ior.Right(_) => r.flatMap(getConfigDataFromJson)
       case b@Ior.Both(_, _) => b.flatMap(getConfigDataFromJson) // should be unreachable
     }

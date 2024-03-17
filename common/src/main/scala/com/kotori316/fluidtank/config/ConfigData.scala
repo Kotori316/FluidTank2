@@ -38,4 +38,6 @@ object ConfigData {
     debug = false,
     changeItemInCreative = false,
   )
+
+  final val FOR_TEST: ConfigData = DEFAULT.copy(debug = true)
 }

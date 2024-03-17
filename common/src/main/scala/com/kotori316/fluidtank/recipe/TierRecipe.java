@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.recipe;
 
 import com.google.gson.JsonObject;
+import com.kotori316.fluidtank.DebugLogging;
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
@@ -60,7 +61,7 @@ public abstract class TierRecipe implements CraftingRecipe {
         this.subItem = subItem;
         this.result = new ItemStack(PlatformTankAccess.getInstance().getTankBlockMap().get(tier).get());
 
-        LOGGER.debug("{} instance created for Tier {}({}).", getClass().getSimpleName(), tier, result);
+        DebugLogging.LOGGER().debug("{} instance created for Tier {}({}).", getClass().getSimpleName(), tier, result);
     }
 
     @Override
@@ -122,8 +123,9 @@ public abstract class TierRecipe implements CraftingRecipe {
     @Override
     public ItemStack assemble(CraftingContainer inv, RegistryAccess access) {
         if (!this.checkInv(inv)) {
-            LOGGER.error("Requested to return crafting result for invalid inventory. {}",
-                IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem).collect(Collectors.toList()));
+            var stacks = IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem).collect(Collectors.toList());
+            LOGGER.error("Requested to return crafting result for invalid inventory. {}", stacks);
+            DebugLogging.LOGGER().error("Requested to return crafting result for invalid inventory. {}", stacks);
             return ItemStack.EMPTY;
         }
         ItemStack result = getResultItem(access);
@@ -236,12 +238,18 @@ public abstract class TierRecipe implements CraftingRecipe {
 
         public TierRecipe fromJson(JsonObject object) {
             return this.codec.parse(JsonOps.INSTANCE, object)
-                .getOrThrow(false, s -> LOGGER.warn("Error in parsing TierRecipe ({}) from JSON {}", s, object));
+                .getOrThrow(false, s -> {
+                    LOGGER.error("Error in parsing TierRecipe ({}) from JSON {}", s, object);
+                    DebugLogging.LOGGER().error("Error in parsing TierRecipe ({}) from JSON {}", s, object);
+                });
         }
 
         public JsonObject toJson(TierRecipe recipe) {
             return this.codec.encodeStart(JsonOps.INSTANCE, recipe)
-                .getOrThrow(false, s -> LOGGER.warn("Error in encoding TierRecipe ({}) from Recipe {}", s, recipe))
+                .getOrThrow(false, s -> {
+                    LOGGER.error("Error in encoding TierRecipe ({}) from Recipe {}", s, recipe);
+                    DebugLogging.LOGGER().error("Error in encoding TierRecipe ({}) from Recipe {}", s, recipe);
+                })
                 .getAsJsonObject();
         }
 
@@ -250,9 +258,11 @@ public abstract class TierRecipe implements CraftingRecipe {
             Tier tier = Tier.valueOf(tierName);
             Ingredient tankItem = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
             Ingredient subItem = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
-            if (subItem.isEmpty())
+            if (subItem.isEmpty()) {
                 LOGGER.warn("Empty ingredient was loaded for {}", tierName);
-            LOGGER.debug("Serializer loaded from packet for tier {}, sub {}.", tier, PlatformItemAccess.convertIngredientToString(subItem));
+                DebugLogging.LOGGER().warn("Empty ingredient was loaded for {}", tierName);
+            }
+            DebugLogging.LOGGER().debug("Serializer loaded from packet for tier {}, sub {}.", tier, PlatformItemAccess.convertIngredientToString(subItem));
             return createInstance(tier, tankItem, subItem);
         }
 
@@ -260,7 +270,7 @@ public abstract class TierRecipe implements CraftingRecipe {
             buffer.writeUtf(recipe.tier.name());
             Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.tankItem);
             Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.subItem);
-            LOGGER.debug("Serialized to packet for tier {}.", recipe.tier);
+            DebugLogging.LOGGER().debug("Serialized to packet for tier {}.", recipe.tier);
         }
 
         @VisibleForTesting

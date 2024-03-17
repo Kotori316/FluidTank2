@@ -1,10 +1,12 @@
 package com.kotori316.fluidtank.fabric.tank
 
 import com.kotori316.fluidtank.contents.*
+import com.kotori316.fluidtank.fabric.FluidTank
 import com.kotori316.fluidtank.fabric.fluid.FabricTankStorage
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, FluidLike, fluidAccess}
 import com.kotori316.fluidtank.tank.{ItemBlockTank, Tier, TileTank}
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
 import net.minecraft.core.component.{DataComponentPatch, DataComponentType, DataComponents}
 import net.minecraft.nbt.CompoundTag
@@ -13,8 +15,11 @@ import net.minecraft.world.item.component.CustomData
 import scala.jdk.CollectionConverters.IterableHasAsScala
 import scala.jdk.OptionConverters.RichOptional
 
+import scala.jdk.CollectionConverters.CollectionHasAsScala
+
 //noinspection UnstableApiUsage
 class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c) {
+
   override def getTank: Tank[FluidLike] = {
     val componentPatch = context.getItemVariant.getComponents
     val maybeTank = for {
@@ -52,5 +57,12 @@ class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c
       componentBuilder.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tileTag))
     }
     ItemVariant.of(context.getItemVariant.getItem, componentBuilder.build())
+  }
+}
+
+object FabricTankItemStorage {
+  def register(): Unit = {
+    FluidStorage.ITEM.registerForItems((_, context) => new FabricTankItemStorage(context),
+      FluidTank.TANK_MAP.values().asScala.toSeq *)
   }
 }

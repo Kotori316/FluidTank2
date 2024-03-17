@@ -11,6 +11,7 @@ plugins {
 }
 
 val minecraftVersion = project.property("minecraft_version") as String
+val platformVersion = project.version.toString()
 val modId = "FluidTank".lowercase()
 configurations {
     val common = create("common")
@@ -29,7 +30,7 @@ val jarAttributeMap = mapOf(
     "Specification-Version" to "1",
     "Implementation-Title" to "FluidTank",
     "Implementation-Vendor" to "Kotori316",
-    "Implementation-Version" to project.version as String,
+    "Implementation-Version" to platformVersion,
     "Implementation-Timestamp" to ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT),
     "Automatic-Module-Name" to modId,
 )
@@ -89,12 +90,12 @@ afterEvaluate {
     }
     tasks.withType(ProcessResources::class) {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        val version = project.version.toString()
-        inputs.property("version", version)
+        inputs.property("version", platformVersion)
+        inputs.property("minecraftVersion", minecraftVersion)
         listOf("fabric.mod.json", "META-INF/mods.toml").forEach { fileName ->
             filesMatching(fileName) {
                 expand(
-                    "version" to version,
+                    "version" to platformVersion,
                     "update_url" to "https://version.kotori316.com/get-version/${minecraftVersion}/${project.name}/${modId}",
                     // FIXME change to minecraftVersion
                     "mc_version" to "1.20",

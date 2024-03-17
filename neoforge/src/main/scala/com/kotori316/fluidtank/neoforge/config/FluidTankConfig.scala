@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.neoforge.config
 
 import com.kotori316.fluidtank.config.ConfigData
 import com.kotori316.fluidtank.tank.Tier
+import net.neoforged.fml.loading.FMLLoader
 import net.neoforged.neoforge.common.ModConfigSpec
 
 import java.util.Locale
@@ -19,11 +20,11 @@ class FluidTankConfig(builder: ModConfigSpec.Builder) {
   builder.pop()
 
   builder.push("tank")
-  builder.comment("The capacity of each tanks", "Unit is fabric one, 1000 mB is 81000 unit.").push("capacity")
+  builder.comment("The capacity of each tanks", "Unit is fabric one, 81000 unit is 1000 mB.").push("capacity")
 
   private final val capacities: Map[Tier, ModConfigSpec.ConfigValue[String]] = Tier.values().toSeq.map { t =>
     val defaultCapacity = ConfigData.DEFAULT.capacityMap(t)
-    t -> builder.comment(s"Capacity of $t", s"Default: ${defaultCapacity / 81} mB(= $defaultCapacity unit)")
+    t -> builder.comment(s"Capacity of $t", s"Default: $defaultCapacity unit(= ${defaultCapacity / 81} mB)")
       .define[String](t.name().toLowerCase(Locale.ROOT), defaultCapacity.toString(),
         FunctionConverters.asJavaPredicate[AnyRef] {
           case s: String => Try(BigInt(s)).isSuccess
@@ -34,8 +35,8 @@ class FluidTankConfig(builder: ModConfigSpec.Builder) {
   builder.pop()
 
   private final val debug: ModConfigSpec.BooleanValue = builder.comment("Debug mode")
-    .comment(s"Default: ${ConfigData.DEFAULT.debug}")
-    .define("debug", ConfigData.DEFAULT.debug)
+    .comment(s"Default: ${ConfigData.DEFAULT.debug || !FMLLoader.isProduction}")
+    .define("debug", ConfigData.DEFAULT.debug || !FMLLoader.isProduction)
   private final val changeItemInCreative: ModConfigSpec.BooleanValue = builder.comment("True to allow to modify items in player attracting")
     .comment(s"Default: ${ConfigData.DEFAULT.changeItemInCreative}")
     .define("changeItemInCreative", ConfigData.DEFAULT.changeItemInCreative)

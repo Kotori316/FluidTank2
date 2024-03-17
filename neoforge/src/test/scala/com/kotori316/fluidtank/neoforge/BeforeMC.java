@@ -17,7 +17,7 @@ public abstract class BeforeMC {
     }
 
     private static void setup() {
-        PlatformConfigAccess.setInstance(ConfigData::DEFAULT);
+        PlatformConfigAccess.setInstance(ConfigData::FOR_TEST);
     }
 
 }

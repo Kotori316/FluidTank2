@@ -20,7 +20,7 @@ public class BeforeMC {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
         unfreezeRegistry();
-        PlatformConfigAccess.setInstance(ConfigData::DEFAULT);
+        PlatformConfigAccess.setInstance(ConfigData::FOR_TEST);
     }
 
     private static void unfreezeRegistry() {

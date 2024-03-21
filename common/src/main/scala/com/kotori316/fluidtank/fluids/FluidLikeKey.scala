@@ -2,10 +2,10 @@ package com.kotori316.fluidtank.fluids
 
 import cats.{Hash, Show}
 import com.kotori316.fluidtank.contents.GenericUnit
+import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.nbt.CompoundTag
 
-case class FluidLikeKey(fluid: FluidLike, tag: Option[CompoundTag]) {
+case class FluidLikeKey(fluid: FluidLike, tag: Option[DataComponentPatch]) {
   def isEmpty: Boolean = fluid == FluidLike.FLUID_EMPTY
 
   def isDefined: Boolean = !isEmpty
@@ -15,11 +15,11 @@ case class FluidLikeKey(fluid: FluidLike, tag: Option[CompoundTag]) {
 }
 
 object FluidLikeKey {
-  def apply(fluid: FluidLike, tag: Option[CompoundTag]): FluidLikeKey = new FluidLikeKey(fluid, tag.map(_.copy()))
+  def apply(fluid: FluidLike, tag: Option[DataComponentPatch]): FluidLikeKey = new FluidLikeKey(fluid, tag)
 
-  def apply(fluid: FluidLike, tag: CompoundTag): FluidLikeKey = apply(fluid, Option(tag))
+  def apply(fluid: FluidLike, tag: DataComponentPatch): FluidLikeKey = apply(fluid, Option(tag))
 
-  def from(fluidAmount: FluidAmount): FluidLikeKey = FluidLikeKey(fluidAmount.content, fluidAmount.nbt)
+  def from(fluidAmount: FluidAmount): FluidLikeKey = FluidLikeKey(fluidAmount.content, fluidAmount.componentPatch)
 
   implicit val FluidKeyHash: Hash[FluidLikeKey] = Hash.fromUniversalHashCode
   implicit val FluidKeyShow: Show[FluidLikeKey] = key =>

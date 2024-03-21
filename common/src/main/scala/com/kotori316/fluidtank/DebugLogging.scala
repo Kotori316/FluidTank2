@@ -49,7 +49,7 @@ object DebugLogging {
       .map { case (id, r) => (id, r.getResultItem(server.registryAccess()), ingredientAsMap(r.getIngredients.asScala)) }
       .map { case (id, stack, value) =>
         val location = BuiltInRegistries.ITEM.getKey(stack.getItem)
-        s"$id $location x${stack.getCount}(tag: ${stack.getTag}) -> ${noPretty.toJson(value)}"
+        s"$id $location x${stack.getCount}(tag: ${stack.getComponents}) -> ${noPretty.toJson(value)}"
       }
       .zipWithIndex
       .foreach { case (s, index) => LOGGER.info("{} {}", index + 1, s) }

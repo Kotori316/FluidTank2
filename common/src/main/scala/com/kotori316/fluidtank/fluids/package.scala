@@ -4,8 +4,7 @@ import cats.Hash
 import com.kotori316.fluidtank.connection.ConnectionHelper
 import com.kotori316.fluidtank.contents.{GenericAccess, GenericAmount, GenericUnit}
 import com.kotori316.fluidtank.tank.TileTank
-import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.material.Fluid
 
@@ -31,7 +30,7 @@ package object fluids {
 
     override def classTag: ClassTag[FluidLike] = implicitly[ClassTag[FluidLike]]
 
-    override def newInstance(content: FluidLike, amount: GenericUnit, nbt: Option[CompoundTag]): FluidAmount =
-      GenericAmount(content, amount, nbt)
+    override def newInstance(content: FluidLike, amount: GenericUnit, componentMap: Option[DataComponentPatch]): FluidAmount =
+      GenericAmount(content, amount, componentMap.filterNot(_.isEmpty))
   }
 }

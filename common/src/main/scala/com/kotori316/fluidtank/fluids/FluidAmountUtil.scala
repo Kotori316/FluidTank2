@@ -1,8 +1,10 @@
 package com.kotori316.fluidtank.fluids
 
-import com.kotori316.fluidtank.contents.{GenericAccess, GenericAmount, GenericUnit}
+import com.kotori316.fluidtank.contents.{GenericAccess, GenericUnit}
+import net.minecraft.core.Holder
+import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.item.alchemy.{Potion, PotionUtils}
+import net.minecraft.world.item.alchemy.{Potion, PotionContents}
 import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.material.{Fluid, Fluids}
 import org.jetbrains.annotations.VisibleForTesting
@@ -15,20 +17,24 @@ object FluidAmountUtil {
   final val BUCKET_WATER: FluidAmount = from(Fluids.WATER, GenericUnit.ONE_BUCKET)
   final val BUCKET_LAVA: FluidAmount = from(Fluids.LAVA, GenericUnit.ONE_BUCKET)
 
-  def from(fluid: Fluid, genericUnit: GenericUnit, nbt: Option[CompoundTag]): FluidAmount = {
-    from(FluidLike.of(fluid), genericUnit, nbt)
+  def from(fluid: Fluid, genericUnit: GenericUnit, componentPatch: Option[DataComponentPatch]): FluidAmount = {
+    from(FluidLike.of(fluid), genericUnit, componentPatch)
   }
 
   def from(fluid: Fluid, genericUnit: GenericUnit): FluidAmount = from(fluid, genericUnit, Option.empty)
 
-  def from(fluidLike: FluidLike, genericUnit: GenericUnit, nbt: Option[CompoundTag]): FluidAmount = {
-    GenericAmount(fluidLike, genericUnit, nbt)
+  def from(fluidLike: FluidLike, genericUnit: GenericUnit, componentPatch: Option[DataComponentPatch]): FluidAmount = {
+    implicitly[GenericAccess[FluidLike]].newInstance(fluidLike, genericUnit, componentPatch)
+  }
+
+  def from(fluidLike: FluidLike, genericUnit: GenericUnit, componentPatch: DataComponentPatch): FluidAmount = {
+    from(fluidLike, genericUnit, Option(componentPatch))
   }
 
   @VisibleForTesting
-  def from(potionType: PotionType, potion: Potion, genericUnit: GenericUnit): FluidAmount = {
-    val tag = PotionUtils.setPotion(new ItemStack(Items.POTION), potion).getTag
-    from(FluidLike.of(potionType), genericUnit, Option(tag))
+  def from(potionType: PotionType, potion: Holder[Potion], genericUnit: GenericUnit): FluidAmount = {
+    val componentMap = PotionContents.createItemStack(Items.POTION, potion).getComponentsPatch
+    from(FluidLike.of(potionType), genericUnit, componentMap)
   }
 
   def fromItem(stack: ItemStack): FluidAmount = {
@@ -46,5 +52,5 @@ object FluidAmountUtil {
    */
   def access: GenericAccess[FluidLike] = implicitly[GenericAccess[FluidLike]]
 
-  def getTag(amount: FluidAmount): java.util.Optional[CompoundTag] = amount.nbt.toJava
+  def getComponentPatch(amount: FluidAmount): java.util.Optional[DataComponentPatch] = amount.componentPatch.toJava
 }

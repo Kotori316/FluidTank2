@@ -72,7 +72,7 @@ object PotionFluidHandler {
     override def fill(toFill: FluidAmount, vanillaPotion: VanillaPotion): PlatformFluidAccess.TransferStack = {
       if (toFill.hasOneBottle) {
         val filledItem = new ItemStack(vanillaPotion.potionType.getItem)
-        toFill.nbt.foreach(c => filledItem.setTag(c))
+        toFill.componentPatch.foreach(c => filledItem.applyComponents(c))
         val moved = toFill.setAmount(GenericUnit.ONE_BOTTLE)
         transferStack(moved, filledItem)
       } else {
@@ -107,7 +107,8 @@ object PotionFluidHandler {
 
     override def getContent: GenericAmount[FluidLike] = {
       val potionType = PotionType.fromItemUnsafe(stack.getItem)
-      FluidAmountUtil.from(FluidLike.of(potionType), GenericUnit.ONE_BOTTLE, Option(stack.getTag))
+      val componentMap = stack.getComponentsPatch
+      FluidAmountUtil.from(FluidLike.of(potionType), GenericUnit.ONE_BOTTLE, componentMap)
     }
   }
 }

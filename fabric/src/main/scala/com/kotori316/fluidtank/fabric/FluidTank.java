@@ -6,6 +6,7 @@ import com.kotori316.fluidtank.PlatformAccess;
 import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.cat.ItemChestAsTank;
 import com.kotori316.fluidtank.config.PlatformConfigAccess;
+import com.kotori316.fluidtank.contents.Tank;
 import com.kotori316.fluidtank.fabric.cat.ChestAsTankStorage;
 import com.kotori316.fluidtank.fabric.config.FabricPlatformConfigAccess;
 import com.kotori316.fluidtank.fabric.integration.ae2.AE2FluidTankIntegration;
@@ -14,6 +15,8 @@ import com.kotori316.fluidtank.fabric.recipe.IgnoreUnknownTagIngredientFabric;
 import com.kotori316.fluidtank.fabric.recipe.TierRecipeFabric;
 import com.kotori316.fluidtank.fabric.reservoir.ReservoirFluidStorage;
 import com.kotori316.fluidtank.fabric.tank.*;
+import com.kotori316.fluidtank.fluids.FluidAmountUtil;
+import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.*;
@@ -23,6 +26,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -78,6 +82,9 @@ public final class FluidTank implements ModInitializer {
     public static final BlockItem ITEM_CAT = new ItemChestAsTank(BLOCK_CAT);
     public static final Map<Tier, ItemReservoir> RESERVOIR_MAP = Stream.of(Tier.WOOD, Tier.STONE, Tier.IRON)
         .collect(Collectors.toMap(Function.identity(), ItemReservoir::new));
+    public static final DataComponentType<Tank<FluidLike>> FLUID_TANK_DATA_COMPONENT = DataComponentType.<Tank<FluidLike>>builder()
+        .persistent(Tank.codec(FluidAmountUtil.access()))
+        .build();
 
     private static void registerObjects() {
         Stream.concat(TANK_MAP.entrySet().stream(), Stream.of(Map.entry(Tier.CREATIVE, BLOCK_CREATIVE_TANK), Map.entry(Tier.VOID, BLOCK_VOID_TANK)))
@@ -94,6 +101,7 @@ public final class FluidTank implements ModInitializer {
         createTab(builder);
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, new ResourceLocation(FluidTankCommon.modId, FluidTankCommon.modId), builder.build());
         CustomIngredientSerializer.register(IgnoreUnknownTagIngredientFabric.SERIALIZER);
+        Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, new ResourceLocation(FluidTankCommon.modId, Tank.COMPONENT_NAME()), FLUID_TANK_DATA_COMPONENT);
     }
 
     private static void createTab(CreativeModeTab.Builder builder) {

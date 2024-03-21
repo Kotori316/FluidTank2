@@ -3,11 +3,13 @@ package com.kotori316.fluidtank.contents
 import com.kotori316.fluidtank.FluidTankCommon
 import net.minecraft.nbt.CompoundTag
 
+import java.nio.ByteBuffer
+
 object TankUtil {
-  private final val KEY_TYPE = "type"
-  private final val TYPE_TANK = "Tank"
-  private final val TYPE_CREATIVE_TANK = "CreativeTank"
-  private final val TYPE_VOID_TANK = "VoidTank"
+  final val KEY_TYPE = "type"
+  final val TYPE_TANK = "Tank"
+  final val TYPE_CREATIVE_TANK = "CreativeTank"
+  final val TYPE_VOID_TANK = "VoidTank"
 
   def save[A](tank: Tank[A])(implicit access: GenericAccess[A]): CompoundTag = {
     val tag = new CompoundTag()
@@ -38,7 +40,17 @@ object TankUtil {
     }
   }
 
-  private def getType(tank: Tank[?]): String = {
+  def createTank[A](content: GenericAmount[A], byteBuffer: ByteBuffer, tankType: String): Tank[A] = {
+    val capacity = GenericUnit.fromByteArray(byteBuffer.array())
+    tankType match {
+      case TYPE_TANK => Tank(content, capacity)
+      case TYPE_CREATIVE_TANK => new CreativeTank(content, capacity)
+      case TYPE_VOID_TANK => new VoidTank(content, capacity)
+      case _ => throw new IllegalArgumentException("Unknown type of tank for %s, %s".formatted(tankType, content))
+    }
+  }
+
+  def getType(tank: Tank[?]): String = {
     tank match {
       case _: CreativeTank[?] => TYPE_CREATIVE_TANK
       case _: VoidTank[?] => TYPE_VOID_TANK

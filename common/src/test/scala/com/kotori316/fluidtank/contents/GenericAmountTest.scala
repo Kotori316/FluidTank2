@@ -1,12 +1,14 @@
 package com.kotori316.fluidtank.contents
 
-import net.minecraft.nbt.CompoundTag
-import org.junit.jupiter.api.Assertions.{assertEquals, assertNotEquals, assertNotNull, assertTrue}
+import com.kotori316.fluidtank.BeforeMC
+import net.minecraft.core.component.{DataComponentPatch, DataComponents}
+import net.minecraft.world.item.DyeColor
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.{assertEquals, assertNotEquals, assertNotNull, assertTrue}
 
 import scala.language.implicitConversions
 
-class GenericAmountTest {
+class GenericAmountTest extends BeforeMC {
 
   implicit def int2GenericUnit(a: Int): GenericUnit = GenericUnit.fromForge(a)
 
@@ -65,7 +67,7 @@ class GenericAmountTest {
     @Test
     def notEqual3(): Unit = {
       val a = GenericAmount("a", 1, None)
-      val b = GenericAmount("a", 1, Option(new CompoundTag()))
+      val b = GenericAmount("a", 1, Option(DataComponentPatch.EMPTY))
       assertNotEquals(a, b)
       assertNotEquals(a.##, b.##)
     }
@@ -89,7 +91,8 @@ class GenericAmountTest {
         GenericAmount("a", 1, None),
         GenericAmount("a", 3, None),
         GenericAmount("b", 1, None),
-        GenericAmount("b", 1, Option(new CompoundTag())),
+        GenericAmount("b", 1, Option(DataComponentPatch.EMPTY)),
+        GenericAmount("tag", 1, Option(DataComponentPatch.builder().set(DataComponents.BASE_COLOR, DyeColor.BLACK).build())),
       )
 
       amounts.map(f => DynamicTest.dynamicTest(s"cycle $f", () => {

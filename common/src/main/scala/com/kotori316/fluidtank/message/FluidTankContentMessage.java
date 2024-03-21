@@ -10,10 +10,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 
-public class FluidTankContentMessage implements IMessage<FluidTankContentMessage> {
+public abstract class FluidTankContentMessage implements IMessage<FluidTankContentMessage> {
+
     private final BlockPos pos;
     private final ResourceKey<Level> dim;
     private final Tank<FluidLike> tank;

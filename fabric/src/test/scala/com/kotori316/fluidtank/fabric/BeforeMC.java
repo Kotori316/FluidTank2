@@ -31,7 +31,7 @@ public abstract class BeforeMC {
 
     public static void assertEqualStack(ItemStack expected, ItemStack actual) {
         Assertions.assertTrue(ItemStack.matches(expected, actual),
-            "Expected: %s(%s), Actual: %s(%s)".formatted(expected, expected.getTag(), actual, actual.getTag()));
+            "Expected: %s(%s), Actual: %s(%s)".formatted(expected, expected.getComponents(), actual, actual.getComponents()));
     }
 
 }

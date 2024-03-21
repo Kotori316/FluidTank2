@@ -10,12 +10,13 @@ import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.function.Function;
 
 final class RenderResourceHelper {
     static TextureAtlasSprite getSprite(GenericAmount<FluidLike> fluid) {
@@ -26,11 +27,10 @@ final class RenderResourceHelper {
         if (fluid.content() instanceof VanillaFluid) {
             return FluidVariantRendering.getColor(FabricConverter.toVariant(fluid, Fluids.EMPTY));
         } else if (fluid.content() instanceof VanillaPotion) {
-            return PotionUtils.getColor(
-                FluidAmountUtil.getTag(fluid)
-                    .map(PotionUtils::getAllEffects)
-                    .orElse(List.of())
-            );
+            return FluidAmountUtil.getComponentPatch(fluid)
+                .map(p -> p.<PotionContents>get(DataComponents.POTION_CONTENTS))
+                .flatMap(Function.identity())
+                .map(PotionContents::getColor).orElse(16253176);
         } else {
             throw new AssertionError();
         }

@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.fabric.integration.ae2
 
+/*
 import appeng.api.config.Actionable
 import appeng.api.networking.security.IActionSource
 import appeng.api.stacks.{AEFluidKey, AEKey, KeyCounter}
@@ -19,7 +20,7 @@ case class TankMEStorage(tank: TileTank) extends MEStorage {
     what match {
       case key: AEFluidKey =>
         tank.getConnection.getContent.forall { c =>
-          c.content === FluidLike.of(key.getFluid) && c.nbt === Option(key.getTag)
+          c.content === FluidLike.of(key.getFluid) && c.componentPatch === Option(key.getTag)
         }
       case _ => false
     }
@@ -48,7 +49,7 @@ case class TankMEStorage(tank: TileTank) extends MEStorage {
   override def getAvailableStacks(out: KeyCounter): Unit = {
     this.tank.getConnection.getContent.foreach { c =>
       c.content match {
-        case VanillaFluid(fluid) => out.add(AEFluidKey.of(fluid, c.nbt.orNull), c.amount.asFabric)
+        case VanillaFluid(fluid) => out.add(AEFluidKey.of(fluid, c.componentPatch.orNull), c.amount.asFabric)
         case VanillaPotion(_) =>
       }
     }
@@ -57,4 +58,4 @@ case class TankMEStorage(tank: TileTank) extends MEStorage {
   private def fromAeFluid(fluidKey: AEFluidKey, amount: Long): FluidAmount = {
     FluidAmountUtil.from(fluidKey.getFluid, GenericUnit.fromFabric(amount), Option(fluidKey.copyTag()))
   }
-}
+}*/

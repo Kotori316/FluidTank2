@@ -7,13 +7,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public interface IMessage<T extends IMessage<T>> extends CustomPacketPayload {
-    @Override
     void write(FriendlyByteBuf buffer);
-
-    @Override
-    default ResourceLocation id() {
-        return getIdentifier();
-    }
 
     default ResourceLocation getIdentifier() {
         return createIdentifier(getClass());

@@ -14,6 +14,7 @@ import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, Test
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.alchemy.Potions
+import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.Vec3
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
@@ -54,7 +55,7 @@ class ReservoirTest extends FabricGameTest {
         val tile = placeTank(g, basePos, Tier.WOOD)
         tile.getConnection.getHandler.fill(initial, execute = true)
         val stack = createReservoirStack(fluid)
-        val player = g.makeMockSurvivalPlayer()
+        val player = g.makeMockPlayer(GameType.SURVIVAL)
         player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
         g.useBlock(basePos, player)
@@ -71,7 +72,7 @@ class ReservoirTest extends FabricGameTest {
     val basePos = BlockPos.ZERO.above
     val tile = placeTank(helper, basePos, Tier.WOOD)
     val stack = createReservoirStack(FluidAmountUtil.BUCKET_WATER)
-    val player = helper.makeMockSurvivalPlayer()
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
     helper.useBlock(basePos, player)
@@ -88,7 +89,7 @@ class ReservoirTest extends FabricGameTest {
     val tile = placeTank(helper, basePos, Tier.WOOD)
     tile.getConnection.getHandler.fill(FluidAmountUtil.BUCKET_WATER, execute = true)
     val stack = createReservoirStack(FluidAmountUtil.BUCKET_WATER)
-    val player = helper.makeMockSurvivalPlayer()
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
     helper.useBlock(basePos, player)
@@ -112,7 +113,7 @@ class ReservoirTest extends FabricGameTest {
         val tile = placeTank(g, basePos, Tier.WOOD)
         tile.getConnection.getHandler.fill(initial, execute = true)
         val stack = createReservoirStack(fluid)
-        val player = g.makeMockSurvivalPlayer()
+        val player = g.makeMockPlayer(GameType.SURVIVAL)
         player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
         g.useBlock(basePos, player)
@@ -142,7 +143,7 @@ class ReservoirTest extends FabricGameTest {
         val tile = placeTank(g, basePos, Tier.WOOD)
         tile.getConnection.getHandler.fill(fluid.setAmount(GenericUnit.fromForge(4000)), execute = true)
         val stack = createReservoirStack(fluid)
-        val player = g.makeMockSurvivalPlayer()
+        val player = g.makeMockPlayer(GameType.SURVIVAL)
         player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
         g.useBlock(basePos, player)
@@ -159,7 +160,7 @@ class ReservoirTest extends FabricGameTest {
     val basePos: BlockPos = BlockPos.ZERO.above
     helper.setBlock(basePos, Blocks.LAVA)
     val stack = createReservoirStack(FluidAmountUtil.EMPTY)
-    val player = helper.makeMockSurvivalPlayer()
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     player.setPos(Vec3.atBottomCenterOf(helper.absolutePos(basePos.above())))
     player.setXRot(90f)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
@@ -176,7 +177,7 @@ class ReservoirTest extends FabricGameTest {
     val basePos: BlockPos = BlockPos.ZERO.above
     helper.setBlock(basePos, Blocks.LAVA)
     val stack = createReservoirStack(FluidAmountUtil.BUCKET_LAVA)
-    val player = helper.makeMockSurvivalPlayer()
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     player.setPos(Vec3.atBottomCenterOf(helper.absolutePos(basePos.above())))
     player.setXRot(90f)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
@@ -193,7 +194,7 @@ class ReservoirTest extends FabricGameTest {
     val basePos: BlockPos = BlockPos.ZERO.above
     helper.setBlock(basePos, Blocks.LAVA)
     val stack = createReservoirStack(FluidAmountUtil.BUCKET_WATER)
-    val player = helper.makeMockSurvivalPlayer()
+    val player = helper.makeMockPlayer(GameType.SURVIVAL)
     player.setPos(Vec3.atBottomCenterOf(helper.absolutePos(basePos.above())))
     player.setXRot(90f)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)

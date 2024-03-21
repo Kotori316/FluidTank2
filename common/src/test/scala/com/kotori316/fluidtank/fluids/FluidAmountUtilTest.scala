@@ -2,7 +2,8 @@ package com.kotori316.fluidtank.fluids
 
 import com.kotori316.fluidtank.BeforeMC
 import com.kotori316.fluidtank.contents.{GenericAmount, GenericUnit, gaString}
-import net.minecraft.world.item.alchemy.{PotionUtils, Potions}
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.alchemy.{PotionContents, Potions}
 import net.minecraft.world.item.{Item, ItemStack, Items}
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -22,9 +23,9 @@ class FluidAmountUtilTest extends BeforeMC {
       FluidAmountUtil.EMPTY,
       FluidAmountUtil.BUCKET_WATER,
       FluidAmountUtil.BUCKET_LAVA,
-      FluidAmountUtil.fromItem(PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER)),
-      FluidAmountUtil.fromItem(PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.INVISIBILITY)),
-      FluidAmountUtil.fromItem(PotionUtils.setPotion(new ItemStack(Items.SPLASH_POTION), Potions.WATER)),
+      FluidAmountUtil.fromItem(PotionContents.createItemStack(Items.POTION, Potions.WATER)),
+      FluidAmountUtil.fromItem(PotionContents.createItemStack(Items.POTION, Potions.INVISIBILITY)),
+      FluidAmountUtil.fromItem(PotionContents.createItemStack(Items.SPLASH_POTION, Potions.WATER)),
     )
     fluids.combinations(2).map(s =>
       DynamicTest.dynamicTest(s"$s", () =>
@@ -86,9 +87,9 @@ class FluidAmountUtilTest extends BeforeMC {
 
     @Test
     def fromWaterBottle(): Unit = {
-      val fluid = FluidAmountUtil.fromItem(PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER))
+      val fluid = FluidAmountUtil.fromItem(PotionContents.createItemStack(Items.POTION, Potions.WATER))
       assertEquals(FluidLike.POTION_NORMAL, fluid.content)
-      assertTrue(fluid.nbt.nonEmpty)
+      assertTrue(fluid.componentPatch.nonEmpty)
       assertEquals(GenericUnit.ONE_BOTTLE, fluid.amount)
     }
   }
@@ -98,7 +99,7 @@ class FluidAmountUtilTest extends BeforeMC {
 
     @Test
     def fillBucket(): Unit = {
-      val fluid = FluidAmountUtil.fromItem(PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER))
+      val fluid = FluidAmountUtil.fromItem(PotionContents.createItemStack(Items.POTION, Potions.WATER))
 
       val filled = PlatformFluidAccess.getInstance().fillItem(fluid, Items.BUCKET.getDefaultInstance, null, null, true)
       assertTrue(filled.moved().isEmpty)
@@ -110,7 +111,7 @@ class FluidAmountUtilTest extends BeforeMC {
     def fillBottle(): Array[DynamicNode] = {
       PotionType.values()
         .map(p => DynamicTest.dynamicTest(s"fillBottle_$p", () => {
-          val fluid = FluidAmountUtil.fromItem(PotionUtils.setPotion(new ItemStack(p.getItem), Potions.WATER))
+          val fluid = FluidAmountUtil.fromItem(PotionContents.createItemStack(p.getItem, Potions.WATER))
           fillBottle(fluid, p.getItem)
         }))
     }
@@ -120,7 +121,7 @@ class FluidAmountUtilTest extends BeforeMC {
       assertEquals(fluid.setAmount(GenericUnit.ONE_BOTTLE), filled.moved())
       assertTrue(filled.shouldMove())
       assertEquals(potionItem, filled.toReplace.getItem)
-      assertEquals(Potions.WATER, PotionUtils.getPotion(filled.toReplace))
+      assertEquals(new PotionContents(Potions.WATER), filled.toReplace.get(DataComponents.POTION_CONTENTS))
     }
   }
 }

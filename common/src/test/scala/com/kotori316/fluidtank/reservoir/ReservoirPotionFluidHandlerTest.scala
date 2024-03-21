@@ -3,14 +3,17 @@ package com.kotori316.fluidtank.reservoir
 import com.kotori316.fluidtank.BeforeMC
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank}
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, FluidLike, PotionType}
+import com.kotori316.fluidtank.item.PlatformItemAccess
 import com.kotori316.fluidtank.potions.PotionFluidHandler
 import com.kotori316.fluidtank.tank.Tier
+import net.minecraft.core.component.DataComponentType
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.alchemy.Potions
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertFalse, assertInstanceOf, assertTrue}
 import org.junit.jupiter.api.Test
 
 class ReservoirPotionFluidHandlerTest extends BeforeMC {
+  val tankComponent: DataComponentType[Tank[FluidLike]] = PlatformItemAccess.getInstance().fluidTankComponentType()
   val reservoir = new ItemReservoir(Tier.WOOD)
 
   @Test
@@ -40,8 +43,8 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     assertAll(
       () => assertTrue(result.shouldMove()),
       () => assertEquals(toFill, result.moved()),
-      () => assertFalse(stack.hasTag),
-      () => assertTrue(result.toReplace.hasTag),
+      () => assertFalse(stack.has(tankComponent)),
+      () => assertTrue(result.toReplace.has(tankComponent)),
     )
 
     val tank = reservoir.getTank(result.toReplace)
@@ -59,8 +62,8 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     assertAll(
       () => assertTrue(result.shouldMove()),
       () => assertEquals(toFill, result.moved()),
-      () => assertTrue(stack.hasTag),
-      () => assertTrue(result.toReplace.hasTag),
+      () => assertTrue(stack.has(tankComponent)),
+      () => assertTrue(result.toReplace.has(tankComponent)),
     )
 
     val tank = reservoir.getTank(result.toReplace)
@@ -78,8 +81,8 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     assertAll(
       () => assertTrue(result.shouldMove()),
       () => assertEquals(toFill.setAmount(GenericUnit.ONE_BUCKET), result.moved()),
-      () => assertTrue(stack.hasTag),
-      () => assertTrue(result.toReplace.hasTag),
+      () => assertTrue(stack.has(tankComponent)),
+      () => assertTrue(result.toReplace.has(tankComponent)),
     )
 
     val tank = reservoir.getTank(result.toReplace)
@@ -98,8 +101,8 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     assertAll(
       () => assertFalse(result.shouldMove()),
       () => assertEquals(FluidAmountUtil.EMPTY, result.moved()),
-      () => assertTrue(stack.hasTag),
-      () => assertTrue(result.toReplace.hasTag),
+      () => assertTrue(stack.has(tankComponent)),
+      () => assertTrue(result.toReplace.has(tankComponent)),
     )
 
     val tank = reservoir.getTank(result.toReplace)
@@ -111,7 +114,7 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     val stack = new ItemStack(reservoir)
     val toDrain = FluidAmountUtil.from(PotionType.NORMAL, Potions.INVISIBILITY, GenericUnit.ONE_BUCKET)
     reservoir.saveTank(stack, Tank(toDrain, GenericUnit.fromForge(4000)))
-    assertTrue(stack.hasTag)
+    assertTrue(stack.has(tankComponent))
     val handler = PotionFluidHandler(stack)
     assertEquals(toDrain, handler.getContent)
 
@@ -119,7 +122,7 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     assertAll(
       () => assertTrue(result.shouldMove()),
       () => assertEquals(toDrain, result.moved()),
-      () => assertFalse(result.toReplace.hasTag),
+      () => assertFalse(result.toReplace.has(tankComponent)),
     )
 
     val tank = reservoir.getTank(result.toReplace)
@@ -131,7 +134,7 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     val stack = new ItemStack(reservoir)
     val toDrain = FluidAmountUtil.from(PotionType.NORMAL, Potions.INVISIBILITY, GenericUnit.ONE_BUCKET)
     reservoir.saveTank(stack, Tank(toDrain, GenericUnit.fromForge(4000)))
-    assertTrue(stack.hasTag)
+    assertTrue(stack.has(tankComponent))
     val handler = PotionFluidHandler(stack)
     assertEquals(toDrain, handler.getContent)
 
@@ -139,7 +142,7 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     assertAll(
       () => assertTrue(result.shouldMove()),
       () => assertEquals(toDrain, result.moved()),
-      () => assertFalse(result.toReplace.hasTag),
+      () => assertFalse(result.toReplace.has(tankComponent)),
     )
 
     val tank = reservoir.getTank(result.toReplace)
@@ -151,7 +154,7 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     val stack = new ItemStack(reservoir)
     val toDrain = FluidAmountUtil.from(PotionType.NORMAL, Potions.INVISIBILITY, GenericUnit.ONE_BUCKET)
     reservoir.saveTank(stack, Tank(toDrain, GenericUnit.fromForge(4000)))
-    assertTrue(stack.hasTag)
+    assertTrue(stack.has(tankComponent))
     val handler = PotionFluidHandler(stack)
     assertEquals(toDrain, handler.getContent)
 
@@ -159,7 +162,7 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     assertAll(
       () => assertTrue(result.shouldMove()),
       () => assertEquals(toDrain.setAmount(GenericUnit.fromForge(500)), result.moved()),
-      () => assertTrue(result.toReplace.hasTag),
+      () => assertTrue(result.toReplace.has(tankComponent)),
     )
 
     val tank = reservoir.getTank(result.toReplace)
@@ -172,7 +175,7 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     val toDrain = FluidAmountUtil.from(PotionType.NORMAL, Potions.INVISIBILITY, GenericUnit.ONE_BUCKET)
     val content = FluidAmountUtil.from(PotionType.NORMAL, Potions.NIGHT_VISION, GenericUnit.ONE_BUCKET)
     reservoir.saveTank(stack, Tank(content, GenericUnit.fromForge(4000)))
-    assertTrue(stack.hasTag)
+    assertTrue(stack.has(tankComponent))
     val handler = PotionFluidHandler(stack)
     assertEquals(content, handler.getContent)
 
@@ -180,7 +183,7 @@ class ReservoirPotionFluidHandlerTest extends BeforeMC {
     assertAll(
       () => assertFalse(result.shouldMove()),
       () => assertEquals(FluidAmountUtil.EMPTY, result.moved()),
-      () => assertTrue(result.toReplace.hasTag),
+      () => assertTrue(result.toReplace.has(tankComponent)),
     )
 
     val tank = reservoir.getTank(result.toReplace)

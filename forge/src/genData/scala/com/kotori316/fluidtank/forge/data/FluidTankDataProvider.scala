@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.forge.data
 
 import com.google.gson.{JsonArray, JsonElement, JsonNull, JsonObject}
 import com.kotori316.fluidtank.FluidTankCommon
+import com.kotori316.fluidtank.config.{ConfigData, PlatformConfigAccess}
 import com.mojang.serialization.JsonOps
 import net.minecraft.data.loot.LootTableProvider
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
@@ -21,6 +22,7 @@ object FluidTankDataProvider {
 
   @SubscribeEvent
   def gatherDataEvent(event: GatherDataEvent): Unit = {
+    PlatformConfigAccess.setInstance(() => ConfigData.FOR_TEST)
     FluidTankCommon.LOGGER.info(MARKER, "Start data generation")
     // Loot table
     event.getGenerator.addProvider(event.includeServer(), new LootTableProvider(event.getGenerator.getPackOutput, Collections.emptySet(),

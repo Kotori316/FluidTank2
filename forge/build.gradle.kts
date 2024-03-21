@@ -125,6 +125,7 @@ loom {
             source("genData")
             property("mixin.env.remapRefMap", "true")
             property("mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg")
+            property("mixin.debug.export", "true")
             property("bsl.debug", "true")
             data()
             mods {

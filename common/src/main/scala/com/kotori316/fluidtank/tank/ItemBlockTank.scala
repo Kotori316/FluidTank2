@@ -4,17 +4,13 @@ import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, PlatformFluidAccess}
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.{BlockItem, Item, ItemStack, Rarity, TooltipFlag}
+import net.minecraft.world.item.{BlockItem, Item, ItemStack, TooltipFlag}
 import net.minecraft.world.level.Level
 
 import java.util
 
 class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, new Item.Properties()) {
   override def toString: String = blockTank.tier.getBlockName
-
-  override def getRarity(stack: ItemStack): Rarity =
-    if (stack.has(DataComponents.BLOCK_ENTITY_DATA)) Rarity.RARE
-    else Rarity.COMMON
 
   override def appendHoverText(stack: ItemStack, level: Level, tooltip: util.List[Component], isAdvanced: TooltipFlag): Unit = {
     super.appendHoverText(stack, level, tooltip, isAdvanced)

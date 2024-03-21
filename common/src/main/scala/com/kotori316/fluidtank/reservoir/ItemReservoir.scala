@@ -9,7 +9,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.{Item, ItemStack, ItemUtils, Rarity, TooltipFlag, UseAnim}
+import net.minecraft.world.item.{Item, ItemStack, ItemUtils, TooltipFlag, UseAnim}
 import net.minecraft.world.level.block.BucketPickup
 import net.minecraft.world.level.{ClipContext, Level}
 import net.minecraft.world.phys.{BlockHitResult, HitResult}
@@ -32,7 +32,7 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
 
   override def getUseDuration(stack: ItemStack): Int = {
     getTank(stack).content.content match {
-      case v: VanillaPotion if v.potionType == PotionType.NORMAL => Item.EAT_DURATION
+      case v: VanillaPotion if v.potionType == PotionType.NORMAL => 32 // See PotionItem
       case _ => super.getUseDuration(stack)
     }
   }
@@ -74,11 +74,6 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
         stack
       case _ => stack
     }
-  }
-
-  override def getRarity(stack: ItemStack): Rarity = {
-    if (stack.has(PlatformItemAccess.getInstance().fluidTankComponentType())) Rarity.UNCOMMON
-    else super.getRarity(stack)
   }
 
   override def appendHoverText(stack: ItemStack, level: Level, tooltip: util.List[Component], isAdvanced: TooltipFlag): Unit = {

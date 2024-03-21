@@ -18,8 +18,8 @@ import com.kotori316.fluidtank.tank.TileTank;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -121,7 +121,7 @@ public abstract class TierRecipe implements CraftingRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess access) {
+    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider access) {
         if (!this.checkInv(inv)) {
             var stacks = IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem).collect(Collectors.toList());
             LOGGER.error("Requested to return crafting result for invalid inventory. {}", stacks);
@@ -159,7 +159,7 @@ public abstract class TierRecipe implements CraftingRecipe {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess access) {
+    public ItemStack getResultItem(HolderLookup.Provider access) {
         return result.copy();
     }
 

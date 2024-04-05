@@ -43,8 +43,8 @@ class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: BlockPos, s
   def getTank: Tank[FluidLike] = this.tank
 
   // Override of BlockEntity
-  override def load(tag: CompoundTag, provider: HolderLookup.Provider): Unit = {
-    super.load(tag, provider)
+  override def loadAdditional(tag: CompoundTag, provider: HolderLookup.Provider): Unit = {
+    super.loadAdditional(tag, provider)
     this.setTank(TankUtil.load(tag.getCompound(KEY_TANK)))
     this.tier = Tier.valueOf(tag.getString(KEY_TIER))
     this.customName = Option.when(tag.contains(KEY_STACK_NAME))(

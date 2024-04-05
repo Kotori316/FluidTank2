@@ -1,7 +1,6 @@
 package com.kotori316.fluidtank.contents
 
 import com.mojang.serialization.Codec
-import net.minecraft.Util
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.nbt.{CompoundTag, NbtOps, Tag as NbtTag}
 import net.minecraft.resources.ResourceLocation
@@ -40,7 +39,7 @@ trait GenericAccess[A] {
 
     tag.putString(KEY_CONTENT, getKey(amount.content).toString)
     tag.putByteArray(KEY_AMOUNT_GENERIC, amount.amount.asByteArray)
-    amount.componentPatch.foreach(t => tag.put(KEY_TAG, Util.getOrThrow(DataComponentPatch.CODEC.encodeStart(NbtOps.INSTANCE, t), s => new RuntimeException(s))))
+    amount.componentPatch.foreach(t => tag.put(KEY_TAG, DataComponentPatch.CODEC.encodeStart(NbtOps.INSTANCE, t).getOrThrow()))
 
     tag
   }
@@ -57,7 +56,7 @@ trait GenericAccess[A] {
       else GenericUnit.fromForge(tag.getLong(KEY_FORGE_AMOUNT))
     }
     val component: Option[DataComponentPatch] = Option.when(tag.contains(KEY_TAG))(tag.getCompound(KEY_TAG))
-      .map(t => Util.getOrThrow(DataComponentPatch.CODEC.decode(NbtOps.INSTANCE, t).map(_.getFirst), s => new RuntimeException(s)))
+      .map(t => DataComponentPatch.CODEC.decode(NbtOps.INSTANCE, t).map(_.getFirst).getOrThrow())
     newInstance(content, amount, component)
   }
 

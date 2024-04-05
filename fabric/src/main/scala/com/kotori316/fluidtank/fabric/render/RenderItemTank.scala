@@ -33,7 +33,7 @@ class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
         tileTank.tier = tankItem.blockTank.tier
         val data = stack.get(DataComponents.BLOCK_ENTITY_DATA)
         if (data != null && !data.isEmpty) {
-          tileTank.load(data.copyTag(), Minecraft.getInstance.level.registryAccess())
+          tileTank.loadAdditional(data.copyTag(), Minecraft.getInstance.level.registryAccess())
           if (tileTank.getTank.hasContent) {
             Minecraft.getInstance.getBlockEntityRenderDispatcher.renderItem(
               tileTank, matrixStack, renderTypeBuffer, light, otherLight

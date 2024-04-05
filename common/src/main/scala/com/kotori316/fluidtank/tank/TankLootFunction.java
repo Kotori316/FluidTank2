@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.tank;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -36,7 +36,7 @@ public final class TankLootFunction extends LootItemConditionalFunction {
         return LootItemConditionalFunction.simpleBuilder(TankLootFunction::new);
     }
 
-    public static final Codec<TankLootFunction> CODEC = RecordCodecBuilder.create(
+    public static final MapCodec<TankLootFunction> CODEC = RecordCodecBuilder.mapCodec(
         instance -> LootItemConditionalFunction.commonFields(instance).apply(instance, TankLootFunction::new)
     );
 }

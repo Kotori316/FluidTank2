@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ExtraCodecs;
 import scala.jdk.javaapi.OptionConverters;
 
 import java.nio.ByteBuffer;
@@ -15,7 +14,7 @@ final class CodecHelper {
             var t = instance.group(
                 ResourceLocation.CODEC.fieldOf(access.KEY_CONTENT()).forGetter(a -> access.getKey(a.content())),
                 Codec.BYTE_BUFFER.fieldOf(access.KEY_AMOUNT_GENERIC()).forGetter(a -> ByteBuffer.wrap(a.amount().toByteArray())),
-                ExtraCodecs.strictOptionalField(DataComponentPatch.CODEC, access.KEY_COMPONENT()).forGetter(a ->
+                DataComponentPatch.CODEC.optionalFieldOf(access.KEY_COMPONENT()).forGetter(a ->
                     OptionConverters.toJava(a.componentPatch())
                 )
             );

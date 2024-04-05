@@ -17,6 +17,7 @@ import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -207,11 +208,11 @@ public abstract class TierRecipe implements CraftingRecipe {
 
     public static abstract class SerializerBase implements RecipeSerializer<TierRecipe> {
         public static final ResourceLocation LOCATION = new ResourceLocation(FluidTankCommon.modId, "crafting_grade_up");
-        private final Codec<TierRecipe> codec;
+        private final MapCodec<TierRecipe> codec;
         private final StreamCodec<RegistryFriendlyByteBuf, TierRecipe> streamCodec;
 
         public SerializerBase(Codec<Ingredient> ingredientCodec) {
-            this.codec = RecordCodecBuilder.create(instance ->
+            this.codec = RecordCodecBuilder.mapCodec(instance ->
                 instance.group(
                     Codec.STRING.xmap(Tier::valueOfIgnoreCase, Tier::name).fieldOf(KEY_TIER).forGetter(TierRecipe::getTier),
                     ingredientCodec.fieldOf(KEY_SUB_ITEM).forGetter(TierRecipe::getSubItem)
@@ -227,7 +228,7 @@ public abstract class TierRecipe implements CraftingRecipe {
         }
 
         @Override
-        public Codec<TierRecipe> codec() {
+        public MapCodec<TierRecipe> codec() {
             return this.codec;
         }
 
@@ -237,18 +238,22 @@ public abstract class TierRecipe implements CraftingRecipe {
         }
 
         public TierRecipe fromJson(JsonObject object) {
-            return this.codec.parse(JsonOps.INSTANCE, object)
-                .getOrThrow(false, s -> {
-                    LOGGER.error("Error in parsing TierRecipe ({}) from JSON {}", s, object);
-                    DebugLogging.LOGGER().error("Error in parsing TierRecipe ({}) from JSON {}", s, object);
+            return this.codec.codec().parse(JsonOps.INSTANCE, object)
+                .getOrThrow(s -> {
+                    var message = "Error in parsing TierRecipe (%s) from JSON %s".formatted(s, object);
+                    LOGGER.error(message);
+                    DebugLogging.LOGGER().error(message);
+                    return new IllegalStateException(message);
                 });
         }
 
         public JsonObject toJson(TierRecipe recipe) {
-            return this.codec.encodeStart(JsonOps.INSTANCE, recipe)
-                .getOrThrow(false, s -> {
-                    LOGGER.error("Error in encoding TierRecipe ({}) from Recipe {}", s, recipe);
-                    DebugLogging.LOGGER().error("Error in encoding TierRecipe ({}) from Recipe {}", s, recipe);
+            return this.codec.codec().encodeStart(JsonOps.INSTANCE, recipe)
+                .getOrThrow(s -> {
+                    var message = "Error in encoding TierRecipe (%s) from Recipe %s".formatted(s, recipe);
+                    LOGGER.error(message);
+                    DebugLogging.LOGGER().error(message);
+                    return new IllegalStateException(message);
                 })
                 .getAsJsonObject();
         }

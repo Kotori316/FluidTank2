@@ -9,6 +9,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.Item.TooltipContext
 import net.minecraft.world.item.{Item, ItemStack, ItemUtils, TooltipFlag, UseAnim}
 import net.minecraft.world.level.block.BucketPickup
 import net.minecraft.world.level.{ClipContext, Level}
@@ -76,8 +77,8 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
     }
   }
 
-  override def appendHoverText(stack: ItemStack, level: Level, tooltip: util.List[Component], isAdvanced: TooltipFlag): Unit = {
-    super.appendHoverText(stack, level, tooltip, isAdvanced)
+  override def appendHoverText(stack: ItemStack, context: TooltipContext, tooltip: util.List[Component], isAdvanced: TooltipFlag): Unit = {
+    super.appendHoverText(stack, context, tooltip, isAdvanced)
     val tank = getTank(stack)
     if (tank.isEmpty) {
       tooltip.add(Component.translatable("fluidtank.waila.capacity", GenericUnit.asForgeFromBigInt(tier.getCapacity)))

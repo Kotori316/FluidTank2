@@ -45,8 +45,7 @@ public interface PlatformItemAccess {
     }
 
     default JsonElement ingredientToJson(Ingredient ingredient) {
-        return ingredientCodec().encodeStart(JsonOps.INSTANCE, ingredient)
-            .get().orThrow();
+        return ingredientCodec().encodeStart(JsonOps.INSTANCE, ingredient).getOrThrow();
     }
 }
 

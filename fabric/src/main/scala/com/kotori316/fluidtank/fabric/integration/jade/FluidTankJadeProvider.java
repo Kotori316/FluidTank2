@@ -17,7 +17,7 @@ class FluidTankJadeProvider implements IServerDataProvider<BlockAccessor>, IBloc
             var languageSplit = Minecraft.getInstance().getLanguageManager().getSelected().split("_", 2);
             Locale locale;
             if (languageSplit.length == 2) {
-                locale = new Locale(languageSplit[0], languageSplit[1].toUpperCase(Locale.ROOT));
+                locale = Locale.of(languageSplit[0], languageSplit[1].toUpperCase(Locale.ROOT));
             } else {
                 locale = Locale.US;
             }

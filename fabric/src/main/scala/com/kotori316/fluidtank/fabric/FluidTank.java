@@ -76,7 +76,7 @@ public final class FluidTank implements ModInitializer {
         BlockEntityType.Builder.of(TileCreativeTankFabric::new, BLOCK_CREATIVE_TANK).build(DSL.emptyPartType());
     public static final BlockEntityType<TileVoidTank> TILE_VOID_TANK_TYPE =
         BlockEntityType.Builder.of(TileVoidTank::new, BLOCK_VOID_TANK).build(DSL.emptyPartType());
-    public static final LootItemFunctionType TANK_LOOT_FUNCTION = new LootItemFunctionType(TankLootFunction.CODEC);
+    public static final LootItemFunctionType<TankLootFunction> TANK_LOOT_FUNCTION = new LootItemFunctionType<>(TankLootFunction.CODEC);
     public static final RecipeSerializer<TierRecipe> TIER_RECIPE_SERIALIZER = TierRecipeFabric.SERIALIZER;
     public static final BlockChestAsTank BLOCK_CAT = new BlockChestAsTank();
     public static final BlockItem ITEM_CAT = new ItemChestAsTank(BLOCK_CAT);

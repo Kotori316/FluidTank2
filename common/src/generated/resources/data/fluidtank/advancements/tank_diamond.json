@@ -33,13 +33,13 @@
       "condition": "fabric:or",
       "values": [
         {
-          "condition": "fabric:item_tags_populated",
+          "condition": "fabric:tags_populated",
           "values": [
             "c:diamonds"
           ]
         },
         {
-          "condition": "fabric:item_tags_populated",
+          "condition": "fabric:tags_populated",
           "values": [
             "forge:gems/diamond"
           ]

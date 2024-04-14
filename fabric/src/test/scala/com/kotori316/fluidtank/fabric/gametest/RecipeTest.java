@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.fabric.gametest;
 
+import com.google.common.base.CaseFormat;
 import com.google.gson.JsonObject;
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.contents.GenericAmount;
@@ -12,7 +13,7 @@ import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.tank.Tier;
 import io.netty.buffer.ByteBufAllocator;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
+import net.fabricmc.fabric.impl.resource.conditions.ResourceConditionsImpl;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.gametest.framework.GameTestGenerator;
@@ -253,11 +254,15 @@ public final class RecipeTest implements FabricGameTest {
         }
     }
 
+    // just for test
+    @SuppressWarnings("UnstableApiUsage")
     void notLoadLeadRecipe(GameTestHelper helper) throws IOException {
         var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipes");
         var leadRecipe = recipeParent.resolve("tank_lead.json");
         var read = GsonHelper.parse(Files.newBufferedReader(leadRecipe));
-        assertFalse(ResourceConditions.objectMatchesConditions(read), "Lead recipe must not be loaded");
+        assertFalse(
+            ResourceConditionsImpl.applyResourceConditions(read, "TEST", new ResourceLocation(FluidTankCommon.modId, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "notLoadLeadRecipe")), helper.getLevel().registryAccess()),
+            "Lead recipe must not be loaded");
         helper.succeed();
     }
 

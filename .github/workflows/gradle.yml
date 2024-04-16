@@ -15,13 +15,14 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v3
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
       - run: chmod +x ./gradlew
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: ${{ github.event_name != 'push' }}
           gradle-home-cache-cleanup: true
@@ -50,13 +51,14 @@ jobs:
       DISABLE_NEOFORGE: ${{ matrix.platform != 'neoforge' }}
     steps:
       - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v3
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
       - run: chmod +x ./gradlew
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: ${{ github.event_name != 'push' }}
           gradle-home-cache-cleanup: true
@@ -81,21 +83,20 @@ jobs:
       DISABLE_NEOFORGE: true
     steps:
       - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v3
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
       - run: chmod +x ./gradlew
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: ${{ github.event_name != 'push' }}
           gradle-home-cache-cleanup: true
           add-job-summary: 'on-failure'
       - name: Compile
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: :forge:genDataClasses
+        run: ./gradlew :forge:genDataClasses
       - name: Prepare Run
         run: >-
           ./gradlew configureLaunch downloadAssets ||

@@ -172,7 +172,7 @@ final class RecipeTest {
             .filter(Predicate.isEqual(Tier.WOOD).negate())
             .flatMap(t -> Stream.of(
                 GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_json_" + t.name().toLowerCase(Locale.ROOT), () -> serializeJson(t)),
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_packet_" + t.name().toLowerCase(Locale.ROOT), () -> serializePacket(t))
+                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_packet_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializePacket(g, t))
             ))
             .toList();
     }
@@ -192,11 +192,11 @@ final class RecipeTest {
         );
     }
 
-    void serializePacket(Tier tier) {
+    void serializePacket(GameTestHelper helper, Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
         var recipe = new TierRecipeNeoForge(tier, TierRecipeNeoForge.Serializer.getIngredientTankForTier(tier), subItem);
 
-        var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), RegistryAccess.EMPTY);
+        var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), helper.getLevel().registryAccess());
         var streamCodec = TierRecipeNeoForge.SERIALIZER.streamCodec();
         streamCodec.encode(buffer, recipe);
         var deserialized = streamCodec.decode(buffer);
@@ -204,6 +204,7 @@ final class RecipeTest {
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), deserialized.getResultItem(RegistryAccess.EMPTY)))
         );
+        helper.succeed();
     }
 
     void getRecipeFromJson(GameTestHelper helper) {
@@ -224,6 +225,7 @@ final class RecipeTest {
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), read.getResultItem(RegistryAccess.EMPTY)))
         );
+        helper.succeed();
     }
 
     @GameTestGenerator
@@ -232,7 +234,10 @@ final class RecipeTest {
         var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipes");
         try (var files = Files.find(recipeParent, 1, (path, a) -> path.getFileName().toString().endsWith(".json"))) {
             return files.map(p -> GameTestUtil.create(FluidTankCommon.modId, "recipe_test", "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),
-                (g) -> loadFromFile(g, p))).toList();
+                (g) -> {
+                    loadFromFile(g, p);
+                    g.succeed();
+                })).toList();
         }
     }
 
@@ -241,6 +246,7 @@ final class RecipeTest {
         var leadRecipe = recipeParent.resolve("tank_lead.json");
         var read = loadFromFile(helper, leadRecipe);
         assertTrue(read.isEmpty(), "Lead recipe must not be loaded");
+        helper.succeed();
     }
 
     static Optional<Recipe<?>> loadFromFile(GameTestHelper helper, Path path) {

@@ -68,6 +68,10 @@ repositories {
             includeVersion("appeng", "appliedenergistics2-fabric", project.property("ae2_fabric_version") as String)
         }
     }
+    maven {
+        name = "MavenTestGCP"
+        url = uri("https://storage.googleapis.com/kotori316-maven-test-storage/maven/")
+    }
     mavenLocal()
 }
 

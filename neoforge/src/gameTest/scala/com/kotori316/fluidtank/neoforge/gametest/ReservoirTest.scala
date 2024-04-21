@@ -14,6 +14,7 @@ import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, Test
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.alchemy.Potions
+import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.gametest.GameTestHolder

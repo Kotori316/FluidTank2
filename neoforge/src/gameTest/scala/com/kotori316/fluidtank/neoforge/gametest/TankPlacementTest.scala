@@ -10,6 +10,7 @@ import com.kotori316.testutil.GameTestUtil
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.{Block, Blocks}
 import net.minecraft.world.phys.{BlockHitResult, Vec3}
 import net.neoforged.neoforge.gametest.GameTestHolder

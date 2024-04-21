@@ -12,19 +12,21 @@ import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.testutil.GameTestUtil;
 import com.mojang.serialization.JsonOps;
 import io.netty.buffer.ByteBufAllocator;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.gametest.framework.GameTestGenerator;
+import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.conditions.WithConditions;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +58,7 @@ final class RecipeTest {
     @NotNull
     private static TierRecipeNeoForge getRecipe() {
         return new TierRecipeNeoForge(Tier.STONE,
-            Ingredient.of(FluidTank.TANK_MAP.get(Tier.WOOD).get()), Ingredient.of(Tags.Items.STONE)
+            Ingredient.of(FluidTank.TANK_MAP.get(Tier.WOOD).get()), Ingredient.of(Tags.Items.STONES)
         );
     }
 
@@ -194,16 +196,17 @@ final class RecipeTest {
         var subItem = Ingredient.of(Items.APPLE);
         var recipe = new TierRecipeNeoForge(tier, TierRecipeNeoForge.Serializer.getIngredientTankForTier(tier), subItem);
 
-        var buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
-        TierRecipeNeoForge.SERIALIZER.toNetwork(buffer, recipe);
-        var deserialized = TierRecipeNeoForge.SERIALIZER.fromNetwork(buffer);
+        var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), RegistryAccess.EMPTY);
+        var streamCodec = TierRecipeNeoForge.SERIALIZER.streamCodec();
+        streamCodec.encode(buffer, recipe);
+        var deserialized = streamCodec.decode(buffer);
         assertNotNull(deserialized);
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), deserialized.getResultItem(RegistryAccess.EMPTY)))
         );
     }
 
-    void getRecipeFromJson() {
+    void getRecipeFromJson(GameTestHelper helper) {
         // language=json
         String jsonString = """
             {
@@ -214,7 +217,7 @@ final class RecipeTest {
               }
             }
             """.formatted(TierRecipeNeoForge.Serializer.LOCATION.toString());
-        var read = managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString)).orElseThrow();
+        var read = managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()).orElseThrow();
         var recipe = new TierRecipeNeoForge(
             Tier.STONE, TierRecipeNeoForge.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
@@ -229,28 +232,29 @@ final class RecipeTest {
         var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipes");
         try (var files = Files.find(recipeParent, 1, (path, a) -> path.getFileName().toString().endsWith(".json"))) {
             return files.map(p -> GameTestUtil.create(FluidTankCommon.modId, "recipe_test", "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),
-                () -> loadFromFile(p))).toList();
+                (g) -> loadFromFile(g, p))).toList();
         }
     }
 
-    void notLoadLeadRecipe() {
+    void notLoadLeadRecipe(GameTestHelper helper) {
         var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipes");
         var leadRecipe = recipeParent.resolve("tank_lead.json");
-        var read = loadFromFile(leadRecipe);
+        var read = loadFromFile(helper, leadRecipe);
         assertTrue(read.isEmpty(), "Lead recipe must not be loaded");
     }
 
-    static Optional<Recipe<?>> loadFromFile(Path path) {
+    static Optional<Recipe<?>> loadFromFile(GameTestHelper helper, Path path) {
         try {
             var json = GsonHelper.parse(Files.newBufferedReader(path));
-            return assertDoesNotThrow(() -> managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_load"), json));
+            return assertDoesNotThrow(() -> managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_load"), json, helper.getLevel().registryAccess()));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private static Optional<Recipe<?>> managerFromJson(ResourceLocation location, JsonObject jsonObject) {
-        return RecipeManager.fromJson(location, jsonObject, JsonOps.INSTANCE)
-            .map(RecipeHolder::value);
+    private static Optional<Recipe<?>> managerFromJson(ResourceLocation location, JsonObject jsonObject, HolderLookup.Provider provider) {
+        return Recipe.CONDITIONAL_CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, provider), jsonObject)
+            .getOrThrow()
+            .map(WithConditions::carrier);
     }
 }

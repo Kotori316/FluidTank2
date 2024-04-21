@@ -9,6 +9,7 @@ import com.kotori316.fluidtank.fabric.fluid.FabricConverter;
 import com.kotori316.fluidtank.fluids.*;
 import com.kotori316.fluidtank.potions.PotionFluidHandler;
 import com.kotori316.fluidtank.tank.BlockTank;
+import com.kotori316.fluidtank.tank.TankLootFunction;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
 import com.mojang.serialization.Codec;
@@ -185,7 +186,7 @@ final class FabricPlatformAccess implements PlatformAccess {
     }
 
     @Override
-    public LootItemFunctionType getTankLoot() {
+    public LootItemFunctionType<TankLootFunction> getTankLoot() {
         return FluidTank.TANK_LOOT_FUNCTION;
     }
 

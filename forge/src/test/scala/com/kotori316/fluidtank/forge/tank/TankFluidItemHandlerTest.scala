@@ -53,11 +53,11 @@ class TankFluidItemHandlerTest extends BeforeMC {
       val filled = handler.fill(FluidAmountUtil.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
       assertEquals(1000, filled)
       assertTrue(handler.getTank.isEmpty)
-      assertNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
       val filled2 = handler.fill(FluidAmountUtil.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
       assertEquals(1000, filled2)
       assertEquals(FluidAmountUtil.BUCKET_WATER, handler.getTank.content)
-      assertNotNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNotNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
 
     @Test
@@ -70,7 +70,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
       assertEquals(1000, filled1)
       assertEquals(1000, filled2)
       assertEquals(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(2000)), handler.getTank.content)
-      assertNotNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNotNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
 
     @Test
@@ -129,7 +129,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
         FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(500)),
         handler.getTank.content
       )
-      assertNotNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNotNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
 
     @Test
@@ -140,7 +140,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
       assertTrue(d2.isFluidStackIdentical(new FluidStack(Fluids.WATER, 1000)))
 
       assertTrue(handler.getTank.isEmpty)
-      assertNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
 
     @Test
@@ -151,7 +151,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
       assertTrue(d2.isFluidStackIdentical(new FluidStack(Fluids.WATER, 1000)))
 
       assertTrue(handler.getTank.isEmpty)
-      assertNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
 
     @Test
@@ -174,7 +174,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
       handler.drain(new FluidStack(Fluids.WATER, 1500), IFluidHandler.FluidAction.EXECUTE)
 
       assertTrue(handler.getTank.isEmpty)
-      assertNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
   }
 }

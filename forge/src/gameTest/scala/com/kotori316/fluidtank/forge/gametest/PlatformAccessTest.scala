@@ -118,7 +118,7 @@ class PlatformAccessTest {
   private def potions(): Seq[(PotionType, Potion)] = {
     for {
       t <- PotionType.values().toSeq
-      p <- Seq(Potions.WATER, Potions.EMPTY, Potions.NIGHT_VISION, Potions.LONG_NIGHT_VISION)
+      p <- Seq(Potions.WATER, Potions.AWKWARD, Potions.NIGHT_VISION, Potions.LONG_NIGHT_VISION)
     } yield (t, p)
   }
 

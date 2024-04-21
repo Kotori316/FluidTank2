@@ -80,7 +80,8 @@ class EntityChestAsTankTest extends BeforeMC {
   @MethodSource(Array("com.kotori316.fluidtank.neoforge.cat.EntityChestAsTankTest#fluids"))
   def drainStackedBucket1(fluid: FluidAmount, filledItem: ItemStack): Unit = {
     val items = new SimpleContainer(2)
-    items.setItem(1, ItemHandlerHelper.copyStackWithSize(filledItem, 2))
+    items.setItem(1, filledItem.copy())
+    items.getItem(1).setCount(2)
     val handler = new EntityChestAsTank.FluidHandlerProxy(new InvWrapper(items))
 
     val drained = handler.drain(fluid.toStack, IFluidHandler.FluidAction.EXECUTE)
@@ -92,7 +93,8 @@ class EntityChestAsTankTest extends BeforeMC {
   @MethodSource(Array("com.kotori316.fluidtank.neoforge.cat.EntityChestAsTankTest#fluids"))
   def drainStackedBucket2(fluid: FluidAmount, filledItem: ItemStack): Unit = {
     val items = new SimpleContainer(2)
-    items.setItem(0, ItemHandlerHelper.copyStackWithSize(filledItem, 2))
+    items.setItem(0, filledItem.copy())
+    items.getItem(0).setCount(2)
     val handler = new EntityChestAsTank.FluidHandlerProxy(new InvWrapper(items))
 
     val drained = handler.drain(fluid.amount.asForge, IFluidHandler.FluidAction.EXECUTE)

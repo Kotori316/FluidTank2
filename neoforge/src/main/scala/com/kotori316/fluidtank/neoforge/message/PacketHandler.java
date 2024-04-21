@@ -10,8 +10,8 @@ public final class PacketHandler {
     public static void init(RegisterPayloadHandlerEvent event) {
         var registrar = event.registrar(FluidTankCommon.modId).versioned("1");
         registrar.play(
-            IMessage.createIdentifier(FluidTankContentMessageNeoForge.class),
-            FluidTankContentMessageNeoForge::new,
+            FluidTankContentMessageNeoForge.TYPE,
+            FluidTankContentMessageNeoForge.STREAM_CODEC,
             handler -> handler.client(FluidTankContentMessageNeoForge::onReceiveMessage)
         );
     }

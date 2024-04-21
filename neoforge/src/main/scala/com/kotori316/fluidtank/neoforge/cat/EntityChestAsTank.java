@@ -185,7 +185,7 @@ public class EntityChestAsTank extends BlockEntity {
             return IntStream.range(0, getTanks())
                 .mapToObj(this::getFluidInTank)
                 .filter(Predicate.not(FluidStack::isEmpty))
-                .collect(Collectors.groupingBy(f -> FluidLikeKey.apply(FluidLike.of(f.getFluid()), f.getTag()),
+                .collect(Collectors.groupingBy(f -> FluidLikeKey.apply(FluidLike.of(f.getFluid()), f.getComponentsPatch()),
                     Collectors.reducing(BigInt.apply(0), f -> GenericUnit.asBigIntFromForge(f.getAmount()), BigInt::$plus)));
         }
     }

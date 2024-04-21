@@ -30,7 +30,7 @@ import java.util.stream.StreamSupport;
 
 public final class IgnoreUnknownTagIngredient extends Ingredient {
     public static final String NAME = "ignore_unknown_tag_ingredient";
-    private static final Codec<IgnoreUnknownTagIngredient> CODEC = new MapCodec.MapCodecCodec<>(new MapC());
+    private static final MapCodec<IgnoreUnknownTagIngredient> CODEC = new MapC();
     public static final IngredientType<IgnoreUnknownTagIngredient> SERIALIZER = new IngredientType<>(CODEC);
 
     private final List<? extends Value> values;

@@ -5,9 +5,14 @@ import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, FluidLike, 
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
 import com.kotori316.fluidtank.neoforge.fluid.TankFluidHandler
 import com.kotori316.fluidtank.tank.{Tier, TileTank}
-import net.minecraft.world.item.{BlockItem, ItemStack}
+import net.minecraft.core.component.DataComponents
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.CustomData
 import net.neoforged.neoforge.fluids.capability.{IFluidHandler, IFluidHandlerItem}
 import org.jetbrains.annotations.VisibleForTesting
+
+import scala.jdk.OptionConverters.RichOptional
 
 class TankFluidItemHandler(tier: Tier, stack: ItemStack) extends TankFluidHandler {
 
@@ -16,23 +21,30 @@ class TankFluidItemHandler(tier: Tier, stack: ItemStack) extends TankFluidHandle
   override def getContainer: ItemStack = stack
 
   override def getTank: Tank[FluidLike] = {
-    val tag = BlockItem.getBlockEntityData(getContainer)
-    if (tag == null || !tag.contains(TileTank.KEY_TANK)) return Tank(FluidAmountUtil.EMPTY, GenericUnit(tier.getCapacity))
-
-    TankUtil.load(tag.getCompound(TileTank.KEY_TANK))
+    val componentPatch = getContainer.getComponentsPatch
+    val maybeTank = for {
+      blockEntityData <- Option(componentPatch.get(DataComponents.BLOCK_ENTITY_DATA)).flatMap(_.toScala)
+      if blockEntityData.contains(TileTank.KEY_TANK)
+      customTag = blockEntityData.copyTag()
+      tankTag <- Option(customTag.getCompound(TileTank.KEY_TANK))
+    } yield TankUtil.load(tankTag)
+    maybeTank.getOrElse(Tank(FluidAmountUtil.EMPTY, GenericUnit(tier.getCapacity)))
   }
 
   override def saveTank(tank: Tank[FluidLike]): Unit = {
     if (tank.isEmpty) {
       // remove tags related to block entity
       // Other mods might add own tags in BlockEntityTag, but remove them as they will cause rendering issue.
-      getContainer.removeTagKey(BlockItem.BLOCK_ENTITY_TAG)
+      getContainer.remove(DataComponents.BLOCK_ENTITY_DATA)
     } else {
       val tankTag = TankUtil.save(tank)
-      val tag = getContainer.getOrCreateTagElement(BlockItem.BLOCK_ENTITY_TAG)
+      val tag = Option(getContainer.getComponentsPatch.get(DataComponents.BLOCK_ENTITY_DATA))
+        .flatMap(_.toScala)
+        .map(_.copyTag())
+        .getOrElse(new CompoundTag())
       tag.put(TileTank.KEY_TANK, tankTag)
       tag.putString(TileTank.KEY_TIER, tier.name())
-      // No need to save because the instance is shared.
+      getContainer.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag))
     }
   }
 

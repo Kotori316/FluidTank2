@@ -28,7 +28,7 @@ loom {
     runs {
         named("client") {
             configName = "Client"
-            property("forge.enabledGameTestNamespaces", "fluidtank")
+            property("neoforge.enabledGameTestNamespaces", "fluidtank")
             runDir = "run"
             mods {
                 create("main") {
@@ -49,7 +49,7 @@ loom {
             forgeTemplate("gameTestServer")
             vmArg("-ea")
             property("fabric.dli.env", "gameTestServer")
-            property("forge.enabledGameTestNamespaces", "fluidtank")
+            property("neoforge.enabledGameTestNamespaces", "fluidtank")
             runDir = "game-test"
             mods {
                 create("main") {
@@ -81,7 +81,7 @@ dependencies {
     runtimeOnly(
         group = "com.kotori316",
         name = "ScalableCatsForce-NeoForge".lowercase(),
-        version = project.property("slpVersion").toString(),
+        version = project.property("slp_neoforge_version").toString(),
         classifier = "with-library"
     ) {
         isTransitive = false
@@ -142,7 +142,7 @@ ext {
         | -- | -- |
         | Minecraft | ${project.property("minecraft_version")} |
         | NeoForge | ${project.property("neoforge_version")} |
-        | scalable-cats-force | ${project.property("slpVersion")} |
+        | scalable-cats-force | ${project.property("slp_neoforge_version")} |
         """.trimIndent()
     )
 }

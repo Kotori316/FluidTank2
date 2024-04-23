@@ -41,7 +41,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.crafting.IngredientType;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.*;
 
 import java.util.Comparator;
@@ -137,7 +137,7 @@ public final class FluidTank {
     }
 
     @SubscribeEvent
-    public void setupPacket(RegisterPayloadHandlerEvent event) {
+    public void setupPacket(RegisterPayloadHandlersEvent event) {
         PacketHandler.init(event);
     }
 

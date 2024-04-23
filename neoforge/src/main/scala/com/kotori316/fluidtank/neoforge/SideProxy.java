@@ -14,13 +14,13 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Optional;
 
 public abstract class SideProxy {
 
-    public abstract Optional<Level> getLevel(PlayPayloadContext context);
+    public abstract Optional<Level> getLevel(IPayloadContext context);
 
     public static SideProxy get() {
         return switch (FMLEnvironment.dist) {
@@ -44,8 +44,8 @@ public abstract class SideProxy {
         }
 
         @Override
-        public Optional<Level> getLevel(PlayPayloadContext context) {
-            return context.level();
+        public Optional<Level> getLevel(IPayloadContext context) {
+            return Optional.of(context.player().level());
         }
 
         @SubscribeEvent
@@ -65,8 +65,8 @@ public abstract class SideProxy {
         }
 
         @Override
-        public Optional<Level> getLevel(PlayPayloadContext context) {
-            return context.level();
+        public Optional<Level> getLevel(IPayloadContext context) {
+            return Optional.of(context.player().level());
         }
 
         /**

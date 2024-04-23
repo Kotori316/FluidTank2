@@ -4,15 +4,15 @@ import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.message.IMessage;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 public final class PacketHandler {
-    public static void init(RegisterPayloadHandlerEvent event) {
+    public static void init(RegisterPayloadHandlersEvent event) {
         var registrar = event.registrar(FluidTankCommon.modId).versioned("1");
-        registrar.play(
+        registrar.playToClient(
             FluidTankContentMessageNeoForge.TYPE,
             FluidTankContentMessageNeoForge.STREAM_CODEC,
-            handler -> handler.client(FluidTankContentMessageNeoForge::onReceiveMessage)
+            FluidTankContentMessageNeoForge::onReceiveMessage
         );
     }
 

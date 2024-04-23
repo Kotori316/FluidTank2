@@ -12,7 +12,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Objects;
 
@@ -38,9 +38,9 @@ public final class FluidTankContentMessageNeoForge extends FluidTankContentMessa
         super(buf);
     }
 
-    void onReceiveMessage(PlayPayloadContext context) {
+    void onReceiveMessage(IPayloadContext context) {
         // Should be client side
-        context.workHandler().execute(() ->
+        context.enqueueWork(() ->
             this.onReceive(FluidTank.proxy.getLevel(context).orElse(null))
         );
     }

@@ -28,7 +28,7 @@ public final class TankLootFunction extends LootItemConditionalFunction {
     }
 
     @Override
-    public LootItemFunctionType getType() {
+    public LootItemFunctionType<TankLootFunction> getType() {
         return PlatformTankAccess.getInstance().getTankLoot();
     }
 

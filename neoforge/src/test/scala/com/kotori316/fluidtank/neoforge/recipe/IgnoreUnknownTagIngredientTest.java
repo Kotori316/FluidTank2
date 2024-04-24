@@ -43,7 +43,7 @@ class IgnoreUnknownTagIngredientTest extends BeforeMC {
                   "item": "minecraft:apple"
                 }
                 """;
-            var result = Ingredient.VANILLA_CODEC.decode(JsonOps.INSTANCE, GsonHelper.parse(json));
+            var result = Ingredient.CODEC.decode(JsonOps.INSTANCE, GsonHelper.parse(json));
             var ingredient = assertDoesNotThrow(() -> result.getOrThrow().getFirst());
             var expected = Ingredient.of(Items.APPLE);
 
@@ -58,7 +58,7 @@ class IgnoreUnknownTagIngredientTest extends BeforeMC {
                   "tag": "minecraft:logs"
                 }
                 """;
-            var result = Ingredient.VANILLA_CODEC.decode(JsonOps.INSTANCE, GsonHelper.parse(json));
+            var result = Ingredient.CODEC.decode(JsonOps.INSTANCE, GsonHelper.parse(json));
             var ingredient = assertDoesNotThrow(() -> result.getOrThrow().getFirst());
             var expected = Ingredient.of(ItemTags.LOGS);
 
@@ -114,7 +114,7 @@ class IgnoreUnknownTagIngredientTest extends BeforeMC {
                 }
                 """;
             var result = Ingredient.CODEC.decode(JsonOps.INSTANCE, GsonHelper.parse(json));
-            var ingredient = assertInstanceOf(IgnoreUnknownTagIngredient.class, assertDoesNotThrow(() -> result.getOrThrow().getFirst()));
+            var ingredient = assertInstanceOf(Ingredient.class, assertDoesNotThrow(() -> result.getOrThrow().getFirst()));
             var expected = IgnoreUnknownTagIngredient.of(Items.APPLE);
 
             assertIngredientEqual(expected, ingredient);
@@ -130,7 +130,7 @@ class IgnoreUnknownTagIngredientTest extends BeforeMC {
                 }
                 """;
             var result = Ingredient.CODEC.decode(JsonOps.INSTANCE, GsonHelper.parse(json));
-            var ingredient = assertInstanceOf(IgnoreUnknownTagIngredient.class, assertDoesNotThrow(() -> result.getOrThrow().getFirst()));
+            var ingredient = assertInstanceOf(Ingredient.class, assertDoesNotThrow(() -> result.getOrThrow().getFirst()));
             var expected = IgnoreUnknownTagIngredient.of(ItemTags.LOGS);
 
             assertIngredientEqual(expected, ingredient);
@@ -146,7 +146,7 @@ class IgnoreUnknownTagIngredientTest extends BeforeMC {
                 }
                 """;
             var result = Ingredient.CODEC.decode(JsonOps.INSTANCE, GsonHelper.parse(json));
-            var ingredient = assertInstanceOf(IgnoreUnknownTagIngredient.class, assertDoesNotThrow(() -> result.getOrThrow().getFirst()));
+            var ingredient = assertInstanceOf(Ingredient.class, assertDoesNotThrow(() -> result.getOrThrow().getFirst()));
             assertEquals(0, ingredient.getItems().length);
         }
 
@@ -163,8 +163,9 @@ class IgnoreUnknownTagIngredientTest extends BeforeMC {
                 }
                 """;
             var result = Ingredient.CODEC.decode(JsonOps.INSTANCE, GsonHelper.parse(json));
-            var ingredient = assertInstanceOf(IgnoreUnknownTagIngredient.class, assertDoesNotThrow(() -> result.getOrThrow().getFirst()));
-            assertEquals(2, ingredient.getIngredientValues().size());
+            var ingredient = assertInstanceOf(Ingredient.class, assertDoesNotThrow(() -> result.getOrThrow().getFirst()));
+            var custom = assertInstanceOf(IgnoreUnknownTagIngredient.class, ingredient.getCustomIngredient());
+            assertEquals(2, custom.getIngredientValues().size());
         }
     }
 
@@ -174,7 +175,7 @@ class IgnoreUnknownTagIngredientTest extends BeforeMC {
         void singleItemInternal() {
             var ingredient = IgnoreUnknownTagIngredient.of(Items.APPLE);
             var codec = IgnoreUnknownTagIngredient.SERIALIZER.codec().codec();
-            var encoded = codec.encodeStart(JsonOps.INSTANCE, ingredient);
+            var encoded = codec.encodeStart(JsonOps.INSTANCE, (IgnoreUnknownTagIngredient) ingredient.getCustomIngredient());
             var json = assertDoesNotThrow(() -> encoded.getOrThrow());
             assertTrue(json.isJsonObject());
 

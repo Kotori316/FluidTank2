@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "fluidtank_data",
+  "version": "1.0.0",
+  "name": "Fluid Tank Data gen",
+  "entrypoints": {
+    "fabric-datagen": [
+      "com.kotori316.fluidtank.fabric.data.FluidTankDataProvider"
+    ]
+  }
+}

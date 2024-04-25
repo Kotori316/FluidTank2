@@ -9,6 +9,17 @@ architectury {
     fabric()
 }
 
+fabricApi {
+    configureDataGeneration {
+        createSourceSet = true
+        outputDirectory = file("../common/src/generated/resources/")
+        modId = "fluidtank_data"
+        // define custom configuration as default one runs on server and never terminate
+        createRunConfiguration = false
+        addToResources = false
+    }
+}
+
 loom {
     runs {
         named("client") {
@@ -32,6 +43,16 @@ loom {
             runDir = "game-test"
             source(sourceSets["test"])
         }
+
+        create("data") {
+            name("Fabric Data")
+            client()
+            runDir("build/datagen")
+            property("fabric-api.datagen")
+            property("fabric-api.datagen.output-dir", file("../common/src/generated/resources/").absolutePath)
+            property("fabric-api.datagen.modid", "fluidtank_data")
+            source(sourceSets["datagen"])
+        }
     }
 }
 
@@ -42,6 +63,9 @@ repositories {
 configurations {
     named("developmentFabric") {
         extendsFrom(common.get())
+    }
+    named("datagenRuntimeClasspath") {
+        extendsFrom(testRuntimeClasspath.get())
     }
 }
 

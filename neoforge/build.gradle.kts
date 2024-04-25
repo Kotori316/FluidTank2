@@ -70,9 +70,6 @@ configurations {
 }
 
 repositories {
-    maven {
-        url = uri("https://prmaven.neoforged.net/NeoForge/pr794")
-    }
 }
 
 dependencies {

@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank.neoforge;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.kotori316.fluidtank.PlatformAccess;
 import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
@@ -160,6 +162,15 @@ final class NeoForgePlatformAccess implements PlatformAccess {
     public Codec<Ingredient> ingredientCodec() {
         // OK, forge magic is included in the codec.
         return Ingredient.CODEC;
+    }
+
+    @Override
+    public JsonElement ingredientToJson(Ingredient ingredient) {
+        if (ingredient.hasNoItems()) {
+            // NeoForge throws error when ingredient is empty.
+            return new JsonArray();
+        }
+        return PlatformAccess.super.ingredientToJson(ingredient);
     }
 
     @Override

@@ -31,7 +31,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -56,12 +56,12 @@ import java.util.stream.Stream;
 public final class FluidTank {
     public static final SideProxy proxy = SideProxy.get();
 
-    public FluidTank(IEventBus modBus) {
-        FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize {}", FluidTankCommon.modId);
+    public FluidTank(IEventBus modBus, ModContainer container) {
+        FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize {} with {}", FluidTankCommon.modId, container.getClass().getName());
         NeoForgeMod.enableMilkFluid();
         REGISTER_LIST.forEach(r -> r.register(modBus));
         PlatformAccess.setInstance(new NeoForgePlatformAccess());
-        setupConfig(modBus);
+        setupConfig(modBus, container);
         modBus.register(this);
         modBus.register(proxy);
         modBus.addListener(FluidTank::registerCapabilities);
@@ -71,12 +71,12 @@ public final class FluidTank {
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize finished {}", FluidTankCommon.modId);
     }
 
-    private static void setupConfig(IEventBus modBus) {
+    private static void setupConfig(IEventBus modBus, ModContainer container) {
         var config = new NeoForgePlatformConfigAccess();
         modBus.register(config);
         var builder = config.setupConfig();
         PlatformConfigAccess.setInstance(config);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, builder.build());
+        container.registerConfig(ModConfig.Type.COMMON, builder.build());
     }
 
     private static final DeferredRegister.Blocks BLOCK_REGISTER = DeferredRegister.createBlocks(FluidTankCommon.modId);

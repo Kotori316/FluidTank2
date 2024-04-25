@@ -1,5 +1,5 @@
-modLoader = "javafml"
-loaderVersion = "[1,)"
+modLoader = "kotori_scala"
+loaderVersion = "[3.3.3,)"
 license = "All rights reserved"
 
 [[mods]]

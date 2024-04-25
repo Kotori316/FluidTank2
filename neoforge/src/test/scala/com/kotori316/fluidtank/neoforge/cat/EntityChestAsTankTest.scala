@@ -7,7 +7,6 @@ import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.FluidAmount2Flui
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.{ItemStack, Items}
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
-import net.neoforged.neoforge.items.ItemHandlerHelper
 import net.neoforged.neoforge.items.wrapper.InvWrapper
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
 import org.junit.jupiter.api.Test
@@ -38,7 +37,7 @@ class EntityChestAsTankTest extends BeforeMC {
   @ParameterizedTest
   @MethodSource(Array("com.kotori316.fluidtank.neoforge.cat.EntityChestAsTankTest#fluids"))
   def drainFromBucket1(fluid: FluidAmount, filledItem: ItemStack): Unit = {
-    val items = new SimpleContainer(Seq.fill(10)(ItemHandlerHelper.copyStackWithSize(filledItem, 1)) *)
+    val items = new SimpleContainer(Seq.fill(10)(filledItem.copyWithCount(1)) *)
     val handler = new EntityChestAsTank.FluidHandlerProxy(new InvWrapper(items))
 
     val drained = handler.drain(fluid.toStack, IFluidHandler.FluidAction.EXECUTE)
@@ -52,7 +51,7 @@ class EntityChestAsTankTest extends BeforeMC {
   @ParameterizedTest
   @MethodSource(Array("com.kotori316.fluidtank.neoforge.cat.EntityChestAsTankTest#fluids"))
   def drainFromBucket2(fluid: FluidAmount, filledItem: ItemStack): Unit = {
-    val items = new SimpleContainer(Seq.fill(10)(ItemHandlerHelper.copyStackWithSize(filledItem, 1)) *)
+    val items = new SimpleContainer(Seq.fill(10)(filledItem.copyWithCount(1)) *)
     val handler = new EntityChestAsTank.FluidHandlerProxy(new InvWrapper(items))
 
     val drained = handler.drain(fluid.amount.asForge, IFluidHandler.FluidAction.EXECUTE)

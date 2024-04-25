@@ -43,8 +43,8 @@ object RecipeInventoryUtil {
     stack
   }
 
-  final class DummyContainer extends AbstractContainerMenu(null, 35) {
-    val inventory = new SimpleContainer(9)
+  private final class DummyContainer extends AbstractContainerMenu(null, 35) {
+    private val inventory = new SimpleContainer(9)
     for (i <- 0 until inventory.getContainerSize) {
       addSlot(new Slot(inventory, i, 0, 0))
     }

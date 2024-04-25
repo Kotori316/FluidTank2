@@ -53,7 +53,7 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
         }
         InteractionResult.SUCCESS
       case tile =>
-        FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {}", pos.show, tile)
+        FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {} in useWithoutItem", pos.show, tile)
         super.useWithoutItem(blockState, level, pos, player, blockHitResult)
     }
   }
@@ -82,7 +82,7 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
           ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
         }
       case tile =>
-        FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {}", pos.show, tile)
+        FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {} in useItemOn", pos.show, tile)
         ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
     }
   }
@@ -91,7 +91,7 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
     super.setPlacedBy(level, pos, state, entity, stack)
     level.getBlockEntity(pos) match {
       case tank: TileTank => if (!level.isClientSide) tank.onBlockPlacedBy()
-      case tile => FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {}", pos.show, tile)
+      case tile => FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {} in setPlacedBy", pos.show, tile)
     }
   }
 
@@ -102,7 +102,7 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
   override final def getAnalogOutputSignal(blockState: BlockState, level: Level, pos: BlockPos): Int = {
     level.getBlockEntity(pos) match {
       case tileTank: TileTank => tileTank.getComparatorLevel
-      case tile => FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {}", pos.show, tile); 0
+      case tile => FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {} in getAnalogOutputSignal", pos.show, tile); 0
     }
   }
 
@@ -111,7 +111,7 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
     if (!state.is(newState.getBlock)) {
       level.getBlockEntity(pos) match {
         case tank: TileTank => tank.onDestroy()
-        case tile => FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {}", pos.show, tile)
+        case tile => FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {} in onRemove", pos.show, tile)
       }
       //noinspection ScalaDeprecation,deprecation
       super.onRemove(state, level, pos, newState, moved): @nowarn

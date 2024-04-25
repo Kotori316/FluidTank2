@@ -119,14 +119,14 @@ class TankFluidItemHandlerTest extends BeforeMC {
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
 
       val d1 = handler.drain(new FluidStack(Fluids.WATER, 500), IFluidHandler.FluidAction.SIMULATE)
-      assertTrue(d1.isFluidStackIdentical(new FluidStack(Fluids.WATER, 500)))
+      assertTrue(FluidStack.matches(d1, new FluidStack(Fluids.WATER, 500)))
       assertEquals(
         FluidAmountUtil.BUCKET_WATER,
         handler.getTank.content
       )
 
       val d2 = handler.drain(new FluidStack(Fluids.WATER, 500), IFluidHandler.FluidAction.EXECUTE)
-      assertTrue(d2.isFluidStackIdentical(new FluidStack(Fluids.WATER, 500)))
+      assertTrue(FluidStack.matches(d2, new FluidStack(Fluids.WATER, 500)))
       assertEquals(
         FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(500)),
         handler.getTank.content
@@ -139,7 +139,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
       val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
       val d2 = handler.drain(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE)
-      assertTrue(d2.isFluidStackIdentical(new FluidStack(Fluids.WATER, 1000)))
+      assertTrue(FluidStack.matches(d2, new FluidStack(Fluids.WATER, 1000)))
 
       assertTrue(handler.getTank.isEmpty)
       assertNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
@@ -150,7 +150,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
       val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
       val d2 = handler.drain(new FluidStack(Fluids.WATER, 1500), IFluidHandler.FluidAction.EXECUTE)
-      assertTrue(d2.isFluidStackIdentical(new FluidStack(Fluids.WATER, 1000)))
+      assertTrue(FluidStack.matches(d2, new FluidStack(Fluids.WATER, 1000)))
 
       assertTrue(handler.getTank.isEmpty)
       assertNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))

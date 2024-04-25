@@ -8,7 +8,6 @@ import com.kotori316.fluidtank.tank.TileCreativeTank;
 import com.kotori316.fluidtank.tank.VisualTank;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 
 public final class TileCreativeTankFabric extends TileCreativeTank {
 

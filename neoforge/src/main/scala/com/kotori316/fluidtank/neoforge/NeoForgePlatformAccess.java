@@ -37,7 +37,6 @@ import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.neoforged.neoforge.common.SoundActions;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,7 +80,7 @@ final class NeoForgePlatformAccess implements PlatformAccess {
     @Override
     public Component getDisplayName(GenericAmount<FluidLike> amount) {
         if (amount.content() instanceof VanillaFluid) {
-            return NeoForgeConverter.toStack(amount).getDisplayName();
+            return NeoForgeConverter.toStack(amount).getHoverName();
         } else if (amount.content() instanceof VanillaPotion vanillaPotion) {
             return vanillaPotion.getVanillaPotionName(amount.componentPatch());
         } else {
@@ -95,7 +94,7 @@ final class NeoForgePlatformAccess implements PlatformAccess {
             var potionHandler = PotionFluidHandler.apply(fluidContainer);
             return potionHandler.fill(toFill, vanillaPotion);
         }
-        return FluidUtil.getFluidHandler(ItemHandlerHelper.copyStackWithSize(fluidContainer, 1))
+        return FluidUtil.getFluidHandler(fluidContainer.copyWithCount(1))
             .map(h -> {
                 int filledAmount = h.fill(NeoForgeConverter.toStack(toFill), IFluidHandler.FluidAction.EXECUTE);
                 return new TransferStack(toFill.setAmount(GenericUnit.fromForge(filledAmount)), h.getContainer());
@@ -109,7 +108,7 @@ final class NeoForgePlatformAccess implements PlatformAccess {
             var potionHandler = PotionFluidHandler.apply(fluidContainer);
             return potionHandler.drain(toDrain, v);
         }
-        return FluidUtil.getFluidHandler(ItemHandlerHelper.copyStackWithSize(fluidContainer, 1))
+        return FluidUtil.getFluidHandler(fluidContainer.copyWithCount(1))
             .map(h -> {
                 var drained = h.drain(NeoForgeConverter.toStack(toDrain), IFluidHandler.FluidAction.EXECUTE);
                 return new TransferStack(NeoForgeConverter.toAmount(drained), h.getContainer());

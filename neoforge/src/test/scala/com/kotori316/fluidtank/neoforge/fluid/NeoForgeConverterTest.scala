@@ -17,7 +17,7 @@ class NeoForgeConverterTest extends BeforeMC {
   @TestFactory
   def testToFluidStack(): Array[DynamicNode] = {
     conversion.map { case (amount, stack) => DynamicTest.dynamicTest(amount.toString, () => {
-      Assertions.assertTrue(stack.isFluidStackIdentical(amount.toStack))
+      Assertions.assertTrue(FluidStack.matches(stack, amount.toStack))
     })
     }.toArray
   }

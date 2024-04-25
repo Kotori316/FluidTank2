@@ -159,18 +159,21 @@ public final class IgnoreUnknownTagIngredient implements ICustomIngredient {
         }
 
         private static <T> RecordBuilder<T> encodeValue(Ingredient.Value value, DynamicOps<T> ops, RecordBuilder<T> builder) {
-            if (value instanceof Ingredient.ItemValue itemValue) {
-                var key = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(itemValue.item().getItem()));
-                builder.add("item", ops.createString(key.toString()));
-                return builder;
-            } else if (value instanceof Ingredient.TagValue tagValue) {
-                builder.add("tag", ops.createString(tagValue.tag().location().toString()));
-                return builder;
-            } else if (value instanceof IgnoreUnknownTagIngredient.TagValue tagValue) {
-                builder.add("tag", ops.createString(tagValue.tag.location().toString()));
-                return builder;
-            } else {
-                throw new IllegalArgumentException("Unexpected value type " + value);
+            switch (value) {
+                case Ingredient.ItemValue itemValue -> {
+                    var key = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(itemValue.item().getItem()));
+                    builder.add("item", ops.createString(key.toString()));
+                    return builder;
+                }
+                case Ingredient.TagValue tagValue -> {
+                    builder.add("tag", ops.createString(tagValue.tag().location().toString()));
+                    return builder;
+                }
+                case IgnoreUnknownTagIngredient.TagValue tagValue -> {
+                    builder.add("tag", ops.createString(tagValue.tag.location().toString()));
+                    return builder;
+                }
+                case null, default -> throw new IllegalArgumentException("Unexpected value type " + value);
             }
         }
     }

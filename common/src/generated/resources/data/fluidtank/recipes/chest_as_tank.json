@@ -20,6 +20,6 @@
     "xxx"
   ],
   "result": {
-    "item": "fluidtank:chest_as_tank"
+    "id": "fluidtank:chest_as_tank"
   }
 }

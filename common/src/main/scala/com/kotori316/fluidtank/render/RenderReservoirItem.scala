@@ -32,28 +32,26 @@ abstract class RenderReservoirItem extends BlockEntityWithoutLevelRenderer(Minec
     RenderSystem.enableCull()
     this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0f, 1.0f, 1.0f, 1.0f)
 
-    if (stack.hasTag) {
-      val tank = reservoir.getTank(stack)
-      if (tank.hasContent) {
-        val ratio = Mth.clamp(tank.content.amount.asForgeDouble / tank.capacity.asForgeDouble, 0.1d, 1d)
-        val (minY, maxY) = if (tank.content.isGaseous) {
-          (1d - ratio, 1d)
-        } else {
-          (0d, ratio)
-        }
-
-        val box = Box(0.5, minY, 0.5d / 16d,
-          0.5, maxY, 0.5d / 16d,
-          11.9d / 16d, maxY - minY, 0.99d / 16d, firstSide = false, endSide = false)
-        val texture = getFluidTexture(tank)
-        val color = getFluidColor(tank)
-        val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
-        box.render(
-          buffer = buffer.getBuffer(RenderType.translucent),
-          matrix = poseStack, sprite = texture,
-          alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF
-        )
+    val tank = reservoir.getTank(stack)
+    if (tank.hasContent) {
+      val ratio = Mth.clamp(tank.content.amount.asForgeDouble / tank.capacity.asForgeDouble, 0.1d, 1d)
+      val (minY, maxY) = if (tank.content.isGaseous) {
+        (1d - ratio, 1d)
+      } else {
+        (0d, ratio)
       }
+
+      val box = Box(0.5, minY, 0.5d / 16d,
+        0.5, maxY, 0.5d / 16d,
+        11.9d / 16d, maxY - minY, 0.99d / 16d, firstSide = false, endSide = false)
+      val texture = getFluidTexture(tank)
+      val color = getFluidColor(tank)
+      val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
+      box.render(
+        buffer = buffer.getBuffer(RenderType.translucent),
+        matrix = poseStack, sprite = texture,
+        alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF
+      )
     }
 
     poseStack.popPose()

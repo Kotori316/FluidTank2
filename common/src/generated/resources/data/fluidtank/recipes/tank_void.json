@@ -30,6 +30,6 @@
     "ooo"
   ],
   "result": {
-    "item": "fluidtank:tank_void"
+    "id": "fluidtank:tank_void"
   }
 }

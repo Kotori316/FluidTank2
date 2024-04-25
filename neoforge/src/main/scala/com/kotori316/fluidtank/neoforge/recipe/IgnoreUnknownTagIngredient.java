@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.kotori316.fluidtank.DebugLogging;
 import com.kotori316.fluidtank.FluidTankCommon;
-import com.kotori316.fluidtank.neoforge.FluidTank;
 import com.mojang.serialization.*;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,6 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import net.neoforged.neoforge.common.crafting.IngredientType;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -28,24 +28,35 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public final class IgnoreUnknownTagIngredient extends Ingredient {
+public final class IgnoreUnknownTagIngredient implements ICustomIngredient {
     public static final String NAME = "ignore_unknown_tag_ingredient";
-    private static final Codec<IgnoreUnknownTagIngredient> CODEC = new MapCodec.MapCodecCodec<>(new MapC());
+    private static final MapCodec<IgnoreUnknownTagIngredient> CODEC = new MapC();
     public static final IngredientType<IgnoreUnknownTagIngredient> SERIALIZER = new IngredientType<>(CODEC);
 
-    private final List<? extends Value> values;
+    private final List<? extends Ingredient.Value> values;
 
-    public IgnoreUnknownTagIngredient(List<? extends Value> values) {
-        super(values.stream(), FluidTank.IU_INGREDIENT);
+    public IgnoreUnknownTagIngredient(List<? extends Ingredient.Value> values) {
         this.values = values;
     }
 
-    public static IgnoreUnknownTagIngredient of(ItemLike item) {
-        return new IgnoreUnknownTagIngredient(List.of(new ItemValue(new ItemStack(item))));
+    public static Ingredient of(ItemLike item) {
+        var ignoreUnknownTagIngredient = new IgnoreUnknownTagIngredient(List.of(new Ingredient.ItemValue(new ItemStack(item))));
+        return new Ingredient(ignoreUnknownTagIngredient);
     }
 
-    public static IgnoreUnknownTagIngredient of(TagKey<Item> tag) {
-        return new IgnoreUnknownTagIngredient(List.of(new TagValue(tag)));
+    public static Ingredient of(TagKey<Item> tag) {
+        var ignoreUnknownTagIngredient = new IgnoreUnknownTagIngredient(List.of(new TagValue(tag)));
+        return new Ingredient(ignoreUnknownTagIngredient);
+    }
+
+    @Override
+    public boolean test(ItemStack arg) {
+        return getItems().anyMatch(t -> t.is(arg.getItem()));
+    }
+
+    @Override
+    public Stream<ItemStack> getItems() {
+        return values.stream().flatMap(v -> v.getItems().stream());
     }
 
     @Override
@@ -53,12 +64,17 @@ public final class IgnoreUnknownTagIngredient extends Ingredient {
         return true;
     }
 
-    public List<? extends Value> getIngredientValues() {
+    @Override
+    public IngredientType<?> getType() {
+        return SERIALIZER;
+    }
+
+    public List<? extends Ingredient.Value> getIngredientValues() {
         return Collections.unmodifiableList(this.values);
     }
 
     @SuppressWarnings("ClassCanBeRecord")
-    private static final class TagValue implements Value {
+    private static final class TagValue implements Ingredient.Value {
         private final TagKey<Item> tag;
 
         private TagValue(TagKey<Item> tag) {
@@ -81,7 +97,7 @@ public final class IgnoreUnknownTagIngredient extends Ingredient {
 
         public static IgnoreUnknownTagIngredient parse(JsonObject json) {
             if (json.has("item") || json.has("tag")) {
-                List<Value> valueList = List.of(getValue(json));
+                List<Ingredient.Value> valueList = List.of(getValue(json));
                 return new IgnoreUnknownTagIngredient(valueList);
             } else if (json.has("values")) {
                 return parse(json.getAsJsonArray("values"));
@@ -91,17 +107,17 @@ public final class IgnoreUnknownTagIngredient extends Ingredient {
         }
 
         public static IgnoreUnknownTagIngredient parse(JsonArray json) {
-            List<Value> valueList = StreamSupport.stream(json.spliterator(), false)
+            List<Ingredient.Value> valueList = StreamSupport.stream(json.spliterator(), false)
                 .map(JsonElement::getAsJsonObject)
                 .map(MapC::getValue)
                 .toList();
             return new IgnoreUnknownTagIngredient(valueList);
         }
 
-        private static Value getValue(JsonObject json) {
+        private static Ingredient.Value getValue(JsonObject json) {
             if (json.has("item")) {
                 Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(json, "item")));
-                return new ItemValue(new ItemStack(item));
+                return new Ingredient.ItemValue(new ItemStack(item));
             } else if (json.has("tag")) {
                 ResourceLocation resourcelocation = new ResourceLocation(GsonHelper.getAsString(json, "tag"));
                 TagKey<Item> tagkey = TagKey.create(Registries.ITEM, resourcelocation);
@@ -132,7 +148,7 @@ public final class IgnoreUnknownTagIngredient extends Ingredient {
         public <T> RecordBuilder<T> encode(IgnoreUnknownTagIngredient input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
             prefix.add("fabric:type", ops.createString(FluidTankCommon.modId + ":" + NAME));
             var listBuilder = ops.listBuilder();
-            for (Value value : input.values) {
+            for (Ingredient.Value value : input.values) {
                 var builder = encodeValue(value, ops, ops.mapBuilder());
                 var map = builder.build(ops.empty());
                 listBuilder.add(map);
@@ -142,7 +158,7 @@ public final class IgnoreUnknownTagIngredient extends Ingredient {
             return prefix;
         }
 
-        private static <T> RecordBuilder<T> encodeValue(Value value, DynamicOps<T> ops, RecordBuilder<T> builder) {
+        private static <T> RecordBuilder<T> encodeValue(Ingredient.Value value, DynamicOps<T> ops, RecordBuilder<T> builder) {
             if (value instanceof Ingredient.ItemValue itemValue) {
                 var key = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(itemValue.item().getItem()));
                 builder.add("item", ops.createString(key.toString()));

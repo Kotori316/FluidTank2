@@ -6,9 +6,11 @@ import com.kotori316.fluidtank.PlatformAccess;
 import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.cat.ItemChestAsTank;
 import com.kotori316.fluidtank.config.PlatformConfigAccess;
+import com.kotori316.fluidtank.contents.Tank;
+import com.kotori316.fluidtank.fluids.FluidAmountUtil;
+import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.neoforge.cat.EntityChestAsTank;
 import com.kotori316.fluidtank.neoforge.config.NeoForgePlatformConfigAccess;
-import com.kotori316.fluidtank.neoforge.integration.ae2.AE2FluidTankIntegration;
 import com.kotori316.fluidtank.neoforge.integration.top.FluidTankTopPlugin;
 import com.kotori316.fluidtank.neoforge.message.PacketHandler;
 import com.kotori316.fluidtank.neoforge.recipe.IgnoreUnknownTagIngredient;
@@ -17,6 +19,7 @@ import com.kotori316.fluidtank.neoforge.reservoir.ItemReservoirNeoForge;
 import com.kotori316.fluidtank.neoforge.tank.*;
 import com.kotori316.fluidtank.tank.*;
 import com.mojang.datafixers.DSL;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
@@ -38,7 +41,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.crafting.IngredientType;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.*;
 
 import java.util.Comparator;
@@ -62,7 +65,7 @@ public final class FluidTank {
         modBus.register(this);
         modBus.register(proxy);
         modBus.addListener(FluidTank::registerCapabilities);
-        AE2FluidTankIntegration.onAPIAvailable(modBus);
+        // AE2FluidTankIntegration.onAPIAvailable(modBus);
         FluidTankTopPlugin.sendIMC();
         NeoForge.EVENT_BUS.addListener(FluidTank::onServerStart);
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize finished {}", FluidTankCommon.modId);
@@ -82,9 +85,10 @@ public final class FluidTank {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_REGISTER = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, FluidTankCommon.modId);
     private static final DeferredRegister<IngredientType<?>> INGREDIENT_REGISTER = DeferredRegister.create(NeoForgeRegistries.INGREDIENT_TYPES, FluidTankCommon.modId);
     private static final DeferredRegister<CreativeModeTab> CREATIVE_TAB_REGISTER = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB, FluidTankCommon.modId);
-    private static final DeferredRegister<LootItemFunctionType> LOOT_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.LOOT_FUNCTION_TYPE, FluidTankCommon.modId);
+    private static final DeferredRegister<LootItemFunctionType<?>> LOOT_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.LOOT_FUNCTION_TYPE, FluidTankCommon.modId);
+    private static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.DATA_COMPONENT_TYPE, FluidTankCommon.modId);
     static final List<DeferredRegister<?>> REGISTER_LIST = List.of(
-        BLOCK_REGISTER, ITEM_REGISTER, BLOCK_ENTITY_REGISTER, RECIPE_REGISTER, INGREDIENT_REGISTER, CREATIVE_TAB_REGISTER, LOOT_TYPE_REGISTER
+        BLOCK_REGISTER, ITEM_REGISTER, BLOCK_ENTITY_REGISTER, RECIPE_REGISTER, INGREDIENT_REGISTER, CREATIVE_TAB_REGISTER, LOOT_TYPE_REGISTER, DATA_COMPONENT_TYPE_REGISTER
     );
 
     public static final Map<Tier, DeferredBlock<BlockTankNeoForge>> TANK_MAP = Stream.of(Tier.values())
@@ -107,7 +111,7 @@ public final class FluidTank {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileVoidTankNeoForge>> TILE_VOID_TANK_TYPE =
         BLOCK_ENTITY_REGISTER.register(TileVoidTank.class.getSimpleName().toLowerCase(Locale.ROOT), () ->
             BlockEntityType.Builder.of(TileVoidTankNeoForge::new, BLOCK_VOID_TANK.get()).build(DSL.emptyPartType()));
-    public static final DeferredHolder<LootItemFunctionType, LootItemFunctionType> TANK_LOOT_FUNCTION = LOOT_TYPE_REGISTER.register(TankLootFunction.NAME, () -> new LootItemFunctionType(TankLootFunction.CODEC));
+    public static final DeferredHolder<LootItemFunctionType<?>, LootItemFunctionType<TankLootFunction>> TANK_LOOT_FUNCTION = LOOT_TYPE_REGISTER.register(TankLootFunction.NAME, () -> new LootItemFunctionType<>(TankLootFunction.CODEC));
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<?>> TIER_RECIPE = RECIPE_REGISTER.register(TierRecipeNeoForge.Serializer.LOCATION.getPath(), () -> TierRecipeNeoForge.SERIALIZER);
     public static final DeferredHolder<IngredientType<?>, IngredientType<IgnoreUnknownTagIngredient>> IU_INGREDIENT = INGREDIENT_REGISTER.register(IgnoreUnknownTagIngredient.NAME, () -> IgnoreUnknownTagIngredient.SERIALIZER);
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_TAB_REGISTER.register("tab", () -> {
@@ -122,13 +126,18 @@ public final class FluidTank {
             BlockEntityType.Builder.of(EntityChestAsTank::new, BLOCK_CAT.get()).build(DSL.emptyPartType()));
     public static final Map<Tier, DeferredItem<ItemReservoirNeoForge>> RESERVOIR_MAP = Stream.of(Tier.WOOD, Tier.STONE, Tier.IRON)
         .collect(Collectors.toMap(Function.identity(), t -> ITEM_REGISTER.register("reservoir_" + t.name().toLowerCase(Locale.ROOT), () -> new ItemReservoirNeoForge(t))));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Tank<FluidLike>>> FLUID_TANK_DATA_COMPONENT = DATA_COMPONENT_TYPE_REGISTER.register(
+        "fluid_tank_component", () -> DataComponentType.<Tank<FluidLike>>builder()
+            .persistent(Tank.codec(FluidAmountUtil.access()))
+            .build()
+    );
 
     @SubscribeEvent
     public void setup(FMLCommonSetupEvent event) {
     }
 
     @SubscribeEvent
-    public void setupPacket(RegisterPayloadHandlerEvent event) {
+    public void setupPacket(RegisterPayloadHandlersEvent event) {
         PacketHandler.init(event);
     }
 

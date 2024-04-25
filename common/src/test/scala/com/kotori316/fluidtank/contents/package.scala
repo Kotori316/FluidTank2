@@ -2,7 +2,7 @@ package com.kotori316.fluidtank
 
 import cats.data.Chain
 import cats.{Monad, MonoidK}
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.resources.ResourceLocation
 
 import scala.reflect.ClassTag
@@ -32,7 +32,7 @@ package object contents {
 
     override def classTag: ClassTag[String] = implicitly[ClassTag[String]]
 
-    override def newInstance(content: String, amount: GenericUnit, nbt: Option[CompoundTag]): GenericAmount[String] =
-      GenericAmount(content, amount, nbt)
+    override def newInstance(content: String, amount: GenericUnit, componentMap: Option[DataComponentPatch]): GenericAmount[String] =
+      GenericAmount(content, amount, componentMap)
   }
 }

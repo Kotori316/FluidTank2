@@ -28,7 +28,7 @@ loom {
     runs {
         named("client") {
             configName = "Client"
-            property("forge.enabledGameTestNamespaces", "fluidtank")
+            property("neoforge.enabledGameTestNamespaces", "fluidtank")
             runDir = "run"
             mods {
                 create("main") {
@@ -49,7 +49,7 @@ loom {
             forgeTemplate("gameTestServer")
             vmArg("-ea")
             property("fabric.dli.env", "gameTestServer")
-            property("forge.enabledGameTestNamespaces", "fluidtank")
+            property("neoforge.enabledGameTestNamespaces", "fluidtank")
             runDir = "game-test"
             mods {
                 create("main") {
@@ -69,13 +69,19 @@ configurations {
     named("gameTestRuntimeClasspath").get().extendsFrom(runtimeClasspath.get())
 }
 
+repositories {
+    maven {
+        url = uri("https://prmaven.neoforged.net/NeoForge/pr794")
+    }
+}
+
 dependencies {
     neoForge("net.neoforged:neoforge:${project.property("neoforge_version")}")
 
     runtimeOnly(
         group = "com.kotori316",
         name = "ScalableCatsForce-NeoForge".lowercase(),
-        version = project.property("slpVersion").toString(),
+        version = project.property("slp_neoforge_version").toString(),
         classifier = "with-library"
     ) {
         isTransitive = false
@@ -84,26 +90,26 @@ dependencies {
     common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
     shadowCommon(project(path = ":common", configuration = "transformProductionNeoForge")) { isTransitive = false }
 
-    modImplementation(
+    modCompileOnly(
         group = "curse.maven",
         name = "jade-324717",
         version = project.property("jade_neoforge_id").toString()
     )
-    modImplementation(
+    modCompileOnly(
         group = "curse.maven",
         name = "the-one-probe-245211",
         version = project.property("top_neoforge_id").toString()
     )
-    modImplementation(
+    modCompileOnly(
         group = "appeng",
         name = "appliedenergistics2-neoforge",
         version = project.property("ae2_neoforge_version").toString()
     ) { isTransitive = false }
-    modLocalRuntime(
+    /*modLocalRuntime(
         group = "mezz.jei",
         name = "jei-1.20.4-neoforge",
         version = project.property("jei_neoforge_version").toString()
-    ) { isTransitive = false }
+    ) { isTransitive = false }*/
     // Test Dependencies.
     // Required these libraries to execute the tests.
     // The library will avoid errors of ForgeRegistry and Capability.
@@ -136,7 +142,7 @@ ext {
         | -- | -- |
         | Minecraft | ${project.property("minecraft_version")} |
         | NeoForge | ${project.property("neoforge_version")} |
-        | scalable-cats-force | ${project.property("slpVersion")} |
+        | scalable-cats-force | ${project.property("slp_neoforge_version")} |
         """.trimIndent()
     )
 }

@@ -4,6 +4,7 @@ import com.kotori316.fluidtank.fluids.PlatformFluidAccess
 import net.minecraft.ChatFormatting
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.network.chat.Component
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
@@ -13,7 +14,6 @@ import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateD
 import net.minecraft.world.level.block.{Block, EntityBlock, Mirror, Rotation}
 import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.{InteractionHand, InteractionResult}
 
 import scala.jdk.javaapi.CollectionConverters
 
@@ -35,8 +35,7 @@ class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
 
   override def newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = PlatformChestAsTankAccess.getInstance().createCATEntity(pos, state)
 
-  //noinspection ScalaDeprecation,deprecation
-  override def use(state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
+  override def useWithoutItem(state: BlockState, level: Level, pos: BlockPos, player: Player, hit: BlockHitResult): InteractionResult = {
     if (!player.isCrouching) {
       if (!level.isClientSide) {
         val fluids = PlatformChestAsTankAccess.getInstance().getCATFluids(level, pos)

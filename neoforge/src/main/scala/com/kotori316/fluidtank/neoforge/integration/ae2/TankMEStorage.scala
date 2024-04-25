@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.neoforge.integration.ae2
 
+/*
 import appeng.api.config.Actionable
 import appeng.api.networking.security.IActionSource
 import appeng.api.stacks.{AEFluidKey, AEKey, KeyCounter}
@@ -57,4 +58,4 @@ case class TankMEStorage(tank: TileTank) extends MEStorage {
   private def fromAeFluid(fluidKey: AEFluidKey, amount: Long): FluidAmount = {
     FluidAmountUtil.from(fluidKey.getFluid, GenericUnit.fromForge(amount), Option(fluidKey.copyTag()))
   }
-}
+}*/

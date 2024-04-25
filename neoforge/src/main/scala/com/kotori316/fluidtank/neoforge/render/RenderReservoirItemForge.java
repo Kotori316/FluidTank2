@@ -9,12 +9,13 @@ import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter;
 import com.kotori316.fluidtank.render.RenderReservoirItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 
-import java.util.List;
+import java.util.function.Function;
 
 public final class RenderReservoirItemForge extends RenderReservoirItem {
     public static final RenderReservoirItemForge INSTANCE = new RenderReservoirItemForge();
@@ -49,10 +50,10 @@ public final class RenderReservoirItemForge extends RenderReservoirItem {
                 return stackColor;
             }
         } else if (content.content() instanceof VanillaPotion) {
-            return PotionUtils.getColor(FluidAmountUtil.getTag(content)
-                .map(PotionUtils::getAllEffects)
-                .orElse(List.of())
-            );
+            return FluidAmountUtil.getComponentPatch(content)
+                .map(p -> p.<PotionContents>get(DataComponents.POTION_CONTENTS))
+                .flatMap(Function.identity())
+                .map(PotionContents::getColor).orElse(16253176);
         } else {
             throw new IllegalArgumentException("Unknown fluid type " + content);
         }

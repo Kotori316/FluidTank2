@@ -5,13 +5,13 @@
       "condition": "fabric:or",
       "values": [
         {
-          "condition": "fabric:item_tags_populated",
+          "condition": "fabric:tags_populated",
           "values": [
             "c:lead_ingots"
           ]
         },
         {
-          "condition": "fabric:item_tags_populated",
+          "condition": "fabric:tags_populated",
           "values": [
             "forge:ingots/lead"
           ]

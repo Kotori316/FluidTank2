@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - run: chmod +x ./gradlew
       - uses: gradle/actions/setup-gradle@v3
         with:
@@ -44,7 +44,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ common, forge, fabric, neoforge ]
+        # platform: [ common, forge, fabric, neoforge ]
+        platform: [ common, fabric, neoforge ]
     env:
       DISABLE_FORGE: ${{ matrix.platform != 'forge' }}
       DISABLE_FABRIC: ${{ matrix.platform != 'fabric' }}
@@ -56,7 +57,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - run: chmod +x ./gradlew
       - uses: gradle/actions/setup-gradle@v3
         with:
@@ -77,6 +78,7 @@ jobs:
 
   forge-data-gen:
     runs-on: ubuntu-latest
+    if: false
     env:
       DISABLE_FORGE: false
       DISABLE_FABRIC: true
@@ -88,7 +90,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - run: chmod +x ./gradlew
       - uses: gradle/actions/setup-gradle@v3
         with:

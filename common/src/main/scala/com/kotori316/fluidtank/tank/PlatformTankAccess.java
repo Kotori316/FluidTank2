@@ -29,7 +29,7 @@ public interface PlatformTankAccess {
         return entityType == i.getNormalType() || entityType == i.getCreativeType() || entityType == i.getVoidType();
     }
 
-    LootItemFunctionType getTankLoot();
+    LootItemFunctionType<TankLootFunction> getTankLoot();
 
     Map<Tier, Supplier<? extends BlockTank>> getTankBlockMap();
 }
@@ -57,7 +57,7 @@ class PlatformTankAccessHolder {
         }
 
         @Override
-        public LootItemFunctionType getTankLoot() {
+        public LootItemFunctionType<TankLootFunction> getTankLoot() {
             return null;
         }
 

@@ -1,10 +1,7 @@
 package com.kotori316.fluidtank.fabric.gametest;
 
-import java.lang.reflect.Method;
-import java.util.UUID;
-import java.util.function.Consumer;
-
 import com.google.common.base.CaseFormat;
+import com.kotori316.fluidtank.FluidTankCommon;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
@@ -17,7 +14,9 @@ import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import org.junit.platform.commons.function.Try;
 import org.junit.platform.commons.support.ReflectionSupport;
 
-import com.kotori316.fluidtank.FluidTankCommon;
+import java.lang.reflect.Method;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 @SuppressWarnings("unused") // All methods are used in other projects.
 public final class GameTestUtil {
@@ -110,7 +109,7 @@ public final class GameTestUtil {
     public static void logTestName(Object maybeTest, Method createFrom) {
         if (maybeTest instanceof TestFunction testFunction) {
             FluidTankCommon.LOGGER.info("Register {}(batch: {}, structure: {}) from {}",
-                testFunction.getTestName(), testFunction.getBatchName(), testFunction.getStructureName(), createFrom);
+                testFunction.testName(), testFunction.batchName(), testFunction.structureName(), createFrom);
         }
     }
 }

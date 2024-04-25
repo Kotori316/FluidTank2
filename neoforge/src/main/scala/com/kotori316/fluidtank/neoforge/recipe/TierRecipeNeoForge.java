@@ -20,12 +20,12 @@ public final class TierRecipeNeoForge extends TierRecipe implements IShapedRecip
     }
 
     @Override
-    public int getRecipeWidth() {
+    public int getWidth() {
         return 3;
     }
 
     @Override
-    public int getRecipeHeight() {
+    public int getHeight() {
         return 3;
     }
 

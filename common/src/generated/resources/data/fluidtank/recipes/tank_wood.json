@@ -6,13 +6,13 @@
       "condition": "fabric:or",
       "values": [
         {
-          "condition": "fabric:item_tags_populated",
+          "condition": "fabric:tags_populated",
           "values": [
             "c:glass_blocks"
           ]
         },
         {
-          "condition": "fabric:item_tags_populated",
+          "condition": "fabric:tags_populated",
           "values": [
             "forge:glass"
           ]
@@ -77,6 +77,6 @@
     "xxx"
   ],
   "result": {
-    "item": "fluidtank:tank_wood"
+    "id": "fluidtank:tank_wood"
   }
 }

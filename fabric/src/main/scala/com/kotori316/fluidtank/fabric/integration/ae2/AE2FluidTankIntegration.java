@@ -1,8 +1,5 @@
 package com.kotori316.fluidtank.fabric.integration.ae2;
 
-import appeng.api.storage.MEStorage;
-import com.kotori316.fluidtank.tank.PlatformTankAccess;
-import com.kotori316.fluidtank.tank.TileTank;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class AE2FluidTankIntegration {
@@ -15,7 +12,7 @@ public class AE2FluidTankIntegration {
 
 class AE2Capability {
     static void register() {
-        MEStorage.SIDED.registerForBlockEntities(
+        /*MEStorage.SIDED.registerForBlockEntities(
                 (blockEntity, context) -> {
                     if (blockEntity instanceof TileTank tank) return new TankMEStorage(tank);
                     else return null;
@@ -23,6 +20,6 @@ class AE2Capability {
                 PlatformTankAccess.getInstance().getNormalType(),
                 PlatformTankAccess.getInstance().getVoidType(),
                 PlatformTankAccess.getInstance().getCreativeType()
-        );
+        );*/
     }
 }

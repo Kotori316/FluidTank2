@@ -11,13 +11,15 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.blockentity.{BlockEntityRenderer, BlockEntityRendererProvider}
 import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
 import net.minecraft.core.BlockPos
+import net.minecraft.core.component.DataComponents
 import net.minecraft.world.inventory.InventoryMenu
-import net.minecraft.world.item.alchemy.PotionUtils
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.material.Fluids
 import net.neoforged.api.distmarker.{Dist, OnlyIn}
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
 import net.neoforged.neoforge.fluids.FluidType
+
+import scala.jdk.OptionConverters.RichOptional
 
 @OnlyIn(Dist.CLIENT)
 class RenderTank(d: BlockEntityRendererProvider.Context) extends BlockEntityRenderer[TileTank] {
@@ -53,7 +55,7 @@ object RenderTank {
     attributes.getStillTexture(fluid.defaultFluidState(), world, pos)
   }
 
-  private def color(tile: TileTank) = {
+  private def color(tile: TileTank): Int = {
     val fluidAmount = tile.getTank.content
 
     fluidAmount.content match {
@@ -74,9 +76,10 @@ object RenderTank {
           }
         }
       case VanillaPotion(_) =>
-        PotionUtils.getColor(
-          fluidAmount.nbt.map(n => PotionUtils.getAllEffects(n)).getOrElse(java.util.List.of())
-        )
+        fluidAmount.componentPatch
+          .flatMap(_.get(DataComponents.POTION_CONTENTS).toScala)
+          .map(_.getColor)
+          .getOrElse(16253176)
     }
   }
 

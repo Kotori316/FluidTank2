@@ -3,11 +3,13 @@ package com.kotori316.fluidtank.fabric;
 import com.kotori316.fluidtank.PlatformAccess;
 import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
+import com.kotori316.fluidtank.contents.Tank;
 import com.kotori316.fluidtank.fabric.cat.ChestAsTankStorage;
 import com.kotori316.fluidtank.fabric.fluid.FabricConverter;
 import com.kotori316.fluidtank.fluids.*;
 import com.kotori316.fluidtank.potions.PotionFluidHandler;
 import com.kotori316.fluidtank.tank.BlockTank;
+import com.kotori316.fluidtank.tank.TankLootFunction;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
 import com.mojang.serialization.Codec;
@@ -20,7 +22,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.mixin.transfer.BucketItemAccessor;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
@@ -37,7 +39,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import scala.Option;
 
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,7 @@ final class FabricPlatformAccess implements PlatformAccess {
             for (StorageView<FluidVariant> view : storage) {
                 var variant = view.getResource();
                 var amount = view.getAmount();
-                return FluidAmountUtil.from(variant.getFluid(), GenericUnit.fromFabric(amount), Option.<CompoundTag>apply(variant.copyNbt()));
+                return FluidAmountUtil.from(FluidLike.of(variant.getFluid()), GenericUnit.fromFabric(amount), variant.getComponents());
             }
         }
         return FluidAmountUtil.EMPTY();
@@ -86,7 +87,7 @@ final class FabricPlatformAccess implements PlatformAccess {
         if (amount.content() instanceof VanillaFluid) {
             return FluidVariantAttributes.getName(FabricConverter.toVariant(amount, Fluids.EMPTY));
         } else if (amount.content() instanceof VanillaPotion vanillaPotion) {
-            return vanillaPotion.getVanillaPotionName(amount.nbt());
+            return vanillaPotion.getVanillaPotionName(amount.componentPatch());
         } else {
             throw new AssertionError();
         }
@@ -185,7 +186,7 @@ final class FabricPlatformAccess implements PlatformAccess {
     }
 
     @Override
-    public LootItemFunctionType getTankLoot() {
+    public LootItemFunctionType<TankLootFunction> getTankLoot() {
         return FluidTank.TANK_LOOT_FUNCTION;
     }
 
@@ -205,6 +206,11 @@ final class FabricPlatformAccess implements PlatformAccess {
     public Codec<Ingredient> ingredientCodec() {
         // OK, fabric mixins the creation method to insert own codec
         return Ingredient.CODEC;
+    }
+
+    @Override
+    public DataComponentType<Tank<FluidLike>> fluidTankComponentType() {
+        return FluidTank.FLUID_TANK_DATA_COMPONENT;
     }
 
     @Override

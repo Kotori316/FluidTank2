@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.kotori316.fluidtank.fabric.BeforeMC;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.Util;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Items;
@@ -22,8 +21,7 @@ class IgnoreUnknownTagIngredientFabricTest extends BeforeMC {
         void serializeBasicItem() {
             var i = new IgnoreUnknownTagIngredientFabric(Ingredient.of(Items.APPLE));
             var result = assertDoesNotThrow(() ->
-                Util.getOrThrow(Ingredient.CODEC_NONEMPTY
-                    .encodeStart(JsonOps.INSTANCE, i.toVanilla()), IllegalStateException::new)
+                Ingredient.CODEC_NONEMPTY.encodeStart(JsonOps.INSTANCE, i.toVanilla()).getOrThrow()
             );
             assertTrue(result.isJsonObject());
             var expected = new JsonObject();
@@ -36,8 +34,7 @@ class IgnoreUnknownTagIngredientFabricTest extends BeforeMC {
         void serializeBasicTag() {
             var i = new IgnoreUnknownTagIngredientFabric(Ingredient.of(ItemTags.LOGS));
             var result = assertDoesNotThrow(() ->
-                Util.getOrThrow(Ingredient.CODEC_NONEMPTY
-                    .encodeStart(JsonOps.INSTANCE, i.toVanilla()), IllegalStateException::new)
+                Ingredient.CODEC_NONEMPTY.encodeStart(JsonOps.INSTANCE, i.toVanilla()).getOrThrow()
             );
             assertTrue(result.isJsonObject());
             var expected = new JsonObject();
@@ -62,7 +59,7 @@ class IgnoreUnknownTagIngredientFabricTest extends BeforeMC {
                 }
                 """;
             var result = Ingredient.CODEC.decode(JsonOps.INSTANCE, GsonHelper.parse(json));
-            var ingredient = assertDoesNotThrow(() -> Util.getOrThrow(result.map(Pair::getFirst), IllegalStateException::new));
+            var ingredient = assertDoesNotThrow(() -> result.map(Pair::getFirst).getOrThrow());
             var custom = ingredient.getCustomIngredient();
             assertInstanceOf(IgnoreUnknownTagIngredientFabric.class, custom);
         }
@@ -80,7 +77,7 @@ class IgnoreUnknownTagIngredientFabricTest extends BeforeMC {
                 }
                 """;
             var result = Ingredient.CODEC.decode(JsonOps.INSTANCE, GsonHelper.parse(json));
-            var ingredient = assertDoesNotThrow(() -> Util.getOrThrow(result.map(Pair::getFirst), IllegalStateException::new));
+            var ingredient = assertDoesNotThrow(() -> result.map(Pair::getFirst).getOrThrow());
             assertEquals(1, ingredient.getItems().length);
         }
     }

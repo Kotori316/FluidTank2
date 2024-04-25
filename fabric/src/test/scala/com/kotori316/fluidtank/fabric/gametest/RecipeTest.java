@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.fabric.gametest;
 
+import com.google.common.base.CaseFormat;
 import com.google.gson.JsonObject;
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.contents.GenericAmount;
@@ -12,12 +13,13 @@ import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.tank.Tier;
 import io.netty.buffer.ByteBufAllocator;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
+import net.fabricmc.fabric.impl.resource.conditions.ResourceConditionsImpl;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
@@ -187,7 +189,7 @@ public final class RecipeTest implements FabricGameTest {
             .filter(Predicate.isEqual(Tier.WOOD).negate())
             .flatMap(t -> Stream.of(
                 GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_json_" + t.name().toLowerCase(Locale.ROOT), () -> serializeJson(t)),
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_packet_" + t.name().toLowerCase(Locale.ROOT), () -> serializePacket(t))
+                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_packet_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializePacket(g, t))
             ))
             .toList();
     }
@@ -206,21 +208,22 @@ public final class RecipeTest implements FabricGameTest {
         );
     }
 
-    void serializePacket(Tier tier) {
+    void serializePacket(GameTestHelper helper, Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
         var recipe = new TierRecipeFabric(
             tier, TierRecipeFabric.Serializer.getIngredientTankForTier(tier), subItem);
 
-        var buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
-        TierRecipeFabric.SERIALIZER.toNetwork(buffer, recipe);
+        var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), helper.getLevel().registryAccess());
+        TierRecipeFabric.SERIALIZER.toNetwork(recipe, buffer);
         var deserialized = TierRecipeFabric.SERIALIZER.fromNetwork(buffer);
         assertNotNull(deserialized);
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), deserialized.getResultItem(RegistryAccess.EMPTY)))
+            () -> assertTrue(ItemStack.matches(recipe.getResultItem(helper.getLevel().registryAccess()), deserialized.getResultItem(helper.getLevel().registryAccess())))
         );
+        helper.succeed();
     }
 
-    void getRecipeFromJson() {
+    void getRecipeFromJson(GameTestHelper helper) {
         // language=json
         String jsonString = """
             {
@@ -231,13 +234,14 @@ public final class RecipeTest implements FabricGameTest {
               }
             }
             """.formatted(TierRecipeFabric.Serializer.LOCATION.toString());
-        var read = managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString));
+        var read = managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess());
         var recipe = new TierRecipeFabric(
             Tier.STONE, TierRecipeFabric.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), read.getResultItem(RegistryAccess.EMPTY)))
+            () -> assertTrue(ItemStack.matches(recipe.getResultItem(helper.getLevel().registryAccess()), read.getResultItem(helper.getLevel().registryAccess())))
         );
+        helper.succeed();
     }
 
     @GameTestGenerator
@@ -246,30 +250,35 @@ public final class RecipeTest implements FabricGameTest {
         var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipes");
         try (var files = Files.find(recipeParent, 1, (path, a) -> path.getFileName().toString().endsWith(".json"))) {
             return files.map(p -> GameTestUtil.create(FluidTankCommon.modId, "recipe_test", "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),
-                () -> loadFromFile(p))).toList();
+                (g) -> loadFromFile(g, p))).toList();
         }
     }
 
+    // just for test
+    @SuppressWarnings("UnstableApiUsage")
     void notLoadLeadRecipe(GameTestHelper helper) throws IOException {
         var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipes");
         var leadRecipe = recipeParent.resolve("tank_lead.json");
         var read = GsonHelper.parse(Files.newBufferedReader(leadRecipe));
-        assertFalse(ResourceConditions.objectMatchesConditions(read), "Lead recipe must not be loaded");
+        assertFalse(
+            ResourceConditionsImpl.applyResourceConditions(read, "TEST", new ResourceLocation(FluidTankCommon.modId, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "notLoadLeadRecipe")), helper.getLevel().registryAccess()),
+            "Lead recipe must not be loaded");
         helper.succeed();
     }
 
-    static void loadFromFile(Path path) {
+    static void loadFromFile(GameTestHelper helper, Path path) {
         try {
             var json = GsonHelper.parse(Files.newBufferedReader(path));
-            assertDoesNotThrow(() -> managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_load"), json));
+            assertDoesNotThrow(() -> managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_load"), json, helper.getLevel().registryAccess()));
+            helper.succeed();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private static Recipe<?> managerFromJson(ResourceLocation location, JsonObject jsonObject) {
-        return Try.call(() -> RecipeManager.class.getDeclaredMethod("fromJson", ResourceLocation.class, JsonObject.class))
-            .andThenTry(m -> ReflectionSupport.invokeMethod(m, null, location, jsonObject))
+    private static Recipe<?> managerFromJson(ResourceLocation location, JsonObject jsonObject, HolderLookup.Provider provider) {
+        return Try.call(() -> RecipeManager.class.getDeclaredMethod("fromJson", ResourceLocation.class, JsonObject.class, HolderLookup.Provider.class))
+            .andThenTry(m -> ReflectionSupport.invokeMethod(m, null, location, jsonObject, provider))
             .andThenTry(RecipeHolder.class::cast)
             .andThenTry(RecipeHolder::value)
             .andThenTry(Recipe.class::cast)

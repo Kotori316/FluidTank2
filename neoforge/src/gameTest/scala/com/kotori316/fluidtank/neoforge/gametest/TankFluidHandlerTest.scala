@@ -4,6 +4,7 @@ import cats.implicits.catsSyntaxSemigroup
 import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, PotionType}
+import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.FluidAmount2FluidStack
 import com.kotori316.fluidtank.neoforge.gametest.GetGameTestMethods.assertEqualHelper
 import com.kotori316.fluidtank.neoforge.tank.TileTankNeoForge
@@ -55,7 +56,7 @@ class TankFluidHandlerTest {
     tile.getConnection.getHandler.fill(FluidAmountUtil.BUCKET_WATER, execute = true)
 
     val cap = getTankCapability(helper, basePos, tile)
-    assertEquals(FluidAmountUtil.BUCKET_WATER.toStack, cap.getFluidInTank(0))
+    assertEquals(FluidAmountUtil.BUCKET_WATER, NeoForgeConverter.toAmount(cap.getFluidInTank(0)))
     helper.succeed()
   }
 

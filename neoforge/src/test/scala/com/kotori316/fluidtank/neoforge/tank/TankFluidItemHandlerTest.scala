@@ -5,8 +5,10 @@ import com.kotori316.fluidtank.fluids.{FluidAmountUtil, fluidAccess}
 import com.kotori316.fluidtank.neoforge.BeforeMC
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
 import com.kotori316.fluidtank.tank.{Tier, TileTank}
+import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.item.{BlockItem, ItemStack, Items}
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.material.Fluids
 import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
@@ -37,7 +39,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     tag.put(TileTank.KEY_TANK, TankUtil.save(tank))
     tag.putString(TileTank.KEY_TIER, Tier.STONE.name())
     val stack = new ItemStack(Items.APPLE)
-    stack.addTagElement(BlockItem.BLOCK_ENTITY_TAG, tag)
+    stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag))
 
     val handler = new TankFluidItemHandler(Tier.STONE, stack)
     assertEquals(tank, handler.getTank)
@@ -53,11 +55,11 @@ class TankFluidItemHandlerTest extends BeforeMC {
       val filled = handler.fill(FluidAmountUtil.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
       assertEquals(1000, filled)
       assertTrue(handler.getTank.isEmpty)
-      assertNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
       val filled2 = handler.fill(FluidAmountUtil.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
       assertEquals(1000, filled2)
       assertEquals(FluidAmountUtil.BUCKET_WATER, handler.getTank.content)
-      assertNotNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNotNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
 
     @Test
@@ -70,7 +72,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
       assertEquals(1000, filled1)
       assertEquals(1000, filled2)
       assertEquals(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(2000)), handler.getTank.content)
-      assertNotNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNotNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
 
     @Test
@@ -129,7 +131,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
         FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(500)),
         handler.getTank.content
       )
-      assertNotNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNotNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
 
     @Test
@@ -140,7 +142,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
       assertTrue(d2.isFluidStackIdentical(new FluidStack(Fluids.WATER, 1000)))
 
       assertTrue(handler.getTank.isEmpty)
-      assertNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
 
     @Test
@@ -151,7 +153,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
       assertTrue(d2.isFluidStackIdentical(new FluidStack(Fluids.WATER, 1000)))
 
       assertTrue(handler.getTank.isEmpty)
-      assertNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
 
     @Test
@@ -169,12 +171,11 @@ class TankFluidItemHandlerTest extends BeforeMC {
     def unknownTagAdded(): Unit = {
       val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
-      handler.getContainer.getOrCreateTagElement(BlockItem.BLOCK_ENTITY_TAG)
-        .putString("unknownTag", "unknownTag")
+      CustomData.update(DataComponents.BLOCK_ENTITY_DATA, handler.getContainer, tag => tag.putString("unknownTag", "unknownTag"))
       handler.drain(new FluidStack(Fluids.WATER, 1500), IFluidHandler.FluidAction.EXECUTE)
 
       assertTrue(handler.getTank.isEmpty)
-      assertNull(BlockItem.getBlockEntityData(handler.getContainer))
+      assertNull(handler.getContainer.get(DataComponents.BLOCK_ENTITY_DATA))
     }
   }
 }

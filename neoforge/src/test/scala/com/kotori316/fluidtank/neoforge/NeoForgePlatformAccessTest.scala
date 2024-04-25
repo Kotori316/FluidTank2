@@ -3,12 +3,13 @@ package com.kotori316.fluidtank.neoforge
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, FluidLike, PotionType}
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.world.item.alchemy.{PotionUtils, Potions}
+import net.minecraft.world.item.alchemy.{Potion, PotionContents, Potions}
 import net.minecraft.world.item.{ItemStack, Items}
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
 import org.junit.jupiter.api.{DynamicTest, Nested, Test, TestFactory}
 
 import java.util
+import scala.jdk.OptionConverters.RichOption
 import scala.jdk.javaapi.CollectionConverters
 
 final class NeoForgePlatformAccessTest extends BeforeMC {
@@ -43,13 +44,13 @@ final class NeoForgePlatformAccessTest extends BeforeMC {
     @TestFactory
     def getPotion: util.List[DynamicTest] = {
       CollectionConverters.asJava(for {
-        p <- Seq(Potions.WATER, Potions.EMPTY, Potions.NIGHT_VISION)
+        p <- Seq(Potions.WATER, Potions.AWKWARD, Potions.NIGHT_VISION)
         i <- Seq(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION)
-        name = i.toString + " " + p.getName("")
+        name = i.toString + " " + Potion.getName(Option(p).toJava, "")
       } yield DynamicTest.dynamicTest(name, () => {
-        val potion = PotionUtils.setPotion(new ItemStack(i), p)
+        val potion = PotionContents.createItemStack(i, p)
         val fluid = ACCESS.getFluidContained(potion)
-        val expected = FluidAmountUtil.from(FluidLike.of(PotionType.fromItemUnsafe(i)), GenericUnit.ONE_BOTTLE, Option.apply(potion.getTag))
+        val expected = FluidAmountUtil.from(FluidLike.of(PotionType.fromItemUnsafe(i)), GenericUnit.ONE_BOTTLE, potion.getComponentsPatch)
         assertEquals(expected, fluid)
       }))
     }
@@ -64,10 +65,10 @@ final class NeoForgePlatformAccessTest extends BeforeMC {
           Seq(Items.WATER_BUCKET, Items.LAVA_BUCKET, Items.GLASS_BOTTLE).map(i => new ItemStack(i)),
           Seq(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION).flatMap { i =>
             CollectionConverters.asScala(BuiltInRegistries.POTION.iterator())
-              .map(p => PotionUtils.setPotion(new ItemStack(i), p))
+              .map(p => PotionContents.createItemStack(i, BuiltInRegistries.POTION.wrapAsHolder(p)))
           }
         )
-        name = s.toString + " " + s.getTag
+        name = s.toString + " " + s.getComponentsPatch
       } yield DynamicTest.dynamicTest(name, () => assertTrue(ACCESS.isFluidContainer(s))))
     }
   }

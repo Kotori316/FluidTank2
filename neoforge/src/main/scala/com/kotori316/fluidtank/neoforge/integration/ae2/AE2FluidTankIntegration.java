@@ -1,5 +1,5 @@
 package com.kotori316.fluidtank.neoforge.integration.ae2;
-
+/*
 import appeng.api.AECapabilities;
 import com.kotori316.fluidtank.neoforge.FluidTank;
 import com.kotori316.fluidtank.tank.TileTank;
@@ -31,4 +31,4 @@ class AE2Capability {
     private static TankMEStorage create(TileTank tank, Direction ignored) {
         return new TankMEStorage(tank);
     }
-}
+}*/

@@ -8,5 +8,8 @@ public final class FluidTankDataProvider implements DataGeneratorEntrypoint {
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
         FluidTankCommon.LOGGER.info("FluidTank data generator initialized");
+        var pack = fabricDataGenerator.createPack();
+
+        pack.addProvider(RecipeProvider::new);
     }
 }

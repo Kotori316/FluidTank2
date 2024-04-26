@@ -84,7 +84,7 @@ loom {
     silentMojangMappingsLicense()
 }
 
-val enableScala2 = true
+val enableScala2 = false
 
 dependencies {
     minecraft("com.mojang:minecraft:${minecraftVersion}")

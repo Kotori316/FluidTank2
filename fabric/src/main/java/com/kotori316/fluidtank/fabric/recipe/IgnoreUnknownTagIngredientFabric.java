@@ -1,7 +1,9 @@
 package com.kotori316.fluidtank.fabric.recipe;
 
 import com.kotori316.fluidtank.FluidTankCommon;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.fabricmc.fabric.impl.recipe.ingredient.builtin.AnyIngredient;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -59,8 +61,12 @@ public final class IgnoreUnknownTagIngredientFabric extends AnyIngredient {
         static MapCodec<IgnoreUnknownTagIngredientFabric> createCodec(boolean allowEmpty) {
             var base = allowEmpty ? Ingredient.CODEC : Ingredient.CODEC_NONEMPTY;
 
-            return base.listOf().fieldOf("values")
-                .xmap(IgnoreUnknownTagIngredientFabric::new, IgnoreUnknownTagIngredientFabric::getBase);
+            return RecordCodecBuilder.mapCodec(instance ->
+                instance.group(
+                    base.listOf().fieldOf("values").forGetter(IgnoreUnknownTagIngredientFabric::getBase),
+                    Codec.STRING.fieldOf("type").forGetter(o -> NAME.toString()) // just for neoforge
+                ).apply(instance, (t1, t2) -> new IgnoreUnknownTagIngredientFabric(t1))
+            );
         }
 
     }

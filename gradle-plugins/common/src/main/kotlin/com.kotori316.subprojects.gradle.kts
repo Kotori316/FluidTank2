@@ -17,7 +17,7 @@ configurations {
     val common = create("common")
     create("shadowCommon") // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
     compileClasspath { extendsFrom(common) }
-    if (project.name != "forge" || System.getenv("RUN_JUNIT") != null) {
+    if (!loom.isForge || System.getenv("RUN_JUNIT") != null) {
         runtimeClasspath { extendsFrom(common) }
     }
     testCompileClasspath { extendsFrom(compileClasspath.get()) }

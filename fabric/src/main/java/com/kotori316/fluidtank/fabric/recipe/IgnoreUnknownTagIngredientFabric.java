@@ -64,7 +64,7 @@ public final class IgnoreUnknownTagIngredientFabric extends AnyIngredient {
             return RecordCodecBuilder.mapCodec(instance ->
                 instance.group(
                     base.listOf().fieldOf("values").forGetter(IgnoreUnknownTagIngredientFabric::getBase),
-                    Codec.STRING.fieldOf("type").forGetter(o -> NAME.toString()) // just for neoforge
+                    Codec.STRING.optionalFieldOf("type", "DUMMY_TYPE").forGetter(o -> NAME.toString()) // just for neoforge
                 ).apply(instance, (t1, t2) -> new IgnoreUnknownTagIngredientFabric(t1))
             );
         }

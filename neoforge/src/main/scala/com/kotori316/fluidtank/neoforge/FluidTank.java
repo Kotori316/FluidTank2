@@ -11,6 +11,7 @@ import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.neoforge.cat.EntityChestAsTank;
 import com.kotori316.fluidtank.neoforge.config.NeoForgePlatformConfigAccess;
+import com.kotori316.fluidtank.neoforge.integration.ae2.AE2FluidTankIntegration;
 import com.kotori316.fluidtank.neoforge.integration.top.FluidTankTopPlugin;
 import com.kotori316.fluidtank.neoforge.message.PacketHandler;
 import com.kotori316.fluidtank.neoforge.recipe.IgnoreUnknownTagIngredient;
@@ -65,7 +66,7 @@ public final class FluidTank {
         modBus.register(this);
         modBus.register(proxy);
         modBus.addListener(FluidTank::registerCapabilities);
-        // AE2FluidTankIntegration.onAPIAvailable(modBus);
+        AE2FluidTankIntegration.onAPIAvailable(modBus);
         FluidTankTopPlugin.sendIMC();
         NeoForge.EVENT_BUS.addListener(FluidTank::onServerStart);
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize finished {}", FluidTankCommon.modId);
@@ -166,7 +167,7 @@ public final class FluidTank {
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, TILE_CREATIVE_TANK_TYPE.get(), TileCreativeTankNeoForge::getCapability);
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, TILE_VOID_TANK_TYPE.get(), TileVoidTankNeoForge::getCapability);
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, TILE_CAT.get(), EntityChestAsTank::getCapability);
-        event.registerItem(Capabilities.FluidHandler.ITEM, ItemBlockTankNeoForge::initCapabilities, TANK_ITEM_MAP.values().stream().map(DeferredItem::asItem).toArray(Item[]::new));
+        event.registerItem(Capabilities.FluidHandler.ITEM, ItemBlockTankNeoForge::initCapabilities, TANK_MAP.values().stream().map(DeferredBlock::asItem).toArray(Item[]::new));
         event.registerItem(Capabilities.FluidHandler.ITEM, ItemReservoirNeoForge::initCapabilities, RESERVOIR_MAP.values().stream().map(DeferredItem::asItem).toArray(Item[]::new));
     }
 }

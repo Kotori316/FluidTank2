@@ -76,12 +76,11 @@ jobs:
           TEST_UTILITY_LOG_ALL_TEST: true
           RUN_GAME_TEST: true
 
-  forge-data-gen:
+  fabric-data-gen:
     runs-on: ubuntu-latest
-    if: false
     env:
-      DISABLE_FORGE: false
-      DISABLE_FABRIC: true
+      DISABLE_FORGE: true
+      DISABLE_FABRIC: false
       DISABLE_NEOFORGE: true
     steps:
       - uses: actions/checkout@v4
@@ -98,16 +97,14 @@ jobs:
           gradle-home-cache-cleanup: true
           add-job-summary: 'on-failure'
       - name: Compile
-        run: ./gradlew :forge:genDataClasses
+        run: ./gradlew :fabric:datagenClasses
       - name: Prepare Run
         run: >-
-          ./gradlew configureLaunch downloadAssets ||
-          (sleep 5 && ./gradlew configureLaunch downloadAssets) ||
-          (sleep 5 && ./gradlew configureLaunch downloadAssets)
-      - name: Check assets file
-        run: ./gradlew checkResourceFiles
+          ./gradlew configureClientLaunch downloadAssets ||
+          (sleep 5 && ./gradlew configureClientLaunch downloadAssets) ||
+          (sleep 5 && ./gradlew configureClientLaunch downloadAssets)
       - name: Forge DataGen
-        run: ./gradlew :forge:runData
+        run: ./gradlew :fabric:runData
         timeout-minutes: 5
         env:
           TEST_UTILITY_LOG_ALL_DATA: true

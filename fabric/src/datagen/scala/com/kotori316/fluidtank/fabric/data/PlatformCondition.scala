@@ -9,7 +9,7 @@ import net.minecraft.tags.TagKey
 
 import scala.jdk.OptionConverters.RichOptional
 
-sealed trait PlatformCondition {
+private[data] sealed trait PlatformCondition {
   def fabricCondition: Option[JsonObject]
 
   def forgeCondition: Option[JsonObject]
@@ -17,7 +17,7 @@ sealed trait PlatformCondition {
   def neoforgeCondition: Option[JsonObject]
 }
 
-object PlatformCondition {
+private[data] object PlatformCondition {
   // type: array
   final val NEOFORGE_CONDITION_KEY = "neoforge:conditions"
   // type: array

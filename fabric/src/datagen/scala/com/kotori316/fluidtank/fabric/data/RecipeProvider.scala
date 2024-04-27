@@ -26,7 +26,7 @@ import net.minecraft.world.item.{Item, Items}
 import java.util.concurrent.CompletableFuture
 import scala.jdk.CollectionConverters.{MapHasAsScala, SeqHasAsJava}
 
-class RecipeProvider(output: FabricDataOutput, provider: CompletableFuture[HolderLookup.Provider])
+private[data] class RecipeProvider(output: FabricDataOutput, provider: CompletableFuture[HolderLookup.Provider])
   extends DataProvider {
   private val recipePathProvider = output.createPathProvider(Target.DATA_PACK, "recipes")
   private val advancementPathProvider = output.createPathProvider(Target.DATA_PACK, "advancements")

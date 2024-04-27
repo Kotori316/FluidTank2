@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.fabric.data
 
+import cats.data.Chain
 import com.google.gson.{JsonArray, JsonObject}
 import com.mojang.serialization.JsonOps
 import net.fabricmc.fabric.api.resource.conditions.v1.{ResourceCondition, ResourceConditions}
@@ -19,13 +20,13 @@ private[data] sealed trait PlatformCondition {
 
 private[data] object PlatformCondition {
   // type: array
-  final val NEOFORGE_CONDITION_KEY = "neoforge:conditions"
+  private final val NEOFORGE_CONDITION_KEY = "neoforge:conditions"
   // type: array
-  final val FABRIC_CONDITION_KEY = ResourceConditions.CONDITIONS_KEY
+  private final val FABRIC_CONDITION_KEY = ResourceConditions.CONDITIONS_KEY
   // type: array
-  final val FORGE_CONDITION_KEY = "forge:condition"
+  private final val FORGE_CONDITION_KEY = "forge:condition"
 
-  def addPlatformConditions(obj: JsonObject, conditions: Seq[PlatformCondition]): JsonObject = {
+  def addPlatformConditions(obj: JsonObject, conditions: Chain[PlatformCondition]): JsonObject = {
     for {
       (key, getter) <- Seq(
         (NEOFORGE_CONDITION_KEY, (c: PlatformCondition) => c.neoforgeCondition),
@@ -35,10 +36,9 @@ private[data] object PlatformCondition {
     } {
       val objects = for {
         condition <- conditions
-        pc <- getter(condition)
-        if !pc.isEmpty
+        pc <- Chain.fromOption(getter(condition))
       } yield pc
-      val arr = objects.foldLeft(new JsonArray()) { (a, o) => a.add(o); a }
+      val arr = objects.filterNot(_.isEmpty).foldLeft(new JsonArray()) { (a, o) => a.add(o); a }
       if (!arr.isEmpty) {
         obj.add(key, arr)
       }
@@ -53,7 +53,7 @@ private[data] object PlatformCondition {
     TagCondition(fabricTag, fabricTag, forge.map(s => new ResourceLocation(s)))
   }
 
-  case class TagCondition(fabric: Option[ResourceLocation], neoforge: Option[ResourceLocation], forge: Option[ResourceLocation]) extends PlatformCondition {
+  private case class TagCondition(fabric: Option[ResourceLocation], neoforge: Option[ResourceLocation], forge: Option[ResourceLocation]) extends PlatformCondition {
 
     override def fabricCondition: Option[JsonObject] = {
       for {

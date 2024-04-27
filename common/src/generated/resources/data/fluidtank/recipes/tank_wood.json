@@ -1,54 +1,28 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "fabric:load_conditions": [
     {
-      "condition": "fabric:or",
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
       "values": [
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "c:glass_blocks"
-          ]
-        },
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "forge:glass"
-          ]
-        }
+        "c:glass_blocks"
       ]
     }
   ],
-  "forge:condition": {
-    "type": "forge:not",
-    "value": {
-      "type": "forge:and",
-      "values": [
-        {
-          "type": "forge:tag_empty",
-          "tag": "forge:glass"
-        },
-        {
-          "type": "forge:tag_empty",
-          "tag": "c:glass_blocks"
-        }
-      ]
-    }
-  },
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "key": {
     "p": {
       "tag": "minecraft:logs"
     },
     "x": {
-      "type": "fluidtank:ignore_unknown_tag_ingredient",
       "fabric:type": "fluidtank:ignore_unknown_tag_ingredient",
+      "type": "fluidtank:ignore_unknown_tag_ingredient",
       "values": [
         {
-          "tag": "forge:glass"
+          "tag": "c:glass_blocks"
         },
         {
-          "tag": "c:glass_blocks"
+          "tag": "forge:glass"
         }
       ]
     }
@@ -57,17 +31,8 @@
     {
       "type": "neoforge:not",
       "value": {
-        "type": "neoforge:and",
-        "values": [
-          {
-            "type": "neoforge:tag_empty",
-            "tag": "forge:glass"
-          },
-          {
-            "type": "neoforge:tag_empty",
-            "tag": "c:glass_blocks"
-          }
-        ]
+        "type": "neoforge:tag_empty",
+        "tag": "c:glass_blocks"
       }
     }
   ],
@@ -77,6 +42,7 @@
     "xxx"
   ],
   "result": {
+    "count": 1,
     "id": "fluidtank:tank_wood"
   }
 }

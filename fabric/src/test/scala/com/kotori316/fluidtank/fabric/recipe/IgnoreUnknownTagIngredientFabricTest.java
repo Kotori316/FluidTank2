@@ -26,6 +26,7 @@ class IgnoreUnknownTagIngredientFabricTest extends BeforeMC {
             assertTrue(result.isJsonObject());
             var expected = new JsonObject();
             expected.addProperty("fabric:type", "fluidtank:ignore_unknown_tag_ingredient");
+            expected.addProperty("type", "fluidtank:ignore_unknown_tag_ingredient");
             expected.add("values", singleObject("item", "minecraft:apple"));
             assertEquals(expected, result);
         }
@@ -39,6 +40,7 @@ class IgnoreUnknownTagIngredientFabricTest extends BeforeMC {
             assertTrue(result.isJsonObject());
             var expected = new JsonObject();
             expected.addProperty("fabric:type", "fluidtank:ignore_unknown_tag_ingredient");
+            expected.addProperty("type", "fluidtank:ignore_unknown_tag_ingredient");
             expected.add("values", singleObject("tag", "minecraft:logs"));
             assertEquals(expected, result);
         }

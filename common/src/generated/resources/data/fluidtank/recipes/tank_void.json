@@ -1,21 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "fabric:load_conditions": [],
-  "forge:condition": {
-    "type": "forge:true",
-    "value": {}
-  },
   "key": {
     "o": {
-      "type": "fluidtank:ignore_unknown_tag_ingredient",
       "fabric:type": "fluidtank:ignore_unknown_tag_ingredient",
+      "type": "fluidtank:ignore_unknown_tag_ingredient",
       "values": [
         {
-          "tag": "forge:obsidian"
+          "item": "minecraft:obsidian"
         },
         {
-          "item": "minecraft:obsidian"
+          "tag": "c:obsidian"
+        },
+        {
+          "tag": "forge:obsidian"
         }
       ]
     },
@@ -23,13 +21,13 @@
       "item": "fluidtank:tank_wood"
     }
   },
-  "neoforge:conditions": [],
   "pattern": [
     "ooo",
     "oto",
     "ooo"
   ],
   "result": {
+    "count": 1,
     "id": "fluidtank:tank_void"
   }
 }

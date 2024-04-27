@@ -84,7 +84,7 @@ loom {
     silentMojangMappingsLicense()
 }
 
-val enableScala2 = true
+val enableScala2 = false
 
 dependencies {
     minecraft("com.mojang:minecraft:${minecraftVersion}")
@@ -171,6 +171,7 @@ tasks {
         ) {
             scalaCompileOptions.additionalParameters = listOf("-X" + "source:3")
         }
+        scalaCompileOptions.additionalParameters.add("-no-indent")
         options.encoding = "UTF-8"
     }
 

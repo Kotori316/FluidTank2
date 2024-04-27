@@ -35,7 +35,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -278,7 +277,6 @@ public abstract class TierRecipe implements CraftingRecipe {
             DebugLogging.LOGGER().debug("Serialized to packet for tier {}.", recipe.tier);
         }
 
-        @VisibleForTesting
         public static Ingredient getIngredientTankForTier(Tier tier) {
             var targetTiers = Stream.of(Tier.values()).filter(t -> t.getRank() == tier.getRank() - 1);
             var itemStream = targetTiers.map(PlatformTankAccess.getInstance().getTankBlockMap()::get).map(Supplier::get).map(ItemStack::new);

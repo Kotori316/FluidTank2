@@ -1,13 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_tank_iron": {
+    "has_tank": {
       "conditions": {
         "items": [
           {
-            "items": [
-              "fluidtank:tank_iron"
-            ]
+            "items": "fluidtank:tank_wood"
           }
         ]
       },
@@ -15,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fluidtank:reservoir_iron"
+        "recipe": "fluidtank:reservoir_wood"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -23,12 +21,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_tank_iron"
+      "has_tank"
     ]
   ],
   "rewards": {
     "recipes": [
-      "fluidtank:reservoir_iron"
+      "fluidtank:reservoir_wood"
     ]
   }
 }

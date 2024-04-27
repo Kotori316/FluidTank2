@@ -97,8 +97,7 @@ afterEvaluate {
                 expand(
                     "version" to projectVersion,
                     "update_url" to "https://version.kotori316.com/get-version/${minecraftVersion}/${project.name}/${modId}",
-                    // FIXME change to minecraftVersion
-                    "mc_version" to "1.20",
+                    "mc_version" to minecraftVersion,
                 )
             }
         }

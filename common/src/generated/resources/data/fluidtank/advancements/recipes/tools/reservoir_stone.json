@@ -1,13 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_tank_stone": {
+    "has_tank": {
       "conditions": {
         "items": [
           {
-            "items": [
-              "fluidtank:tank_stone"
-            ]
+            "items": "fluidtank:tank_stone"
           }
         ]
       },
@@ -23,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_tank_stone"
+      "has_tank"
     ]
   ],
   "rewards": {

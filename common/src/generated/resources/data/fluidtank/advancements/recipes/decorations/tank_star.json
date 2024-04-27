@@ -1,13 +1,21 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_tank_wood": {
+    "has_ingredient": {
       "conditions": {
         "items": [
           {
-            "items": [
-              "fluidtank:tank_wood"
-            ]
+            "items": "minecraft:nether_star"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_tank": {
+      "conditions": {
+        "items": [
+          {
+            "items": "fluidtank:tank_emerald"
           }
         ]
       },
@@ -15,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fluidtank:reservoir_wood"
+        "recipe": "fluidtank:tank_star"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -23,12 +31,13 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_tank_wood"
+      "has_tank",
+      "has_ingredient"
     ]
   ],
   "rewards": {
     "recipes": [
-      "fluidtank:reservoir_wood"
+      "fluidtank:tank_star"
     ]
   }
 }

@@ -1,20 +1,32 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:stones"
+      ]
+    }
+  ],
   "type": "fluidtank:crafting_grade_up",
-  "fabric:load_conditions": [],
-  "forge:condition": {
-    "type": "forge:true",
-    "value": {}
-  },
-  "neoforge:conditions": [],
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:stones"
+      }
+    }
+  ],
   "sub_item": {
-    "type": "fluidtank:ignore_unknown_tag_ingredient",
     "fabric:type": "fluidtank:ignore_unknown_tag_ingredient",
+    "type": "fluidtank:ignore_unknown_tag_ingredient",
     "values": [
       {
-        "tag": "forge:stone"
+        "tag": "c:stones"
       },
       {
-        "item": "minecraft:stone"
+        "tag": "forge:stone"
       }
     ]
   },

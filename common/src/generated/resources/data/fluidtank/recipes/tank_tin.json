@@ -1,67 +1,32 @@
 {
-  "type": "fluidtank:crafting_grade_up",
   "fabric:load_conditions": [
     {
-      "condition": "fabric:or",
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
       "values": [
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "c:tin_ingots"
-          ]
-        },
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "forge:ingots/tin"
-          ]
-        }
+        "c:ingots/tin"
       ]
     }
   ],
-  "forge:condition": {
-    "type": "forge:not",
-    "value": {
-      "type": "forge:and",
-      "values": [
-        {
-          "type": "forge:tag_empty",
-          "tag": "forge:ingots/tin"
-        },
-        {
-          "type": "forge:tag_empty",
-          "tag": "c:tin_ingots"
-        }
-      ]
-    }
-  },
+  "type": "fluidtank:crafting_grade_up",
   "neoforge:conditions": [
     {
       "type": "neoforge:not",
       "value": {
-        "type": "neoforge:and",
-        "values": [
-          {
-            "type": "neoforge:tag_empty",
-            "tag": "forge:ingots/tin"
-          },
-          {
-            "type": "neoforge:tag_empty",
-            "tag": "c:tin_ingots"
-          }
-        ]
+        "type": "neoforge:tag_empty",
+        "tag": "c:ingots/tin"
       }
     }
   ],
   "sub_item": {
-    "type": "fluidtank:ignore_unknown_tag_ingredient",
     "fabric:type": "fluidtank:ignore_unknown_tag_ingredient",
+    "type": "fluidtank:ignore_unknown_tag_ingredient",
     "values": [
       {
-        "tag": "forge:ingots/tin"
+        "tag": "c:ingots/tin"
       },
       {
-        "tag": "c:tin_ingots"
+        "tag": "forge:ingots/tin"
       }
     ]
   },

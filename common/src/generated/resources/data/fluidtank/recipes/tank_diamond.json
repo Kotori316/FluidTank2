@@ -1,67 +1,32 @@
 {
-  "type": "fluidtank:crafting_grade_up",
   "fabric:load_conditions": [
     {
-      "condition": "fabric:or",
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
       "values": [
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "c:diamonds"
-          ]
-        },
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "forge:gems/diamond"
-          ]
-        }
+        "c:gems/diamond"
       ]
     }
   ],
-  "forge:condition": {
-    "type": "forge:not",
-    "value": {
-      "type": "forge:and",
-      "values": [
-        {
-          "type": "forge:tag_empty",
-          "tag": "forge:gems/diamond"
-        },
-        {
-          "type": "forge:tag_empty",
-          "tag": "c:diamonds"
-        }
-      ]
-    }
-  },
+  "type": "fluidtank:crafting_grade_up",
   "neoforge:conditions": [
     {
       "type": "neoforge:not",
       "value": {
-        "type": "neoforge:and",
-        "values": [
-          {
-            "type": "neoforge:tag_empty",
-            "tag": "forge:gems/diamond"
-          },
-          {
-            "type": "neoforge:tag_empty",
-            "tag": "c:diamonds"
-          }
-        ]
+        "type": "neoforge:tag_empty",
+        "tag": "c:gems/diamond"
       }
     }
   ],
   "sub_item": {
-    "type": "fluidtank:ignore_unknown_tag_ingredient",
     "fabric:type": "fluidtank:ignore_unknown_tag_ingredient",
+    "type": "fluidtank:ignore_unknown_tag_ingredient",
     "values": [
       {
-        "tag": "forge:gems/diamond"
+        "tag": "c:gems/diamond"
       },
       {
-        "tag": "c:diamonds"
+        "tag": "forge:gems/diamond"
       }
     ]
   },

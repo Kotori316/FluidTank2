@@ -1,67 +1,32 @@
 {
-  "type": "fluidtank:crafting_grade_up",
   "fabric:load_conditions": [
     {
-      "condition": "fabric:or",
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
       "values": [
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "c:bronze_ingots"
-          ]
-        },
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "forge:ingots/bronze"
-          ]
-        }
+        "c:ingots/bronze"
       ]
     }
   ],
-  "forge:condition": {
-    "type": "forge:not",
-    "value": {
-      "type": "forge:and",
-      "values": [
-        {
-          "type": "forge:tag_empty",
-          "tag": "forge:ingots/bronze"
-        },
-        {
-          "type": "forge:tag_empty",
-          "tag": "c:bronze_ingots"
-        }
-      ]
-    }
-  },
+  "type": "fluidtank:crafting_grade_up",
   "neoforge:conditions": [
     {
       "type": "neoforge:not",
       "value": {
-        "type": "neoforge:and",
-        "values": [
-          {
-            "type": "neoforge:tag_empty",
-            "tag": "forge:ingots/bronze"
-          },
-          {
-            "type": "neoforge:tag_empty",
-            "tag": "c:bronze_ingots"
-          }
-        ]
+        "type": "neoforge:tag_empty",
+        "tag": "c:ingots/bronze"
       }
     }
   ],
   "sub_item": {
-    "type": "fluidtank:ignore_unknown_tag_ingredient",
     "fabric:type": "fluidtank:ignore_unknown_tag_ingredient",
+    "type": "fluidtank:ignore_unknown_tag_ingredient",
     "values": [
       {
-        "tag": "forge:ingots/bronze"
+        "tag": "c:ingots/bronze"
       },
       {
-        "tag": "c:bronze_ingots"
+        "tag": "forge:ingots/bronze"
       }
     ]
   },

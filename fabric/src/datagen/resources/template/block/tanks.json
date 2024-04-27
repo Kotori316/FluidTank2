@@ -1,6 +1,5 @@
 {
   "parent": "minecraft:block/block",
-  "ambientocclusion": false,
   "elements": [
     {
       "faces": {
@@ -70,10 +69,5 @@
         14
       ]
     }
-  ],
-  "textures": {
-    "particle": "#1",
-    "side": "#1",
-    "top": "#2"
-  }
+  ]
 }

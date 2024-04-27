@@ -145,10 +145,5 @@
       ]
     }
   ],
-  "gui_light": "side",
-  "textures": {
-    "particle": "#1",
-    "side": "#1",
-    "top": "#2"
-  }
+  "gui_light": "side"
 }

@@ -1,67 +1,32 @@
 {
-  "type": "fluidtank:crafting_grade_up",
   "fabric:load_conditions": [
     {
-      "condition": "fabric:or",
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
       "values": [
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "c:emeralds"
-          ]
-        },
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "forge:gems/emerald"
-          ]
-        }
+        "c:gems/emerald"
       ]
     }
   ],
-  "forge:condition": {
-    "type": "forge:not",
-    "value": {
-      "type": "forge:and",
-      "values": [
-        {
-          "type": "forge:tag_empty",
-          "tag": "forge:gems/emerald"
-        },
-        {
-          "type": "forge:tag_empty",
-          "tag": "c:emeralds"
-        }
-      ]
-    }
-  },
+  "type": "fluidtank:crafting_grade_up",
   "neoforge:conditions": [
     {
       "type": "neoforge:not",
       "value": {
-        "type": "neoforge:and",
-        "values": [
-          {
-            "type": "neoforge:tag_empty",
-            "tag": "forge:gems/emerald"
-          },
-          {
-            "type": "neoforge:tag_empty",
-            "tag": "c:emeralds"
-          }
-        ]
+        "type": "neoforge:tag_empty",
+        "tag": "c:gems/emerald"
       }
     }
   ],
   "sub_item": {
-    "type": "fluidtank:ignore_unknown_tag_ingredient",
     "fabric:type": "fluidtank:ignore_unknown_tag_ingredient",
+    "type": "fluidtank:ignore_unknown_tag_ingredient",
     "values": [
       {
-        "tag": "forge:gems/emerald"
+        "tag": "c:gems/emerald"
       },
       {
-        "tag": "c:emeralds"
+        "tag": "forge:gems/emerald"
       }
     ]
   },

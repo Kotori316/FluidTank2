@@ -1,7 +1,7 @@
 {
-  "parent": "fluidtank:item/item_tank",
+  "parent": "fluidtank:item/tanks",
   "textures": {
-    "1": "fluidtank:block/creative1",
-    "2": "fluidtank:block/creative2"
+    "side": "fluidtank:block/creative1",
+    "top": "fluidtank:block/creative2"
   }
 }

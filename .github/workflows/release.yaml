@@ -50,4 +50,5 @@ jobs:
       sign_check_command: 'assemble publishToMavenLocal'
       release_command: 'assemble publishToMavenLocal githubRelease publishMods registerVersion publish --continue'
       enable_signature_check: true
+      java_version: '21'
     secrets: inherit

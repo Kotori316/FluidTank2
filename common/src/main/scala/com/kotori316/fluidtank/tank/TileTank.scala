@@ -1,12 +1,12 @@
 package com.kotori316.fluidtank.tank
 
 import cats.implicits.toShow
-import com.kotori316.fluidtank.DebugLogging
 import com.kotori316.fluidtank.MCImplicits.*
 import com.kotori316.fluidtank.connection.Connection
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank, TankUtil}
 import com.kotori316.fluidtank.fluids.*
 import com.kotori316.fluidtank.tank.TileTank.{KEY_STACK_NAME, KEY_TANK, KEY_TIER}
+import com.kotori316.fluidtank.{DebugLogging, FluidTankCommon}
 import net.minecraft.core.{BlockPos, HolderLookup}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
@@ -15,6 +15,8 @@ import net.minecraft.world.Nameable
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
 import org.jetbrains.annotations.{NotNull, Nullable}
+
+import java.util.Locale
 
 class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: BlockPos, s: BlockState)
   extends BlockEntity(t, p, s) with Nameable {
@@ -126,4 +128,5 @@ object TileTank {
   final val KEY_TIER = "tier" // Tag map provided in Tier class (Actually, String)
   final val KEY_STACK_NAME = "stackName" // String parsed in Text
 
+  final val registryName = "%s:%s".formatted(FluidTankCommon.modId, classOf[TileTank].getSimpleName.toLowerCase(Locale.ROOT))
 }

@@ -4,12 +4,12 @@ import cats.implicits.toShow
 import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.MCImplicits.showPos
 import com.kotori316.fluidtank.fluids.{PlatformFluidAccess, TransferFluid}
+import com.kotori316.fluidtank.item.PlatformItemAccess
 import com.mojang.serialization.MapCodec
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.{BlockPos, Direction, HolderLookup}
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.{Item, ItemStack}
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityTicker, BlockEntityType}
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
@@ -121,7 +121,7 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
   def saveTankNBT(tileEntity: BlockEntity, stack: ItemStack, provider: HolderLookup.Provider): Unit = {
     tileEntity match {
       case tank: TileTank =>
-        if (!tank.getTank.isEmpty) stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tank.saveWithId(provider)))
+        if (!tank.getTank.isEmpty) PlatformItemAccess.setTileTag(stack, tank.saveWithId(provider), null) // id is already saved
         if (tank.hasCustomName) stack.set(DataComponents.CUSTOM_NAME, tank.getCustomName)
       case _ => // should be unreachable
     }

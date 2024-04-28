@@ -1,9 +1,11 @@
 package com.kotori316.fluidtank.fabric.tank
 
+import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank, TankUtil}
 import com.kotori316.fluidtank.fabric.recipe.{ModifiableSingleItemStorage, RecipeInventoryUtil}
 import com.kotori316.fluidtank.fabric.{BeforeMC, FluidTank}
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, fluidAccess}
+import com.kotori316.fluidtank.item.PlatformItemAccess
 import com.kotori316.fluidtank.tank.{Tier, TileTank}
 import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidConstants, FluidVariant}
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
@@ -40,7 +42,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
     tag.putString(TileTank.KEY_TIER, Tier.WOOD.name)
     val tank = Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit(Tier.WOOD.getCapacity))
     tag.put(TileTank.KEY_TANK, TankUtil.save(tank))
-    stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag))
+    PlatformItemAccess.setTileTag(stack, tag, s"${FluidTankCommon.modId}:test")
     val storage = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
     assertAll(
       () => assertEquals(FluidConstants.BUCKET, storage.getAmount),
@@ -58,7 +60,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
     tag.putString(TileTank.KEY_TIER, tier.name)
     val tank = Tank.apply(FluidAmountUtil.BUCKET_LAVA.setAmount(GenericUnit.fromForge(3000)), GenericUnit(tier.getCapacity))
     tag.put(TileTank.KEY_TANK, TankUtil.save(tank))
-    stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag))
+    PlatformItemAccess.setTileTag(stack, tag, s"${FluidTankCommon.modId}:test")
     val handler = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
     assertAll(
       () => assertEquals(FluidConstants.BUCKET * 3, handler.getAmount),

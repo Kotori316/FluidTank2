@@ -2,13 +2,14 @@ package com.kotori316.fluidtank.neoforge.tank
 
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank, TankUtil}
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, FluidLike, fluidAccess}
+import com.kotori316.fluidtank.item.PlatformItemAccess
+import com.kotori316.fluidtank.neoforge.FluidTank
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
 import com.kotori316.fluidtank.neoforge.fluid.TankFluidHandler
 import com.kotori316.fluidtank.tank.{Tier, TileTank}
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.component.CustomData
 import net.neoforged.neoforge.fluids.capability.{IFluidHandler, IFluidHandlerItem}
 import org.jetbrains.annotations.VisibleForTesting
 
@@ -44,7 +45,7 @@ class TankFluidItemHandler(tier: Tier, stack: ItemStack) extends TankFluidHandle
         .getOrElse(new CompoundTag())
       tag.put(TileTank.KEY_TANK, tankTag)
       tag.putString(TileTank.KEY_TIER, tier.name())
-      getContainer.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag))
+      PlatformItemAccess.setTileTag(getContainer, tag, FluidTank.TILE_TANK_TYPE.getId.toString)
     }
   }
 

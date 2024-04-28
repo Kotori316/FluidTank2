@@ -34,6 +34,7 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +148,9 @@ public abstract class TierRecipe implements CraftingRecipe {
             compound.put(TileTank.KEY_TANK(), tankTag);
             compound.putString(TileTank.KEY_TIER(), tier.name());
 
-            PlatformItemAccess.setTileTag(result, compound);
+            var location = BlockEntityType.getKey(PlatformTankAccess.getInstance().getNormalType());
+            assert location != null : "The tile type must be registered";
+            PlatformItemAccess.setTileTag(result, compound, location.toString());
         }
 
         return result;

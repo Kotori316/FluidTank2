@@ -2,8 +2,11 @@ package com.kotori316.fluidtank.fabric.gametest
 
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fabric.FabricPlatformAccessTest
+import com.kotori316.fluidtank.fabric.recipe.RecipeInventoryUtil
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, PotionType}
+import com.kotori316.fluidtank.tank.Tier
 import com.kotori316.fluidtank.{FluidTankCommon, PlatformAccess}
+import com.mojang.serialization.JsonOps
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest
 import net.minecraft.core.Holder
 import net.minecraft.gametest.framework.{GameTest, GameTestGenerator, GameTestHelper, TestFunction}
@@ -11,7 +14,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.alchemy.{Potion, PotionContents, Potions}
 import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.GameType
-import org.junit.jupiter.api.Assertions.{assertEquals, assertFalse, assertTrue}
+import org.junit.jupiter.api.Assertions.{assertDoesNotThrow, assertEquals, assertFalse, assertTrue}
 import org.junit.platform.commons.support.ReflectionSupport
 
 import java.lang.reflect.Modifier
@@ -223,6 +226,13 @@ final class PlatformAccessTest extends FabricGameTest {
     assertFalse(transferred.shouldMove(), "Transfer failed, so nothing to move")
     assertTrue(transferred.moved.isEmpty)
     assertTrue(ItemStack.isSameItemSameComponents(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getComponents, transferred.toReplace.getComponents))
+    helper.succeed()
+  }
+
+  def serializeTankItem(helper: GameTestHelper): Unit = {
+    val stack = RecipeInventoryUtil.getFilledTankStack(Tier.GOLD, FluidAmountUtil.BUCKET_WATER)
+    val result = assertDoesNotThrow(() => ItemStack.STRICT_CODEC.encodeStart(JsonOps.INSTANCE, stack))
+    assertTrue(result.isSuccess)
     helper.succeed()
   }
 }

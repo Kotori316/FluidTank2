@@ -12,10 +12,8 @@ import net.minecraft.core.component.{DataComponentPatch, DataComponentType, Data
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.component.CustomData
 
-import scala.jdk.CollectionConverters.IterableHasAsScala
-import scala.jdk.OptionConverters.RichOptional
-
 import scala.jdk.CollectionConverters.CollectionHasAsScala
+import scala.jdk.OptionConverters.RichOptional
 
 //noinspection UnstableApiUsage
 class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c) {
@@ -43,9 +41,11 @@ class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c
     if (newTank.isEmpty) {
       tileTag.remove(TileTank.KEY_TIER)
       tileTag.remove(TileTank.KEY_TANK)
+      tileTag.remove("id")
     } else {
       tileTag.putString(TileTank.KEY_TIER, getTier.name())
       tileTag.put(TileTank.KEY_TANK, TankUtil.save(newTank))
+      tileTag.putString("id", TileTank.registryName)
     }
     val componentBuilder = DataComponentPatch.builder()
     componentPatch.entrySet().asScala

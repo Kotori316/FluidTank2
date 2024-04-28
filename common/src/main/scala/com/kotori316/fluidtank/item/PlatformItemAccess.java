@@ -9,6 +9,7 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -32,10 +33,17 @@ public interface PlatformItemAccess {
 
     DataComponentType<Tank<FluidLike>> fluidTankComponentType();
 
-    static void setTileTag(@NotNull ItemStack stack, @Nullable CompoundTag tileTag) {
+    static void setTileTag(@NotNull ItemStack stack, @Nullable CompoundTag tileTag, @Nullable String tileTypeId) {
         if (tileTag == null || tileTag.isEmpty()) {
             stack.remove(DataComponents.BLOCK_ENTITY_DATA);
         } else {
+            if (!tileTag.contains("id", Tag.TAG_STRING)) {
+                if (tileTypeId != null) {
+                    tileTag.putString("id", tileTypeId);
+                } else {
+                    throw new IllegalStateException("Missing tile type id in %s".formatted(tileTag));
+                }
+            }
             stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tileTag));
         }
     }

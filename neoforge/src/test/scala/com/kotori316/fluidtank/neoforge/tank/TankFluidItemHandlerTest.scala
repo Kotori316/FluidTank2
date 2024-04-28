@@ -1,7 +1,9 @@
 package com.kotori316.fluidtank.neoforge.tank
 
+import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank, TankUtil}
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, fluidAccess}
+import com.kotori316.fluidtank.item.PlatformItemAccess
 import com.kotori316.fluidtank.neoforge.BeforeMC
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
 import com.kotori316.fluidtank.tank.{Tier, TileTank}
@@ -39,7 +41,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     tag.put(TileTank.KEY_TANK, TankUtil.save(tank))
     tag.putString(TileTank.KEY_TIER, Tier.STONE.name())
     val stack = new ItemStack(Items.APPLE)
-    stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag))
+    PlatformItemAccess.setTileTag(stack, tag, s"${FluidTankCommon.modId}:test")
 
     val handler = new TankFluidItemHandler(Tier.STONE, stack)
     assertEquals(tank, handler.getTank)

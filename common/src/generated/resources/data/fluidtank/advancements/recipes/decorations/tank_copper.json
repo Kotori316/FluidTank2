@@ -17,7 +17,7 @@
             "items": "#c:ingots/copper"
           },
           {
-            "items": "#minecraft:ingots/copper"
+            "items": "#forge:ingots/copper"
           }
         ]
       },

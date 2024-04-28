@@ -153,7 +153,7 @@ private[data] final class RecipeProvider(dataOutput: FabricDataOutput, provider:
       case Tier.EMERALD => both(ConventionalItemTags.EMERALD_GEMS, "forge:gems/emerald")
       case Tier.STAR => itemFallBack(Items.NETHER_STAR, "c:nether_stars", "forge:nether_stars")
       case Tier.VOID => itemFallBack(Items.OBSIDIAN, "c:obsidian", "forge:obsidian")
-      case Tier.COPPER => both(ConventionalItemTags.COPPER_INGOTS, "ingots/copper")
+      case Tier.COPPER => both(ConventionalItemTags.COPPER_INGOTS, "forge:ingots/copper")
       case Tier.TIN => both("c:ingots/tin", "forge:ingots/tin")
       case Tier.BRONZE => both("c:ingots/bronze", "forge:ingots/bronze")
       case Tier.LEAD => both("c:ingots/lead", "forge:ingots/lead")

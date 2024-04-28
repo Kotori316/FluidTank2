@@ -26,7 +26,7 @@
         "tag": "c:ingots/copper"
       },
       {
-        "tag": "minecraft:ingots/copper"
+        "tag": "forge:ingots/copper"
       }
     ]
   },

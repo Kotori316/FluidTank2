@@ -56,7 +56,7 @@ final class NeoForgePlatformAccess implements PlatformAccess {
     @Override
     @NotNull
     public Fluid getBucketContent(BucketItem bucketItem) {
-        return bucketItem.getFluid();
+        return bucketItem.content;
     }
 
     @Override

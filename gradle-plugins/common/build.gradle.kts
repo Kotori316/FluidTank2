@@ -14,10 +14,11 @@ dependencies {
     mapOf(
         "architectury-plugin" to libs.versions.plugin.architectury.get(),
         "dev.architectury.loom" to libs.versions.plugin.loom.get(),
-        "com.kotori316.plugin.cf" to libs.versions.plugin.cf.get(),
+        // "com.kotori316.plugin.cf" to libs.versions.plugin.cf.get(),
         "com.github.johnrengelman.shadow" to libs.versions.plugin.shadow.get(),
         "me.modmuss50.mod-publish-plugin" to libs.versions.plugin.publish.all.get(),
     ).forEach { (name, version) ->
         implementation(group = name, name = "${name}.gradle.plugin", version = version)
     }
+    implementation(group = "com.kotori316", name = "call-plugin", version = libs.versions.plugin.cf.get())
 }

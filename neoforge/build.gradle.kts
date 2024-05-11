@@ -87,7 +87,7 @@ dependencies {
     common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
     shadowCommon(project(path = ":common", configuration = "transformProductionNeoForge")) { isTransitive = false }
 
-    modImplementation(
+    modCompileOnly(
         group = "curse.maven",
         name = "jade-324717",
         version = project.property("jade_neoforge_id").toString()

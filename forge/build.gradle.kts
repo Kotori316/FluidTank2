@@ -176,7 +176,7 @@ dependencies {
     shadowCommon(project(path = ":common", configuration = "transformProductionForge")) { isTransitive = false }
 
     // Other mods
-    modImplementation(
+    modCompileOnly(
         group = "curse.maven",
         name = "jade-324717",
         version = project.property("jade_forge_id").toString()

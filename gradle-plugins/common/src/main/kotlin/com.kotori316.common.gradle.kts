@@ -90,9 +90,8 @@ dependencies {
     minecraft("com.mojang:minecraft:${minecraftVersion}")
     mappings(loom.layered {
         officialMojangMappings()
-        val parchmentVersion = project.property("parchment_mapping").toString().split("-", limit = 2)
-        val parchmentMC = parchmentVersion[0]
-        val parchmentDate = parchmentVersion[1]
+        val parchmentMC = project.property("parchment_mapping_mc")
+        val parchmentDate = project.property("parchment_mapping_version")
         parchment("org.parchmentmc.data:parchment-$parchmentMC:$parchmentDate@zip")
     })
 

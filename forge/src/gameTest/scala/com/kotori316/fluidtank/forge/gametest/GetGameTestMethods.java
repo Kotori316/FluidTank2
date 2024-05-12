@@ -83,6 +83,6 @@ public class GetGameTestMethods {
 
     public static void assertEqualStack(ItemStack expected, ItemStack actual) {
         Assertions.assertTrue(ItemStack.matches(expected, actual),
-            "Expected: %s(%s), Actual: %s(%s)".formatted(expected, expected.getTag(), actual, actual.getTag()));
+            "Expected: %s(%s), Actual: %s(%s)".formatted(expected, expected.getComponentsPatch(), actual, actual.getComponentsPatch()));
     }
 }

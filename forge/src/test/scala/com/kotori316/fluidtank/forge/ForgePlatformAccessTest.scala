@@ -2,13 +2,15 @@ package com.kotori316.fluidtank.forge
 
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, FluidLike, PotionType}
-import net.minecraft.world.item.alchemy.{PotionUtils, Potions}
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.item.alchemy.{Potion, PotionContents, Potions}
 import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraftforge.registries.ForgeRegistries
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
 import org.junit.jupiter.api.{DynamicTest, Nested, Test, TestFactory}
 
 import java.util
+import scala.jdk.OptionConverters.RichOption
 import scala.jdk.javaapi.CollectionConverters
 
 final class ForgePlatformAccessTest extends BeforeMC {

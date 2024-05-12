@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.forge.BeforeMC;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.GsonHelper;
@@ -175,7 +174,7 @@ class IgnoreUnknownTagIngredientTest extends BeforeMC {
         @Test
         void singleItemInternal() {
             var ingredient = IgnoreUnknownTagIngredient.of(Items.APPLE);
-            var codec = (Codec<IgnoreUnknownTagIngredient>) IgnoreUnknownTagIngredient.SERIALIZER.codec();
+            var codec = IgnoreUnknownTagIngredient.typedCodec();
             var encoded = codec.encodeStart(JsonOps.INSTANCE, ingredient);
             var json = assertDoesNotThrow(() -> encoded.getOrThrow());
             assertTrue(json.isJsonObject());

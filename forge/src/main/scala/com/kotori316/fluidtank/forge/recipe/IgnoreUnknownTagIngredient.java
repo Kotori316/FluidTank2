@@ -7,6 +7,7 @@ import com.google.gson.JsonParseException;
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.crafting.ingredients.AbstractIngredient;
 import net.minecraftforge.common.crafting.ingredients.IIngredientSerializer;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -77,6 +79,11 @@ public final class IgnoreUnknownTagIngredient extends AbstractIngredient {
 
     }
 
+    @VisibleForTesting
+    static Codec<IgnoreUnknownTagIngredient> typedCodec() {
+        return Serializer.CODEC.codec();
+    }
+
     private static class Serializer implements IIngredientSerializer<IgnoreUnknownTagIngredient> {
         private static final MapCodec<IgnoreUnknownTagIngredient> CODEC = new MapC();
 
@@ -110,7 +117,7 @@ public final class IgnoreUnknownTagIngredient extends AbstractIngredient {
     private static final class MapC extends MapCodec<IgnoreUnknownTagIngredient> {
 
         public static IgnoreUnknownTagIngredient parse(JsonObject json) {
-            if (json.has("item") || json.has("tag")) {
+            if (json.has("item") || json.has("id") || json.has("tag")) {
                 List<Value> valueList = List.of(getValue(json));
                 return new IgnoreUnknownTagIngredient(valueList);
             } else if (json.has("values")) {
@@ -130,6 +137,9 @@ public final class IgnoreUnknownTagIngredient extends AbstractIngredient {
 
         private static Value getValue(JsonObject json) {
             if (json.has("item")) {
+                Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(json, "item")));
+                return new Ingredient.ItemValue(new ItemStack(item));
+            } else if (json.has("id")) {
                 ItemStack stack = ItemStack.CODEC.decode(JsonOps.INSTANCE, json).map(Pair::getFirst).getOrThrow();
                 return new Ingredient.ItemValue(stack);
             } else if (json.has("tag")) {
@@ -143,7 +153,7 @@ public final class IgnoreUnknownTagIngredient extends AbstractIngredient {
 
         @Override
         public <T> Stream<T> keys(DynamicOps<T> ops) {
-            return Stream.of("item", "tag", "values")
+            return Stream.of("id", "item", "tag", "values")
                 .map(ops::createString);
         }
 
@@ -174,8 +184,16 @@ public final class IgnoreUnknownTagIngredient extends AbstractIngredient {
 
         private static <T> RecordBuilder<T> encodeValue(Value value, DynamicOps<T> ops, RecordBuilder<T> builder) {
             if (value instanceof Ingredient.ItemValue itemValue) {
-                var key = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(itemValue.item().getItem()));
-                builder.add("item", ops.createString(key.toString()));
+                var stack = itemValue.item();
+                if (stack.getComponentsPatch().isEmpty()) {
+                    ResourceLocation key = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack.getItem()));
+                    builder.add("item", ops.createString(key.toString()));
+                } else {
+                    ItemStack.CODEC.encodeStart(ops, stack)
+                        .flatMap(ops::getMapEntries)
+                        .getOrThrow()
+                        .accept(builder::add);
+                }
                 return builder;
             } else if (value instanceof Ingredient.TagValue tagValue) {
                 builder.add("tag", ops.createString(tagValue.tag().location().toString()));

@@ -5,8 +5,10 @@ import com.kotori316.fluidtank.fluids.{FluidAmountUtil, fluidAccess}
 import com.kotori316.fluidtank.forge.BeforeMC
 import com.kotori316.fluidtank.forge.fluid.ForgeConverter.*
 import com.kotori316.fluidtank.tank.{Tier, TileTank}
+import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.item.{BlockItem, ItemStack, Items}
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.material.Fluids
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
@@ -37,7 +39,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     tag.put(TileTank.KEY_TANK, TankUtil.save(tank))
     tag.putString(TileTank.KEY_TIER, Tier.STONE.name())
     val stack = new ItemStack(Items.APPLE)
-    stack.addTagElement(BlockItem.BLOCK_ENTITY_TAG, tag)
+    CustomData.set(DataComponents.BLOCK_ENTITY_DATA, stack, tag)
 
     val handler = new TankFluidItemHandler(Tier.STONE, stack)
     assertEquals(tank, handler.getTank)
@@ -169,8 +171,8 @@ class TankFluidItemHandlerTest extends BeforeMC {
     def unknownTagAdded(): Unit = {
       val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
-      handler.getContainer.getOrCreateTagElement(BlockItem.BLOCK_ENTITY_TAG)
-        .putString("unknownTag", "unknownTag")
+      CustomData.update(DataComponents.BLOCK_ENTITY_DATA, handler.getContainer, tag =>
+        tag.putString("unknownTag", "unknownTag"))
       handler.drain(new FluidStack(Fluids.WATER, 1500), IFluidHandler.FluidAction.EXECUTE)
 
       assertTrue(handler.getTank.isEmpty)

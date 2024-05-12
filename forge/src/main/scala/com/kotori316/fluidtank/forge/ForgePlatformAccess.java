@@ -24,6 +24,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -65,15 +66,27 @@ final class ForgePlatformAccess implements PlatformAccess {
         if (potionHandler.isValidHandler()) {
             return potionHandler.getContent();
         }
-        return FluidUtil.getFluidContained(stack)
+        var fromHandler = FluidUtil.getFluidContained(stack)
             .map(ForgeConverter::toAmount)
             .orElse(FluidAmountUtil.EMPTY());
+        if (fromHandler.nonEmpty()) {
+            return fromHandler;
+        }
+        if (stack.getItem() instanceof BucketItem bucketItem) {
+            var fluid = getBucketContent(bucketItem);
+            if (Fluids.EMPTY.equals(fluid)) {
+                return FluidAmountUtil.EMPTY();
+            }
+            return FluidAmountUtil.from(fluid, GenericUnit.ONE_BUCKET());
+        }
+        return FluidAmountUtil.EMPTY();
     }
 
     @Override
     public boolean isFluidContainer(ItemStack stack) {
         return FluidUtil.getFluidHandler(stack).isPresent() ||
-            PotionFluidHandler.apply(stack).isValidHandler();
+            PotionFluidHandler.apply(stack).isValidHandler() ||
+            stack.getItem() instanceof BucketItem;
     }
 
     @Override
@@ -98,7 +111,15 @@ final class ForgePlatformAccess implements PlatformAccess {
                 int filledAmount = h.fill(ForgeConverter.toStack(toFill), IFluidHandler.FluidAction.EXECUTE);
                 return new TransferStack(toFill.setAmount(GenericUnit.fromForge(filledAmount)), h.getContainer());
             })
-            .orElse(new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer));
+            .orElseGet(() -> {
+                if (toFill.content() instanceof VanillaFluid vanillaFluid && fluidContainer.getItem() == Items.BUCKET && toFill.hasOneBucket()) {
+                    // Just for vanilla bucket
+                    var filledItem = vanillaFluid.fluid().getBucket().getDefaultInstance();
+                    var filledAmount = toFill.setAmount(GenericUnit.ONE_BUCKET());
+                    return new TransferStack(filledAmount, filledItem);
+                }
+                return new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer);
+            });
     }
 
     @Override
@@ -112,7 +133,17 @@ final class ForgePlatformAccess implements PlatformAccess {
                 var drained = h.drain(ForgeConverter.toStack(toDrain), IFluidHandler.FluidAction.EXECUTE);
                 return new TransferStack(ForgeConverter.toAmount(drained), h.getContainer());
             })
-            .orElse(new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer));
+            .orElseGet(() -> {
+                var content = getFluidContained(fluidContainer);
+                if (fluidContainer.getItem() instanceof BucketItem &&
+                    toDrain.content() instanceof VanillaFluid &&
+                    toDrain.hasOneBucket() && content.hasOneBucket() && toDrain.contentEqual(content)) {
+                    var drainedItem = Items.BUCKET.getDefaultInstance();
+                    var drainedAmount = toDrain.setAmount(GenericUnit.ONE_BUCKET());
+                    return new TransferStack(drainedAmount, drainedItem);
+                }
+                return new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer);
+            });
     }
 
     @Override

@@ -35,20 +35,7 @@ public interface PlatformFluidAccess {
     Fluid getBucketContent(BucketItem bucketItem);
 
     @NotNull
-    default GenericAmount<FluidLike> getFluidContained(ItemStack stack) {
-        var potionHandler = PotionFluidHandler.apply(stack);
-        if (potionHandler.isValidHandler()) {
-            return potionHandler.getContent();
-        }
-        if (stack.getItem() instanceof BucketItem bucketItem) {
-            var fluid = getBucketContent(bucketItem);
-            if (Fluids.EMPTY.equals(fluid)) {
-                return FluidAmountUtil.EMPTY();
-            }
-            return FluidAmountUtil.from(fluid, GenericUnit.ONE_BUCKET());
-        }
-        return FluidAmountUtil.EMPTY();
-    }
+    GenericAmount<FluidLike> getFluidContained(ItemStack stack);
 
     boolean isFluidContainer(ItemStack stack);
 
@@ -74,22 +61,12 @@ public interface PlatformFluidAccess {
 
     /**
      * The result of transferring fluids.
+     *
+     * @param moved      filled or drained amount
+     * @param toReplace  the result item with transferred fluids
+     * @param shouldMove whether to move {@code toReplace} item into player inventory. In fabric {@code false} and in forge {@code true}.
      */
-    final class TransferStack {
-        private final GenericAmount<FluidLike> moved;
-        private final ItemStack toReplace;
-        private final boolean shouldMove;
-
-        /**
-         * @param moved      filled or drained amount
-         * @param toReplace  the result item with transferred fluids
-         * @param shouldMove whether to move {@code toReplace} item into player inventory. In fabric {@code false} and in forge {@code true}.
-         */
-        public TransferStack(GenericAmount<FluidLike> moved, ItemStack toReplace, boolean shouldMove) {
-            this.moved = moved;
-            this.toReplace = toReplace;
-            this.shouldMove = shouldMove;
-        }
+    record TransferStack(GenericAmount<FluidLike> moved, ItemStack toReplace, boolean shouldMove) {
 
         /**
          * Helper constructor for forge.
@@ -98,28 +75,8 @@ public interface PlatformFluidAccess {
             this(moved, toReplace, true);
         }
 
-        public GenericAmount<FluidLike> moved() {
-            return moved;
-        }
-
-        public ItemStack toReplace() {
-            return toReplace;
-        }
-
-        public boolean shouldMove() {
-            return shouldMove;
-        }
-
         public TransferStack setShouldMove(boolean shouldMove) {
             return new TransferStack(this.moved, this.toReplace, shouldMove);
-        }
-
-        @Override
-        public String toString() {
-            return "TransferStack[" +
-                "moved=" + moved + ", " +
-                "toReplace=" + toReplace + ", " +
-                "shouldMove=" + shouldMove + ']';
         }
     }
 }
@@ -145,6 +102,23 @@ class PlatformFluidAccessHolder {
                 FluidTankCommon.LOGGER.error("Got error in getting fluid content of %s. Are you in production?".formatted(bucketItem), e);
                 return Fluids.EMPTY;
             }
+        }
+
+        @Override
+        public @NotNull GenericAmount<FluidLike> getFluidContained(ItemStack stack) {
+            var potionHandler = PotionFluidHandler.apply(stack);
+            if (potionHandler.isValidHandler()) {
+                return potionHandler.getContent();
+            }
+            if (stack.getItem() instanceof BucketItem bucketItem) {
+                PlatformFluidAccess access = this;
+                var fluid = access.getBucketContent(bucketItem);
+                if (Fluids.EMPTY.equals(fluid)) {
+                    return FluidAmountUtil.EMPTY();
+                }
+                return FluidAmountUtil.from(fluid, GenericUnit.ONE_BUCKET());
+            }
+            return FluidAmountUtil.EMPTY();
         }
 
         @Override

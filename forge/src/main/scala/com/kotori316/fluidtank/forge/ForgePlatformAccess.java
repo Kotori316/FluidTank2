@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.forge;
 import com.kotori316.fluidtank.PlatformAccess;
 import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
+import com.kotori316.fluidtank.contents.Tank;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.fluids.VanillaFluid;
@@ -11,10 +12,12 @@ import com.kotori316.fluidtank.forge.cat.EntityChestAsTank;
 import com.kotori316.fluidtank.forge.fluid.ForgeConverter;
 import com.kotori316.fluidtank.potions.PotionFluidHandler;
 import com.kotori316.fluidtank.tank.BlockTank;
+import com.kotori316.fluidtank.tank.TankLootFunction;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
@@ -78,7 +81,7 @@ final class ForgePlatformAccess implements PlatformAccess {
         if (amount.content() instanceof VanillaFluid) {
             return ForgeConverter.toStack(amount).getDisplayName();
         } else if (amount.content() instanceof VanillaPotion vanillaPotion) {
-            return vanillaPotion.getVanillaPotionName(amount.nbt());
+            return vanillaPotion.getVanillaPotionName(amount.componentPatch());
         } else {
             throw new AssertionError();
         }
@@ -138,7 +141,7 @@ final class ForgePlatformAccess implements PlatformAccess {
     }
 
     @Override
-    public LootItemFunctionType getTankLoot() {
+    public LootItemFunctionType<TankLootFunction> getTankLoot() {
         return FluidTank.TANK_LOOT_FUNCTION.get();
     }
 
@@ -157,6 +160,11 @@ final class ForgePlatformAccess implements PlatformAccess {
     public Codec<Ingredient> ingredientCodec() {
         // OK, forge magic is included in the codec.
         return Ingredient.CODEC;
+    }
+
+    @Override
+    public DataComponentType<Tank<FluidLike>> fluidTankComponentType() {
+        return FluidTank.FLUID_TANK_DATA_COMPONENT.get();
     }
 
     @Override

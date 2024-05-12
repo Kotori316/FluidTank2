@@ -47,7 +47,7 @@ public abstract class SideProxy {
         @Override
         public Optional<Level> getLevel(CustomPayloadEvent.Context context) {
             var serverWorld = Optional.ofNullable(context.getSender()).map(ServerPlayer::getCommandSenderWorld);
-            return serverWorld.or(() -> LogicalSidedProvider.CLIENTWORLD.get(context.getDirection().getReceptionSide()));
+            return serverWorld.or(() -> LogicalSidedProvider.CLIENTWORLD.get(context.isClientSide()));
         }
 
         @SubscribeEvent

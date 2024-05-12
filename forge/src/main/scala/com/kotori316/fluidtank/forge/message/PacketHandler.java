@@ -21,8 +21,8 @@ public final class PacketHandler {
             .simpleChannel()
             // FluidTankContentMessageForge
             .messageBuilder(FluidTankContentMessageForge.class)
-            .decoder(FluidTankContentMessageForge::new)
-            .encoder(IMessage::write)
+            .decoder(FluidTankContentMessageForge.STREAM_CODEC::decode)
+            .encoder((message, buf) -> FluidTankContentMessageForge.STREAM_CODEC.encode(buf, message))
             .consumerNetworkThread(setHandled(FluidTankContentMessageForge::onReceiveMessage))
             .add();
 

@@ -5,6 +5,7 @@ import com.kotori316.fluidtank.contents.GenericUnit;
 import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.fluids.FluidLikeKey;
 import com.kotori316.fluidtank.forge.FluidTank;
+import com.kotori316.fluidtank.forge.fluid.ForgeConverter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -187,7 +188,7 @@ public class EntityChestAsTank extends BlockEntity {
             return IntStream.range(0, getTanks())
                 .mapToObj(this::getFluidInTank)
                 .filter(Predicate.not(FluidStack::isEmpty))
-                .collect(Collectors.groupingBy(f -> FluidLikeKey.apply(FluidLike.of(f.getFluid()), f.getTag()),
+                .collect(Collectors.groupingBy(f -> FluidLikeKey.apply(FluidLike.of(f.getFluid()), ForgeConverter.fluidStackTag2Component(f.getTag())),
                     Collectors.reducing(BigInt.apply(0), f -> GenericUnit.asBigIntFromForge(f.getAmount()), BigInt::$plus)));
         }
     }

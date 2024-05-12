@@ -11,7 +11,8 @@ import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.{BlockEntityWithoutLevelRenderer, MultiBufferSource}
 import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.core.BlockPos
-import net.minecraft.world.item.{BlockItem, ItemDisplayContext, ItemStack}
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
 
 import scala.collection.mutable
 
@@ -31,9 +32,9 @@ class RenderItemTank extends BlockEntityWithoutLevelRenderer(Minecraft.getInstan
         renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, renderTypeBuffer)
 
         tileTank.tier = tankItem.blockTank.tier
-        val compound = BlockItem.getBlockEntityData(stack)
-        if (compound != null) {
-          tileTank.load(compound)
+        val data = stack.get(DataComponents.BLOCK_ENTITY_DATA)
+        if (data != null && !data.isEmpty) {
+          tileTank.loadAdditional(data.copyTag(), Minecraft.getInstance.level.registryAccess())
           if (tileTank.getTank.hasContent) {
             Minecraft.getInstance.getBlockEntityRenderDispatcher.renderItem(
               tileTank, matrixStack, renderTypeBuffer, light, otherLight

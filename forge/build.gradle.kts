@@ -158,6 +158,10 @@ repositories {
 
 }
 
+configurations.all {
+    resolutionStrategy.force("net.sf.jopt-simple:jopt-simple:5.0.4")
+}
+
 val minecraftVersion = project.property("minecraft_version").toString()
 
 dependencies {
@@ -176,7 +180,7 @@ dependencies {
     shadowCommon(project(path = ":common", configuration = "transformProductionForge")) { isTransitive = false }
 
     // Other mods
-    modImplementation(
+    modCompileOnly(
         group = "curse.maven",
         name = "jade-324717",
         version = project.property("jade_forge_id").toString()
@@ -193,7 +197,7 @@ dependencies {
             version = project.property("jei_forge_version").toString()
         ) { isTransitive = false }
     } else {
-        modImplementation(
+        modCompileOnly(
             group = "mezz.jei",
             name = "jei-1.20.4-forge",
             version = project.property("jei_forge_version").toString()

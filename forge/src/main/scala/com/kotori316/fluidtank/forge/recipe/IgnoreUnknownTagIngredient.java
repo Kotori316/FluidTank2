@@ -5,9 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.kotori316.fluidtank.FluidTankCommon;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
@@ -15,10 +17,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.ingredients.AbstractIngredient;
 import net.minecraftforge.common.crafting.ingredients.IIngredientSerializer;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -77,22 +79,36 @@ public final class IgnoreUnknownTagIngredient extends AbstractIngredient {
 
     }
 
+    @VisibleForTesting
+    static Codec<IgnoreUnknownTagIngredient> typedCodec() {
+        return Serializer.CODEC.codec();
+    }
+
     private static class Serializer implements IIngredientSerializer<IgnoreUnknownTagIngredient> {
-        private static final Codec<IgnoreUnknownTagIngredient> CODEC = new MapCodec.MapCodecCodec<>(new MapC());
+        private static final MapCodec<IgnoreUnknownTagIngredient> CODEC = new MapC();
 
         @Override
-        public Codec<? extends IgnoreUnknownTagIngredient> codec() {
+        public MapCodec<? extends IgnoreUnknownTagIngredient> codec() {
             return CODEC;
         }
 
         @Override
-        public void write(FriendlyByteBuf buffer, IgnoreUnknownTagIngredient ingredient) {
-            buffer.writeCollection(List.of(ingredient.getItems()), FriendlyByteBuf::writeItem);
+        public void write(RegistryFriendlyByteBuf buffer, IgnoreUnknownTagIngredient ingredient) {
+            var items = ingredient.getItems();
+            buffer.writeVarInt(items.length);
+            for (var item : items) {
+                buffer.writeJsonWithCodec(ItemStack.CODEC, item);
+            }
         }
 
         @Override
-        public IgnoreUnknownTagIngredient read(FriendlyByteBuf buffer) {
-            var items = buffer.readCollection(ArrayList::new, FriendlyByteBuf::readItem);
+        public IgnoreUnknownTagIngredient read(RegistryFriendlyByteBuf buffer) {
+            var count = buffer.readVarInt();
+            var items = new ArrayList<ItemStack>(count);
+            for (int i = 0; i < count; i++) {
+                var item = buffer.readJsonWithCodec(ItemStack.CODEC);
+                items.add(item);
+            }
             var values = items.stream().map(ItemValue::new).toList();
             return new IgnoreUnknownTagIngredient(values);
         }
@@ -101,7 +117,7 @@ public final class IgnoreUnknownTagIngredient extends AbstractIngredient {
     private static final class MapC extends MapCodec<IgnoreUnknownTagIngredient> {
 
         public static IgnoreUnknownTagIngredient parse(JsonObject json) {
-            if (json.has("item") || json.has("tag")) {
+            if (json.has("item") || json.has("id") || json.has("tag")) {
                 List<Value> valueList = List.of(getValue(json));
                 return new IgnoreUnknownTagIngredient(valueList);
             } else if (json.has("values")) {
@@ -121,8 +137,11 @@ public final class IgnoreUnknownTagIngredient extends AbstractIngredient {
 
         private static Value getValue(JsonObject json) {
             if (json.has("item")) {
-                ItemStack stack = CraftingHelper.getItemStack(json, true, true);
-                return new ItemValue(stack);
+                Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(json, "item")));
+                return new Ingredient.ItemValue(new ItemStack(item));
+            } else if (json.has("id")) {
+                ItemStack stack = ItemStack.CODEC.decode(JsonOps.INSTANCE, json).map(Pair::getFirst).getOrThrow();
+                return new Ingredient.ItemValue(stack);
             } else if (json.has("tag")) {
                 ResourceLocation resourcelocation = new ResourceLocation(GsonHelper.getAsString(json, "tag"));
                 TagKey<Item> tagkey = TagKey.create(Registries.ITEM, resourcelocation);
@@ -134,7 +153,7 @@ public final class IgnoreUnknownTagIngredient extends AbstractIngredient {
 
         @Override
         public <T> Stream<T> keys(DynamicOps<T> ops) {
-            return Stream.of("item", "tag", "values")
+            return Stream.of("id", "item", "tag", "values")
                 .map(ops::createString);
         }
 
@@ -165,8 +184,16 @@ public final class IgnoreUnknownTagIngredient extends AbstractIngredient {
 
         private static <T> RecordBuilder<T> encodeValue(Value value, DynamicOps<T> ops, RecordBuilder<T> builder) {
             if (value instanceof Ingredient.ItemValue itemValue) {
-                var key = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(itemValue.item().getItem()));
-                builder.add("item", ops.createString(key.toString()));
+                var stack = itemValue.item();
+                if (stack.getComponentsPatch().isEmpty()) {
+                    ResourceLocation key = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack.getItem()));
+                    builder.add("item", ops.createString(key.toString()));
+                } else {
+                    ItemStack.CODEC.encodeStart(ops, stack)
+                        .flatMap(ops::getMapEntries)
+                        .getOrThrow()
+                        .accept(builder::add);
+                }
                 return builder;
             } else if (value instanceof Ingredient.TagValue tagValue) {
                 builder.add("tag", ops.createString(tagValue.tag().location().toString()));

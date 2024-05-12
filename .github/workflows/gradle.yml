@@ -44,7 +44,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # platform: [ common, forge, fabric, neoforge ]
         platform: [ common, fabric, neoforge ]
     env:
       DISABLE_FORGE: ${{ matrix.platform != 'forge' }}
@@ -103,7 +102,7 @@ jobs:
           ./gradlew configureClientLaunch downloadAssets ||
           (sleep 5 && ./gradlew configureClientLaunch downloadAssets) ||
           (sleep 5 && ./gradlew configureClientLaunch downloadAssets)
-      - name: Forge DataGen
+      - name: DataGen
         run: ./gradlew :fabric:runData
         timeout-minutes: 5
         env:

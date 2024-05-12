@@ -5,14 +5,17 @@ import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, PlatformFluidAccess, PotionType}
 import com.kotori316.fluidtank.{FluidTankCommon, PlatformAccess}
 import com.kotori316.testutil.GameTestUtil
+import net.minecraft.core.Holder
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
 import net.minecraft.world.InteractionHand
-import net.minecraft.world.item.alchemy.{Potion, PotionUtils, Potions}
+import net.minecraft.world.item.alchemy.{Potion, PotionContents, Potions}
 import net.minecraft.world.item.{ItemStack, Items}
+import net.minecraft.world.level.GameType
 import net.minecraftforge.gametest.GameTestHolder
 import org.junit.jupiter.api.Assertions.*
 
 import java.util.Locale
+import scala.jdk.OptionConverters.RichOption
 import scala.jdk.javaapi.CollectionConverters
 
 //noinspection ScalaUnusedSymbol
@@ -83,7 +86,7 @@ class PlatformAccessTest {
     helper.succeed()
   }
 
-  private def potionFluid(potionType: PotionType, potion: Potion): FluidAmount = {
+  private def potionFluid(potionType: PotionType, potion: Holder[Potion]): FluidAmount = {
     FluidAmountUtil.from(potionType, potion, GenericUnit.ONE_BOTTLE)
   }
 
@@ -115,7 +118,7 @@ class PlatformAccessTest {
     helper.succeed()
   }
 
-  private def potions(): Seq[(PotionType, Potion)] = {
+  private def potions(): Seq[(PotionType, Holder[Potion])] = {
     for {
       t <- PotionType.values().toSeq
       p <- Seq(Potions.WATER, Potions.AWKWARD, Potions.NIGHT_VISION, Potions.LONG_NIGHT_VISION)
@@ -162,7 +165,7 @@ class PlatformAccessTest {
     }
   )
 
-  private def fillPotion(helper: GameTestHelper, potionType: PotionType, potion: Potion): Unit = {
+  private def fillPotion(helper: GameTestHelper, potionType: PotionType, potion: Holder[Potion]): Unit = {
     val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = new ItemStack(Items.GLASS_BOTTLE)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
@@ -176,7 +179,7 @@ class PlatformAccessTest {
     helper.succeed()
   }
 
-  private def fillFailPotionWithAmount(helper: GameTestHelper, potionType: PotionType, potion: Potion): Unit = {
+  private def fillFailPotionWithAmount(helper: GameTestHelper, potionType: PotionType, potion: Holder[Potion]): Unit = {
     val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = new ItemStack(Items.GLASS_BOTTLE)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
@@ -190,7 +193,7 @@ class PlatformAccessTest {
     helper.succeed()
   }
 
-  private def drainPotion(helper: GameTestHelper, potionType: PotionType, potion: Potion): Unit = {
+  private def drainPotion(helper: GameTestHelper, potionType: PotionType, potion: Holder[Potion]): Unit = {
     val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = PotionContents.createItemStack(potionType.getItem, potion)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
@@ -204,7 +207,7 @@ class PlatformAccessTest {
     helper.succeed()
   }
 
-  private def drainFailPotionWithAmount(helper: GameTestHelper, potionType: PotionType, potion: Potion): Unit = {
+  private def drainFailPotionWithAmount(helper: GameTestHelper, potionType: PotionType, potion: Holder[Potion]): Unit = {
     val player = helper.makeMockPlayer(GameType.SURVIVAL)
     val stack = PotionContents.createItemStack(potionType.getItem, potion)
     val expected = stack.copy

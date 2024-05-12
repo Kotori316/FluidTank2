@@ -1,5 +1,5 @@
 package com.kotori316.fluidtank.forge.integration.ae2;
-
+/*
 import appeng.api.storage.MEStorage;
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.tank.TileTank;
@@ -47,4 +47,4 @@ class AE2Capability implements ICapabilityProvider {
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction arg) {
         return ME_STORAGE_CAPABILITY.orEmpty(capability, this.accessorLazyOptional);
     }
-}
+}*/

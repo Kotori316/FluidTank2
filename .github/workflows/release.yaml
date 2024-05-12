@@ -28,6 +28,7 @@ jobs:
         run: ./gradlew test
         env:
           RUN_JUNIT: true
+          DISABLE_FORGE: true
       - name: Prepare GameTest
         run: |
           (./gradlew configureLaunch downloadAssets) || \
@@ -37,6 +38,7 @@ jobs:
         run: ./gradlew runGameTest
         env:
           RUN_GAME_TEST: true
+          DISABLE_FORGE: true
 
   release:
     needs: [ check ]

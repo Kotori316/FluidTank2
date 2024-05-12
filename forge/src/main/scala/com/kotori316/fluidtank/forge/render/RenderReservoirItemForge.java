@@ -1,7 +1,6 @@
 package com.kotori316.fluidtank.forge.render;
 
 import com.kotori316.fluidtank.contents.Tank;
-import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.fluids.VanillaFluid;
 import com.kotori316.fluidtank.fluids.VanillaPotion;
@@ -9,12 +8,13 @@ import com.kotori316.fluidtank.forge.fluid.ForgeConverter;
 import com.kotori316.fluidtank.render.RenderReservoirItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import scala.jdk.javaapi.OptionConverters;
 
-import java.util.List;
 import java.util.Objects;
 
 public final class RenderReservoirItemForge extends RenderReservoirItem {
@@ -46,10 +46,15 @@ public final class RenderReservoirItemForge extends RenderReservoirItem {
                 return stackColor;
             }
         } else if (content.content() instanceof VanillaPotion) {
-            return PotionUtils.getColor(FluidAmountUtil.getTag(content)
-                .map(PotionUtils::getAllEffects)
-                .orElse(List.of())
-            );
+            return OptionConverters.toJava(content.componentPatch())
+                .map(c -> {
+                    @SuppressWarnings("UnnecessaryLocalVariable") // ???
+                    var t = c.get(DataComponents.POTION_CONTENTS);
+                    return t;
+                })
+                .flatMap(t -> t)
+                .map(PotionContents::getColor)
+                .orElse(16253176);
         } else {
             throw new IllegalArgumentException("Unknown fluid type " + content);
         }

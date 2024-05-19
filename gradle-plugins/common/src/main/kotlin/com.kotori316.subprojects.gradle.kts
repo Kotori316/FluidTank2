@@ -45,7 +45,7 @@ tasks {
     shadowJar {
         exclude("architectury.common.json")
         configurations = listOf(project.configurations.getAt("shadowCommon"))
-        archiveClassifier = "dev"
+        archiveClassifier = if (loom.isForge) "" else "dev"
         manifest {
             attributes(jarAttributeMap)
         }

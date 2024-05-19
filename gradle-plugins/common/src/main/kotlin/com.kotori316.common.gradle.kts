@@ -81,6 +81,7 @@ architectury {
 
 loom {
     knownIndyBsms.add("scala/runtime/LambdaDeserialize")
+    knownIndyBsms.add("java/lang/runtime/SwitchBootstraps/typeSwitch")
     silentMojangMappingsLicense()
 }
 

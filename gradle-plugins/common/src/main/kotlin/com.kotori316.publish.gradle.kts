@@ -31,8 +31,13 @@ val hasGpgSignature = project.hasProperty("signing.keyId") &&
         project.hasProperty("signing.secretKeyRingFile")
 
 tasks {
+    val jarTask = if (loom.isForge) {
+        jar
+    } else {
+        remapJar
+    }
     val jksSignJar = register("jksSignJar") {
-        dependsOn(remapJar)
+        dependsOn(jarTask)
         onlyIf {
             project.hasProperty("jarSign.keyAlias") &&
                     project.hasProperty("jarSign.keyLocation") &&
@@ -41,7 +46,7 @@ tasks {
         doLast {
             ant.withGroovyBuilder {
                 "signjar"(
-                    "jar" to remapJar.flatMap { it.archiveFile }.get(),
+                    "jar" to jarTask.flatMap { it.archiveFile }.get(),
                     "alias" to project.findProperty("jarSign.keyAlias"),
                     "keystore" to project.findProperty("jarSign.keyLocation"),
                     "storepass" to project.findProperty("jarSign.storePass"),
@@ -54,6 +59,9 @@ tasks {
     }
     remapJar {
         finalizedBy(jksSignJar)
+        onlyIf {
+            !loom.isForge
+        }
     }
     withType(Sign::class) {
         onlyIf { hasGpgSignature }

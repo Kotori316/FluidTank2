@@ -27,7 +27,7 @@ jobs:
           cache-read-only: ${{ github.event_name != 'push' }}
           gradle-home-cache-cleanup: true
           add-job-summary: 'on-failure'
-      - run: ./gradlew javaToolchains assemble --scan
+      - run: ./gradlew javaToolchains assemble publishToMavenLocal --scan
       - run: ./gradlew checkChangelog
       - run: ./gradlew checkReleaseVersion
       - name: Upload artifacts

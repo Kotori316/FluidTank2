@@ -58,6 +58,7 @@ tasks {
         manifest {
             attributes(jarAttributeMap)
         }
+        onlyIf { !loom.isForge }
     }
     named("sourcesJar", Jar::class) {
         val commonSources = provider { project(":common") }.flatMap { p -> p.tasks.named("sourcesJar", Jar::class) }

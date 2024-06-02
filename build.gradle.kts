@@ -21,6 +21,7 @@ githubRelease {
     tagName = "v${project.findProperty("mod_version")}"
     releaseName = "v${project.findProperty("mod_version")} for ${project.findProperty("minecraft_version")}"
     body = createChangelog()
+    prerelease = (project.findProperty("mod_version") as String).contains("SNAPSHOT")
 
     val buildDirectories = listOf(
         findProject(":forge")?.layout?.buildDirectory?.dir("libs"),

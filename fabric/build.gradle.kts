@@ -36,10 +36,9 @@ loom {
             name("Fabric GameTest")
             server()
             vmArg("-ea")
-            //noinspection SpellCheckingInspection
-            property("fabric-api.gametest")
-            //noinspection SpellCheckingInspection
-            property("fabric-api.gametest.report-file", "game-test/test-results/game_test.xml")
+            property("fabric-api.GameTest".lowercase())
+            property("fabric-api.GameTest.report-file".lowercase(), "game-test/test-results/game_test.xml")
+            property("fabric-tag-conventions-v2.missingTagTranslationWarning", "VERBOSE")
             runDir = "game-test"
             source(sourceSets["test"])
         }
@@ -48,10 +47,13 @@ loom {
             name("Fabric Data")
             client()
             runDir("build/datagen")
-            property("fabric-api.datagen")
-            property("fabric-api.datagen.output-dir", file("../common/src/generated/resources/").absolutePath)
-            property("fabric-api.datagen.modid", "fluidtank_data")
-            source(sourceSets["datagen"])
+            property("fabric-api.DataGen".lowercase())
+            property(
+                "fabric-api.DataGen.output-dir".lowercase(),
+                file("../common/src/generated/resources/").absolutePath
+            )
+            property("fabric-api.DataGen.ModId".lowercase(), "fluidtank_data")
+            source(sourceSets["DataGen".lowercase()])
         }
     }
 }

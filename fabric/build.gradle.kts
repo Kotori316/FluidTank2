@@ -129,7 +129,6 @@ ext {
         | Fabric | ${project.property("fabric_api_version")} |
         | Fabric Loader | ${project.property("fabric_loader_version")} |
         | scalable-cats-force | ${project.property("slp_fabric_version")} |
-        | Applied Energistics 2 | ${project.property("ae2_fabric_version")} |
         | Jade | File id: ${project.property("jade_fabric_id")} |
         """.trimIndent()
     )

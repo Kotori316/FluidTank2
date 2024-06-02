@@ -123,18 +123,6 @@ publishing {
     }
 
     repositories {
-        if (!System.getenv("CI").toBoolean() || !releaseDebug) {
-            val user = project.findProperty("azureUserName") ?: System.getenv("AZURE_USER_NAME") ?: ""
-            val pass = project.findProperty("azureToken") ?: System.getenv("AZURE_TOKEN") ?: "TOKEN"
-            maven {
-                name = "AzureRepository"
-                url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
-                credentials {
-                    username = user.toString()
-                    password = pass.toString()
-                }
-            }
-        }
         if (System.getenv("CLOUDFLARE_S3_ENDPOINT") != null) {
             val r2AccessKey = (project.findProperty("r2_access_key") ?: System.getenv("R2_ACCESS_KEY") ?: "") as String
             val r2SecretKey = (project.findProperty("r2_secret_key") ?: System.getenv("R2_SECRET_KEY") ?: "") as String

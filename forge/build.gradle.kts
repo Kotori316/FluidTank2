@@ -260,7 +260,6 @@ ext {
         | Minecraft | $minecraftVersion |
         | Forge | ${project.property("forge_version")} |
         | scalable-cats-force | ${project.property("slpVersion")} |
-        | Applied Energistics 2 | ${project.property("ae2_forge_version")} |
         | Jade | File id: ${project.property("jade_forge_id")} |
         | TheOneProbe | File id: ${project.property("top_forge_id")} |
         """.trimIndent()

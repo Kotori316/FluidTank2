@@ -42,7 +42,7 @@ object RecipeSerializeHelper {
   def by(c: RecipeBuilder, location: ResourceLocation): RecipeSerializeHelper = new RecipeSerializeHelper(c, location)
 
   private def getConsumeValue(c: RecipeBuilder): Recipe[?] = {
-    val fixed: RecipeBuilder = c.unlockedBy("dummy", RecipeUnlockedTrigger.unlocked(new ResourceLocation("dummy:dummy")))
+    val fixed: RecipeBuilder = c.unlockedBy("dummy", RecipeUnlockedTrigger.unlocked(ResourceLocation.parse("dummy:dummy")))
     var t: Recipe[?] = null
     fixed.save(new RecipeOutput {
       override def accept(arg: ResourceLocation, arg2: Recipe[?], arg3: ResourceLocation, jsonElement: JsonElement): Unit = {

@@ -46,7 +46,7 @@ private[data] final class RecipeProvider(dataOutput: FabricDataOutput, provider:
   }
 
   private def both(fabricTag: TagKey[Item], forgeTag: String): TagThings = {
-    val ft = TagKey.create(Registries.ITEM, new ResourceLocation(forgeTag))
+    val ft = TagKey.create(Registries.ITEM, ResourceLocation.parse(forgeTag))
     TagThings(
       new IgnoreUnknownTagIngredientFabric(Seq(
         Ingredient.of(fabricTag),
@@ -61,13 +61,13 @@ private[data] final class RecipeProvider(dataOutput: FabricDataOutput, provider:
   }
 
   private def both(fabricTag: String, forgeTag: String): TagThings =
-    both(TagKey.create(Registries.ITEM, new ResourceLocation(fabricTag)), forgeTag)
+    both(TagKey.create(Registries.ITEM, ResourceLocation.parse(fabricTag)), forgeTag)
 
   private def itemFallBack(item: Item, neoforgeTag: String, forgeTag: String): Ingredient = {
     new IgnoreUnknownTagIngredientFabric(Seq(
       Ingredient.of(item),
-      Ingredient.of(TagKey.create(Registries.ITEM, new ResourceLocation(neoforgeTag))),
-      Ingredient.of(TagKey.create(Registries.ITEM, new ResourceLocation(forgeTag))),
+      Ingredient.of(TagKey.create(Registries.ITEM, ResourceLocation.parse(neoforgeTag))),
+      Ingredient.of(TagKey.create(Registries.ITEM, ResourceLocation.parse(forgeTag))),
     ).asJava).toVanilla
   }
 
@@ -170,8 +170,8 @@ object RecipeProvider {
   private case class TagThings(ingredient: Ingredient, criterion: Criterion[InventoryChangeTrigger.TriggerInstance], condition: PlatformCondition)
 
   private final class RecipeOutputWrapper(output: FabricDataOutput, provider: HolderLookup.Provider, conditions: Chain[PlatformCondition], cache: CachedOutput) extends RecipeOutput {
-    private final val recipePathProvider = output.createPathProvider(Target.DATA_PACK, "recipes")
-    private final val advancementPathProvider = output.createPathProvider(Target.DATA_PACK, "advancements")
+    private final val recipePathProvider = output.createRegistryElementsPathProvider(Registries.RECIPE)
+    private final val advancementPathProvider = output.createRegistryElementsPathProvider(Registries.ADVANCEMENT)
     private final val ops = provider.createSerializationContext(JsonOps.INSTANCE)
     private final val builder = Seq.newBuilder[CompletableFuture[?]]
 

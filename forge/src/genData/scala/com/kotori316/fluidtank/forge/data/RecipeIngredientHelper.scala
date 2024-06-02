@@ -30,7 +30,7 @@ object RecipeIngredientHelper {
   }
 
   def bothTag(forgeTag: TagKey[Item], fabricTag: String): RecipeIngredientHelper = {
-    val fTag = ItemTags.create(new ResourceLocation(fabricTag))
+    val fTag = ItemTags.create(ResourceLocation.parse(fabricTag))
     RecipeIngredientHelper(
       IgnoreUnknownTagIngredient.of(forgeTag), Some(IgnoreUnknownTagIngredient.of(fTag)),
       Some(forgeTag.location()), Some(fTag.location())
@@ -38,8 +38,8 @@ object RecipeIngredientHelper {
   }
 
   def bothTag(forgeTag: String, fabricTag: String): RecipeIngredientHelper = {
-    val forgeKey = ItemTags.create(new ResourceLocation(forgeTag))
-    val fabricKey = ItemTags.create(new ResourceLocation(fabricTag))
+    val forgeKey = ItemTags.create(ResourceLocation.parse(forgeTag))
+    val fabricKey = ItemTags.create(ResourceLocation.parse(fabricTag))
     RecipeIngredientHelper(
       IgnoreUnknownTagIngredient.of(forgeKey), Some(IgnoreUnknownTagIngredient.of(fabricKey)),
       Some(forgeKey.location()), Some(fabricKey.location())

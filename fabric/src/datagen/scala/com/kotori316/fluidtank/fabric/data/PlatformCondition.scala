@@ -50,7 +50,7 @@ private[data] object PlatformCondition {
   def tagCondition(fabric: Option[TagKey[?]] = None, forge: Option[String] = None): PlatformCondition = {
     val fabricTag = fabric.map(_.location())
     // Use fabric tag for neoforge, convention tags are shared
-    TagCondition(fabricTag, fabricTag, forge.map(s => new ResourceLocation(s)))
+    TagCondition(fabricTag, fabricTag, forge.map(s => ResourceLocation.parse(s)))
   }
 
   private case class TagCondition(fabric: Option[ResourceLocation], neoforge: Option[ResourceLocation], forge: Option[ResourceLocation]) extends PlatformCondition {

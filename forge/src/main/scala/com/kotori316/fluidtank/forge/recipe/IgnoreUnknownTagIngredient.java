@@ -137,13 +137,13 @@ public final class IgnoreUnknownTagIngredient extends AbstractIngredient {
 
         private static Value getValue(JsonObject json) {
             if (json.has("item")) {
-                Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(json, "item")));
+                Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(GsonHelper.getAsString(json, "item")));
                 return new Ingredient.ItemValue(new ItemStack(item));
             } else if (json.has("id")) {
                 ItemStack stack = ItemStack.CODEC.decode(JsonOps.INSTANCE, json).map(Pair::getFirst).getOrThrow();
                 return new Ingredient.ItemValue(stack);
             } else if (json.has("tag")) {
-                ResourceLocation resourcelocation = new ResourceLocation(GsonHelper.getAsString(json, "tag"));
+                ResourceLocation resourcelocation = ResourceLocation.parse(GsonHelper.getAsString(json, "tag"));
                 TagKey<Item> tagkey = TagKey.create(Registries.ITEM, resourcelocation);
                 return new TagValue(tagkey);
             } else {

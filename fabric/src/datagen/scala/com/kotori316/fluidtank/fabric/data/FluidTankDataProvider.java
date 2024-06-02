@@ -19,7 +19,7 @@ public final class FluidTankDataProvider implements DataGeneratorEntrypoint {
         pack.addProvider((o, future) -> new LootTableProvider(
             o,
             Set.of(),
-            List.of(new LootTableProvider.SubProviderEntry(() -> new LootSubProvider(o, future), LootContextParamSets.BLOCK)),
+            List.of(new LootTableProvider.SubProviderEntry((p) -> new LootSubProvider(o, future), LootContextParamSets.BLOCK)),
             future)
         );
         pack.addProvider(ModelProvider::new);

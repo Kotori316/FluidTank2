@@ -17,7 +17,7 @@ githubRelease {
     owner = "Kotori316"
     repo = "FluidTank2"
     token(project.findProperty("githubToken") as? String ?: System.getenv("REPO_TOKEN") ?: "")
-    targetCommitish = "1.20"
+    targetCommitish = "1.21"
     tagName = "v${project.findProperty("mod_version")}"
     releaseName = "v${project.findProperty("mod_version")} for ${project.findProperty("minecraft_version")}"
     body = createChangelog()

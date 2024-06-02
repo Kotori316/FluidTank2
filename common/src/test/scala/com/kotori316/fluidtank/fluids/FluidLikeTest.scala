@@ -22,7 +22,7 @@ class FluidLikeTest extends BeforeMC {
 
       expected.map { case (str, like) =>
         DynamicTest.dynamicTest(str, () => {
-          val fromName = FluidLike.fromResourceLocation(new ResourceLocation(str))
+          val fromName = FluidLike.fromResourceLocation(ResourceLocation.parse(str))
           assertEquals(like, fromName)
         })
       }.toArray

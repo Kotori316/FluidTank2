@@ -231,7 +231,7 @@ final class RecipeTest {
     @GameTestGenerator
     @SuppressWarnings("ConstantConditions")
     List<TestFunction> loadJsonInData() throws IOException {
-        var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipes");
+        var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipe");
         try (var files = Files.find(recipeParent, 1, (path, a) -> path.getFileName().toString().endsWith(".json"))) {
             return files.map(p -> GameTestUtil.create(FluidTankCommon.modId, "recipe_test", "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),
                 (g) -> {
@@ -242,7 +242,7 @@ final class RecipeTest {
     }
 
     void notLoadLeadRecipe(GameTestHelper helper) {
-        var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipes");
+        var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipe");
         var leadRecipe = recipeParent.resolve("tank_lead.json");
         var read = loadFromFile(helper, leadRecipe);
         assertTrue(read.isEmpty(), "Lead recipe must not be loaded");

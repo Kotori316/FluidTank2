@@ -247,7 +247,7 @@ public final class RecipeTest implements FabricGameTest {
     @GameTestGenerator
     @SuppressWarnings("ConstantConditions")
     public List<TestFunction> loadJsonInData() throws IOException {
-        var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipes");
+        var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipe");
         try (var files = Files.find(recipeParent, 1, (path, a) -> path.getFileName().toString().endsWith(".json"))) {
             return files.map(p -> GameTestUtil.create(FluidTankCommon.modId, "recipe_test", "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),
                 (g) -> loadFromFile(g, p))).toList();
@@ -257,7 +257,7 @@ public final class RecipeTest implements FabricGameTest {
     // just for test
     @SuppressWarnings("UnstableApiUsage")
     void notLoadLeadRecipe(GameTestHelper helper) throws IOException {
-        var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipes");
+        var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipe");
         var leadRecipe = recipeParent.resolve("tank_lead.json");
         var read = GsonHelper.parse(Files.newBufferedReader(leadRecipe));
         assertFalse(

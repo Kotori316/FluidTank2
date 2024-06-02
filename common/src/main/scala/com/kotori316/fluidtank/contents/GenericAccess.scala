@@ -45,7 +45,7 @@ trait GenericAccess[A] {
   }
 
   def read(tag: CompoundTag): GenericAmount[A] = {
-    val key = new ResourceLocation(
+    val key = ResourceLocation.parse(
       if (tag.contains(KEY_CONTENT)) tag.getString(KEY_CONTENT)
       else tag.getString(KEY_FLUID)
     )

@@ -22,7 +22,7 @@ package object contents {
 
     override def isGaseous(a: String): Boolean = a.contains("gas")
 
-    override def getKey(a: String): ResourceLocation = new ResourceLocation(FluidTankCommon.modId, a)
+    override def getKey(a: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, a)
 
     override def fromKey(key: ResourceLocation): String = key.getPath
 

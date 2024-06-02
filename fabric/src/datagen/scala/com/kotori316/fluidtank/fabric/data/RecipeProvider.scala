@@ -100,7 +100,7 @@ private[data] final class RecipeProvider(dataOutput: FabricDataOutput, provider:
       .map { t =>
         val tankItem = TierRecipe.SerializerBase.getIngredientTankForTier(t)
         val itemArr = tankItem.getItems.map(_.getItem())
-        val location = new ResourceLocation(FluidTankCommon.modId, t.getBlockName)
+        val location = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, t.getBlockName)
         getSubItem(t) match {
           case a: Ingredient =>
             val builder = new TierRecipeBuilderFabric(t, tankItem, a)

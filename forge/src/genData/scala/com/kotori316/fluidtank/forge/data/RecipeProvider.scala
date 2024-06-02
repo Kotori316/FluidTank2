@@ -68,7 +68,7 @@ class RecipeProvider(output: PackOutput) extends DataProvider {
       .map { t =>
         val tankItem = TierRecipe.SerializerBase.getIngredientTankForTier(t)
         val subItem = getSubItem(t)
-        val location = new ResourceLocation(FluidTankCommon.modId, t.getBlockName)
+        val location = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, t.getBlockName)
         RecipeSerializeHelper(new TierRecipeForge(t, tankItem, subItem.ingredient), location = location)
           .addTagCondition(subItem)
           .addItemCriterion(subItem)

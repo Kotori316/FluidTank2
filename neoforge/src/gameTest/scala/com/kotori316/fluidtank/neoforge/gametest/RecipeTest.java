@@ -179,7 +179,7 @@ final class RecipeTest {
 
     void serializeJson(Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
-        var id = new ResourceLocation(FluidTankCommon.modId, "test_" + tier.name().toLowerCase(Locale.ROOT));
+        var id = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_" + tier.name().toLowerCase(Locale.ROOT));
         var recipe = new TierRecipeNeoForge(
             tier, TierRecipeNeoForge.Serializer.getIngredientTankForTier(tier), subItem);
 
@@ -218,7 +218,7 @@ final class RecipeTest {
               }
             }
             """.formatted(TierRecipeNeoForge.Serializer.LOCATION.toString());
-        var read = managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()).orElseThrow();
+        var read = managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()).orElseThrow();
         var recipe = new TierRecipeNeoForge(
             Tier.STONE, TierRecipeNeoForge.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
@@ -252,7 +252,7 @@ final class RecipeTest {
     static Optional<Recipe<?>> loadFromFile(GameTestHelper helper, Path path) {
         try {
             var json = GsonHelper.parse(Files.newBufferedReader(path));
-            return assertDoesNotThrow(() -> managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_load"), json, helper.getLevel().registryAccess()));
+            return assertDoesNotThrow(() -> managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_load"), json, helper.getLevel().registryAccess()));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

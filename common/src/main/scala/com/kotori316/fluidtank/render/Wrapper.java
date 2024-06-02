@@ -26,33 +26,33 @@ final class Wrapper {
 
     Wrapper pos(double x, double y, double z, PoseStack matrix) {
         Vector4f vector4f = getPosVector(((float) x), ((float) y), ((float) z), matrix);
-        buffer.vertex(vector4f.x(), vector4f.y(), vector4f.z());
+        buffer.addVertex(vector4f.x(), vector4f.y(), vector4f.z());
         return this;
     }
 
     Wrapper color(int red, int green, int blue, int alpha) {
-        buffer.color(red, green, blue, alpha);
+        buffer.setColor(red, green, blue, alpha);
         return this;
     }
 
     Wrapper tex(float u, float v) {
-        buffer.uv(u, v);
+        buffer.setUv(u, v);
         return this;
     }
 
     @SuppressWarnings("SpellCheckingInspection")
     Wrapper lightmap(int sky, int block) {
-        buffer.overlayCoords(10, 10).uv2(block, sky);
+        buffer.setUv1(10, 10).setUv2(block, sky);
         return this;
     }
 
     Wrapper lightMap(int light, int overlay) {
-        buffer.overlayCoords(overlay).uv2(light);
+        buffer.setOverlay(overlay).setLight(light);
         return this;
     }
 
     void endVertex() {
-        buffer.normal(0, 1, 0).endVertex();
+        buffer.setNormal(0, 1, 0);
     }
 
     public VertexConsumer buffer() {

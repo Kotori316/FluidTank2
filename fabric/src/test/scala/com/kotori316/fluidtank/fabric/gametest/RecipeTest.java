@@ -234,7 +234,7 @@ public final class RecipeTest implements FabricGameTest {
               }
             }
             """.formatted(TierRecipeFabric.Serializer.LOCATION.toString());
-        var read = managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess());
+        var read = managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess());
         var recipe = new TierRecipeFabric(
             Tier.STONE, TierRecipeFabric.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
@@ -261,7 +261,7 @@ public final class RecipeTest implements FabricGameTest {
         var leadRecipe = recipeParent.resolve("tank_lead.json");
         var read = GsonHelper.parse(Files.newBufferedReader(leadRecipe));
         assertFalse(
-            ResourceConditionsImpl.applyResourceConditions(read, "TEST", new ResourceLocation(FluidTankCommon.modId, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "notLoadLeadRecipe")), helper.getLevel().registryAccess()),
+            ResourceConditionsImpl.applyResourceConditions(read, "TEST", ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "notLoadLeadRecipe")), helper.getLevel().registryAccess()),
             "Lead recipe must not be loaded");
         helper.succeed();
     }
@@ -269,7 +269,7 @@ public final class RecipeTest implements FabricGameTest {
     static void loadFromFile(GameTestHelper helper, Path path) {
         try {
             var json = GsonHelper.parse(Files.newBufferedReader(path));
-            assertDoesNotThrow(() -> managerFromJson(new ResourceLocation(FluidTankCommon.modId, "test_load"), json, helper.getLevel().registryAccess()));
+            assertDoesNotThrow(() -> managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_load"), json, helper.getLevel().registryAccess()));
             helper.succeed();
         } catch (IOException e) {
             throw new UncheckedIOException(e);

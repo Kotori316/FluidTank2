@@ -24,7 +24,7 @@ public class AE2FluidTankIntegration {
             MinecraftForge.EVENT_BUS.register(new AE2FluidTankIntegration());
     }
 
-    private static final ResourceLocation LOCATION = new ResourceLocation(FluidTankCommon.modId, "attach_ae2");
+    private static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "attach_ae2");
 
     @SubscribeEvent
     public void attachCapability(AttachCapabilitiesEvent<BlockEntity> event) {

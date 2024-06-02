@@ -27,7 +27,7 @@ public final class RenderReservoirItemFabric extends RenderReservoirItem
 
     @Override
     public ResourceLocation getFabricId() {
-        return new ResourceLocation(FluidTankCommon.modId, "render_reservoir_item_fabric");
+        return ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "render_reservoir_item_fabric");
     }
 
     @Override

@@ -15,7 +15,7 @@ import java.util.function.BiConsumer;
 public final class PacketHandler {
     private static final int PROTOCOL = 1;
     private static final SimpleChannel CHANNEL =
-        ChannelBuilder.named(new ResourceLocation(FluidTankCommon.modId, "main"))
+        ChannelBuilder.named(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "main"))
             .networkProtocolVersion(PROTOCOL)
             .acceptedVersions(Channel.VersionTest.exact(PROTOCOL))
             .simpleChannel()

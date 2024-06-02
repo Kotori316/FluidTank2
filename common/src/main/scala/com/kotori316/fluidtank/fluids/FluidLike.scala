@@ -29,7 +29,7 @@ case class VanillaPotion(potionType: PotionType) extends FluidLike {
   override def isGaseous: Boolean = false
 
   override def getKey: ResourceLocation = {
-    new ResourceLocation(FluidTankCommon.modId, ("potion_" + potionType.name()).toLowerCase(Locale.ROOT))
+    ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, ("potion_" + potionType.name()).toLowerCase(Locale.ROOT))
   }
 
   def getVanillaPotionName(nbt: Option[DataComponentPatch]): Component = {

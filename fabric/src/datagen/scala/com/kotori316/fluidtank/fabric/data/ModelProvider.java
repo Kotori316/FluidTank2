@@ -32,12 +32,12 @@ final class ModelProvider extends FabricModelProvider {
     public ModelProvider(FabricDataOutput output) {
         super(output);
         this.tankBlockParent = new ModelTemplate(
-            Optional.of(new ResourceLocation(FluidTankCommon.modId, "block/tanks")),
+            Optional.of(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/tanks")),
             Optional.empty(),
             TextureSlot.TOP, TextureSlot.SIDE, TextureSlot.PARTICLE
         );
         this.tankItemParent = new ModelTemplate(
-            Optional.of(new ResourceLocation(FluidTankCommon.modId, "item/tanks")),
+            Optional.of(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/tanks")),
             Optional.empty(),
             TextureSlot.TOP, TextureSlot.SIDE
         );
@@ -46,7 +46,7 @@ final class ModelProvider extends FabricModelProvider {
     }
 
     private ResourceLocation blockTexture(String name) {
-        return new ResourceLocation(FluidTankCommon.modId, "block/" + name);
+        return ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/" + name);
     }
 
     @Override
@@ -79,7 +79,7 @@ final class ModelProvider extends FabricModelProvider {
             var modelJson = gson.fromJson(reader, JsonObject.class);
             generators.modelOutput.accept(
                 // No need to add extension
-                new ResourceLocation(FluidTankCommon.modId, "block/tanks"),
+                ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/tanks"),
                 () -> modelJson
             );
         } catch (IOException e) {
@@ -91,7 +91,7 @@ final class ModelProvider extends FabricModelProvider {
             var modelJson = gson.fromJson(reader, JsonObject.class);
             generators.modelOutput.accept(
                 // No need to add extension
-                new ResourceLocation(FluidTankCommon.modId, "item/tanks"),
+                ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/tanks"),
                 () -> modelJson
             );
         } catch (IOException e) {
@@ -125,7 +125,7 @@ final class ModelProvider extends FabricModelProvider {
             var modelJson = gson.fromJson(reader, JsonObject.class);
             generators.output.accept(
                 // No need to add extension
-                new ResourceLocation(FluidTankCommon.modId, "item/reservoirs"),
+                ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/reservoirs"),
                 () -> modelJson
             );
         } catch (IOException e) {
@@ -134,6 +134,6 @@ final class ModelProvider extends FabricModelProvider {
     }
 
     void reservoir(ItemReservoir reservoir, ItemModelGenerators generators) {
-        generators.output.accept(ModelLocationUtils.getModelLocation(reservoir), new DelegatedModel(new ResourceLocation(FluidTankCommon.modId, "item/reservoirs")));
+        generators.output.accept(ModelLocationUtils.getModelLocation(reservoir), new DelegatedModel(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/reservoirs")));
     }
 }

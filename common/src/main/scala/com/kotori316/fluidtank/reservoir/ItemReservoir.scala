@@ -31,10 +31,10 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
     }
   }
 
-  override def getUseDuration(stack: ItemStack): Int = {
+  override def getUseDuration(stack: ItemStack, entity: LivingEntity): Int = {
     getTank(stack).content.content match {
       case v: VanillaPotion if v.potionType == PotionType.NORMAL => 32 // See PotionItem
-      case _ => super.getUseDuration(stack)
+      case _ => super.getUseDuration(stack, entity)
     }
   }
 

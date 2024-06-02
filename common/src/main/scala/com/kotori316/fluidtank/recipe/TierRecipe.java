@@ -26,15 +26,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,13 +63,13 @@ public abstract class TierRecipe implements CraftingRecipe {
     }
 
     @Override
-    public boolean matches(CraftingContainer inv, @Nullable Level worldIn) {
+    public boolean matches(CraftingInput inv, @Nullable Level worldIn) {
         return checkInv(inv);
     }
 
-    private boolean checkInv(CraftingContainer inv) {
-        for (int i = 0; i <= inv.getWidth() - recipeWidth; ++i) {
-            for (int j = 0; j <= inv.getHeight() - recipeHeight; ++j) {
+    private boolean checkInv(CraftingInput inv) {
+        for (int i = 0; i <= inv.width() - recipeWidth; ++i) {
+            for (int j = 0; j <= inv.height() - recipeHeight; ++j) {
                 if (this.checkMatch(inv, i, j)) {
                     return true;
                 }
@@ -85,10 +82,10 @@ public abstract class TierRecipe implements CraftingRecipe {
      * Checks if the region of a crafting inventory is match for the recipe.
      * <p>Copied from {@link net.minecraft.world.item.crafting.ShapedRecipe}</p>
      */
-    public boolean checkMatch(CraftingContainer craftingInventory, int w, int h) {
+    public boolean checkMatch(CraftingInput craftingInventory, int w, int h) {
         NonNullList<Ingredient> ingredients = this.getIngredients();
-        for (int i = 0; i < craftingInventory.getWidth(); ++i) {
-            for (int j = 0; j < craftingInventory.getHeight(); ++j) {
+        for (int i = 0; i < craftingInventory.width(); ++i) {
+            for (int j = 0; j < craftingInventory.height(); ++j) {
                 int k = i - w;
                 int l = j - h;
                 Ingredient ingredient;
@@ -98,14 +95,14 @@ public abstract class TierRecipe implements CraftingRecipe {
                     ingredient = Ingredient.EMPTY;
                 }
 
-                if (!ingredient.test(craftingInventory.getItem(i + j * craftingInventory.getWidth()))) {
+                if (!ingredient.test(craftingInventory.getItem(i + j * craftingInventory.width()))) {
                     return false;
                 }
             }
         }
 
         // Items are placed correctly.
-        List<ItemStack> tankStacks = IntStream.range(0, craftingInventory.getContainerSize())
+        List<ItemStack> tankStacks = IntStream.range(0, craftingInventory.size())
             .mapToObj(craftingInventory::getItem)
             .filter(this.tankItem)
             .toList();
@@ -121,16 +118,17 @@ public abstract class TierRecipe implements CraftingRecipe {
                 .count() <= 1;
     }
 
+    @NotNull
     @Override
-    public ItemStack assemble(CraftingContainer inv, HolderLookup.Provider access) {
+    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider access) {
         if (!this.checkInv(inv)) {
-            var stacks = IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem).collect(Collectors.toList());
+            var stacks = IntStream.range(0, inv.size()).mapToObj(inv::getItem).collect(Collectors.toList());
             LOGGER.error("Requested to return crafting result for invalid inventory. {}", stacks);
             DebugLogging.LOGGER().error("Requested to return crafting result for invalid inventory. {}", stacks);
             return ItemStack.EMPTY;
         }
         ItemStack result = getResultItem(access);
-        GenericAmount<FluidLike> fluidAmount = IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem)
+        GenericAmount<FluidLike> fluidAmount = IntStream.range(0, inv.size()).mapToObj(inv::getItem)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
             .map(s -> s.get(DataComponents.BLOCK_ENTITY_DATA))
             .filter(Objects::nonNull)
@@ -161,11 +159,13 @@ public abstract class TierRecipe implements CraftingRecipe {
         return width >= 3 && height >= 3;
     }
 
+    @NotNull
     @Override
     public ItemStack getResultItem(HolderLookup.Provider access) {
         return result.copy();
     }
 
+    @NotNull
     @Override
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> ingredients = NonNullList.create();
@@ -181,9 +181,10 @@ public abstract class TierRecipe implements CraftingRecipe {
         return ingredients;
     }
 
+    @NotNull
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
-        return IntStream.range(0, inv.getContainerSize())
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput inv) {
+        return IntStream.range(0, inv.size())
             .mapToObj(inv::getItem)
             .map(stack -> {
                 if (stack.getItem() instanceof ItemBlockTank) return ItemStack.EMPTY;
@@ -200,6 +201,7 @@ public abstract class TierRecipe implements CraftingRecipe {
         return this.subItem;
     }
 
+    @NotNull
     @Override
     public CraftingBookCategory category() {
         return CraftingBookCategory.MISC;
@@ -209,7 +211,7 @@ public abstract class TierRecipe implements CraftingRecipe {
     public static final String KEY_SUB_ITEM = "sub_item";
 
     public static abstract class SerializerBase implements RecipeSerializer<TierRecipe> {
-        public static final ResourceLocation LOCATION = new ResourceLocation(FluidTankCommon.modId, "crafting_grade_up");
+        public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "crafting_grade_up");
         private final MapCodec<TierRecipe> codec;
         private final StreamCodec<RegistryFriendlyByteBuf, TierRecipe> streamCodec;
 
@@ -229,11 +231,13 @@ public abstract class TierRecipe implements CraftingRecipe {
             return this.createInstance(tier, getIngredientTankForTier(tier), subItem);
         }
 
+        @NotNull
         @Override
         public MapCodec<TierRecipe> codec() {
             return this.codec;
         }
 
+        @NotNull
         @Override
         public StreamCodec<RegistryFriendlyByteBuf, TierRecipe> streamCodec() {
             return this.streamCodec;

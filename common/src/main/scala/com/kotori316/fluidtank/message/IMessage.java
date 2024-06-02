@@ -14,6 +14,6 @@ public interface IMessage<T extends IMessage<T>> extends CustomPacketPayload {
     }
 
     static ResourceLocation createIdentifier(Class<?> clazz) {
-        return new ResourceLocation(FluidTankCommon.modId, CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, clazz.getSimpleName()));
+        return ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, clazz.getSimpleName()));
     }
 }

@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
 public final class ReservoirModel extends Model {
-    public static final ModelLayerLocation LOCATION = new ModelLayerLocation(new ResourceLocation(FluidTankCommon.modId, "reservoir"), "main");
+    public static final ModelLayerLocation LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir"), "main");
     private final ModelPart root;
 
     public ReservoirModel(ModelPart root) {
@@ -35,8 +35,7 @@ public final class ReservoirModel extends Model {
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay,
-                               float red, float green, float blue, float alpha) {
-        this.root.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        this.root.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 }

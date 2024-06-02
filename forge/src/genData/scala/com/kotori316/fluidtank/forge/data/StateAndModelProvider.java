@@ -49,7 +49,7 @@ final class StateAndModelProvider extends BlockStateProvider {
     void catBlock() {
         this.directionalBlock(FluidTank.BLOCK_CAT.get(), models().cubeTop(BlockChestAsTank.NAME(),
             blockTexture("cat_side"), blockTexture("cat_front")));
-        this.itemModels().withExistingParent("item/" + BlockChestAsTank.NAME(), new ResourceLocation(FluidTankCommon.modId, "block/" + BlockChestAsTank.NAME()));
+        this.itemModels().withExistingParent("item/" + BlockChestAsTank.NAME(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/" + BlockChestAsTank.NAME()));
     }
 
     /*void sourceBlock() {
@@ -58,15 +58,15 @@ final class StateAndModelProvider extends BlockStateProvider {
             new ConfiguredModel(models().cubeColumn(FluidSourceBlock.NAME(), blockTexture("fluid_source"), blockTexture("white"))));
         builder.setModels(builder.partialState().with(FluidSourceBlock.CHEAT_MODE(), true),
             new ConfiguredModel(models().cubeColumn(FluidSourceBlock.NAME() + "_inf", blockTexture("fluid_source_inf"), blockTexture("pink"))));
-        ResourceLocation cheat = new ResourceLocation(FluidTankCommon.modId, "source_cheat");
+        ResourceLocation cheat = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "source_cheat");
         itemModels().getBuilder(ModObjects.blockSource().registryName().getPath())
             .override()
             .predicate(cheat, 0)
-            .model(models().getExistingFile(new ResourceLocation(FluidTankCommon.modId, "block/" + FluidSourceBlock.NAME())))
+            .model(models().getExistingFile(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/" + FluidSourceBlock.NAME())))
             .end()
             .override()
             .predicate(cheat, 1)
-            .model(models().getExistingFile(new ResourceLocation(FluidTankCommon.modId, "block/" + FluidSourceBlock.NAME() + "_inf")))
+            .model(models().getExistingFile(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/" + FluidSourceBlock.NAME() + "_inf")))
             .end();
     }*/
 
@@ -126,14 +126,14 @@ final class StateAndModelProvider extends BlockStateProvider {
         var tier = blockTank.tier();
         getVariantBuilder(blockTank)
             .forAllStates(blockState -> new ConfiguredModel[]{
-                new ConfiguredModel(models().withExistingParent(tier.getBlockName(), new ResourceLocation(FluidTankCommon.modId, "block/tanks"))
+                new ConfiguredModel(models().withExistingParent(tier.getBlockName(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/tanks"))
                     .texture("particle", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
                     .texture("side", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
                     .texture("top", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"))
                     .renderType("cutout")
                 )
             });
-        itemModels().withExistingParent(tier.getBlockName(), new ResourceLocation(FluidTankCommon.modId, "item/item_tank"))
+        itemModels().withExistingParent(tier.getBlockName(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/item_tank"))
             .texture("1", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
             .texture("2", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"));
     }
@@ -142,14 +142,14 @@ final class StateAndModelProvider extends BlockStateProvider {
         var tier = blockGasTank.tier();
         getVariantBuilder(blockGasTank)
             .forAllStates(blockState -> new ConfiguredModel[]{
-                new ConfiguredModel(models().withExistingParent("gas_" + tier.getBlockName(), new ResourceLocation(FluidTankCommon.modId, "block/tanks"))
+                new ConfiguredModel(models().withExistingParent("gas_" + tier.getBlockName(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/tanks"))
                     .texture("particle", blockTexture("gas_%s1".formatted(tier.name().toLowerCase(Locale.ROOT))))
                     .texture("side", blockTexture("gas_%s1".formatted(tier.name().toLowerCase(Locale.ROOT))))
                     .texture("top", blockTexture("gas_%s2".formatted(tier.name().toLowerCase(Locale.ROOT))))
                     .renderType("cutout")
                 )
             });
-        itemModels().withExistingParent(blockGasTank.registryName().getPath(), new ResourceLocation(FluidTankCommon.modId, "item/gas_item_tank"))
+        itemModels().withExistingParent(blockGasTank.registryName().getPath(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/gas_item_tank"))
             .texture("1", blockTexture("gas_%s1".formatted(tier.name().toLowerCase(Locale.ROOT))))
             .texture("2", blockTexture("gas_%s2".formatted(tier.name().toLowerCase(Locale.ROOT))));
     }*/
@@ -208,17 +208,17 @@ final class StateAndModelProvider extends BlockStateProvider {
     /*void pipe(PipeBlock pipeBlock, String modelBaseName) {
         String prefix = pipeBlock.registryName.getPath().replace("pipe", "");
         ResourceLocation frameTexture = blockTexture(prefix + "frame");
-        var centerModel = models().withExistingParent("block/" + modelBaseName + "_center", new ResourceLocation(FluidTankCommon.modId, "block/pipe_center"))
+        var centerModel = models().withExistingParent("block/" + modelBaseName + "_center", ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_center"))
             .texture("particle", frameTexture)
             .texture("texture", frameTexture);
-        var sideModel = models().withExistingParent("block/" + modelBaseName + "_side", new ResourceLocation(FluidTankCommon.modId, "block/pipe_side"))
+        var sideModel = models().withExistingParent("block/" + modelBaseName + "_side", ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_side"))
             .texture("particle", frameTexture)
             .texture("texture", frameTexture);
-        var outModel = models().withExistingParent("block/" + modelBaseName + "_output", new ResourceLocation(FluidTankCommon.modId, "block/pipe_in_out"))
+        var outModel = models().withExistingParent("block/" + modelBaseName + "_output", ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_in_out"))
             .texture("particle", frameTexture)
             .texture("texture", frameTexture)
             .texture("side", blockTexture(prefix + "frame_output"));
-        var inModel = models().withExistingParent("block/" + modelBaseName + "_input", new ResourceLocation(FluidTankCommon.modId, "block/pipe_in_out"))
+        var inModel = models().withExistingParent("block/" + modelBaseName + "_input", ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_in_out"))
             .texture("particle", frameTexture)
             .texture("texture", frameTexture)
             .texture("side", blockTexture(prefix + "frame_input"));
@@ -247,7 +247,7 @@ final class StateAndModelProvider extends BlockStateProvider {
             .modelFile(inModel).uvLock(true).rotationX(90).addModel().condition(PipeBlock.DOWN, PipeBlock.Connection.INPUT).end()
         ;
 
-        itemModels().withExistingParent("item/" + pipeBlock.registryName.getPath(), new ResourceLocation(FluidTankCommon.modId, "item/pipe_base"))
+        itemModels().withExistingParent("item/" + pipeBlock.registryName.getPath(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/pipe_base"))
             .texture("texture", frameTexture);
     }*/
 

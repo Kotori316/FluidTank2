@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.{BlockEntityWithoutLevelRenderer, MultiBufferSource, RenderType}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.ResourceManager
-import net.minecraft.util.Mth
+import net.minecraft.util.{FastColor, Mth}
 import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
 
 import java.util.Locale
@@ -30,7 +30,7 @@ abstract class RenderReservoirItem extends BlockEntityWithoutLevelRenderer(Minec
       this.model.renderType(RenderReservoirItem.textureNameMap(reservoir.tier)),
       true, stack.hasFoil)
     RenderSystem.enableCull()
-    this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1.0f, 1.0f, 1.0f, 1.0f)
+    this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, FastColor.ARGB32.color(255, -1))
 
     val tank = reservoir.getTank(stack)
     if (tank.hasContent) {
@@ -68,6 +68,6 @@ abstract class RenderReservoirItem extends BlockEntityWithoutLevelRenderer(Minec
 
 object RenderReservoirItem {
   private final val textureNameMap: Map[Tier, ResourceLocation] = Tier.values().map(t =>
-      (t, new ResourceLocation(FluidTankCommon.modId, s"textures/item/reservoir_${t.name().toLowerCase(Locale.ROOT)}.png")))
+      (t, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, s"textures/item/reservoir_${t.name().toLowerCase(Locale.ROOT)}.png")))
     .toMap
 }

@@ -16,7 +16,7 @@ import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
 public final class IgnoreUnknownTagIngredientFabric extends AnyIngredient {
-    public static final ResourceLocation NAME = new ResourceLocation(FluidTankCommon.modId, "ignore_unknown_tag_ingredient");
+    public static final ResourceLocation NAME = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "ignore_unknown_tag_ingredient");
     public static final CustomIngredientSerializer<IgnoreUnknownTagIngredientFabric> SERIALIZER = new Serializer();
 
     public IgnoreUnknownTagIngredientFabric(List<Ingredient> bases) {

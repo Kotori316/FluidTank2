@@ -13,7 +13,8 @@ logs/
 
 .classpath
 .project
-.idea/
+.idea/*
+!.idea/icon.png
 classes/
 .metadata
 .vscode

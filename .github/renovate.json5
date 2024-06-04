@@ -3,5 +3,10 @@
   "extends": [
     "github>Kotori316/common-script:renovate-default",
     ":rebaseStalePrs",
+  ],
+  "baseBranches": [
+    "1.21",
+    "1.20",
+    "$default",
   ]
 }

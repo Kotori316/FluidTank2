@@ -28,7 +28,7 @@
   },
   "depends": {
     "fabric": "*",
-    "minecraft": ">=1.21-beta.0",
+    "minecraft": ">=${mc_version}",
     "kotori_scala": ">=2.0.0"
   },
   "custom": {

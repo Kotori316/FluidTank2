@@ -7,13 +7,16 @@ import com.kotori316.fluidtank.forge.tank.TankFluidItemHandler
 import com.kotori316.fluidtank.tank.{ItemBlockTank, Tier}
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.inventory.{AbstractContainerMenu, CraftingContainer, Slot, TransientCraftingContainer}
+import net.minecraft.world.inventory.{AbstractContainerMenu, Slot, TransientCraftingContainer}
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.CraftingInput
 import net.minecraftforge.fluids.capability.IFluidHandler
+
+import scala.jdk.javaapi.CollectionConverters
 
 object RecipeInventoryUtil {
 
-  def getInv(s1: String = "", s2: String = "", s3: String = "", itemMap: scala.collection.Map[Character, ItemStack]): CraftingContainer = {
+  def getInv(s1: String = "", s2: String = "", s3: String = "", itemMap: scala.collection.Map[Character, ItemStack]): CraftingInput = {
     val map = itemMap.toMap + (Character.valueOf(' ') -> ItemStack.EMPTY)
     val cf = new TransientCraftingContainer(new DummyContainer(), 3, 3)
 
@@ -24,10 +27,9 @@ object RecipeInventoryUtil {
     val itemList = (List(s1, s2, s3) zip (0 until 9 by 3))
       .flatMap { case (str, i) => str.zipWithIndex.map { case (c, i1) => (c, i + i1) } }
       .flatMap { case (c, i) => map.get(c).map((i, _)).toList }
-    for ((index, stack) <- itemList) {
-      cf.setItem(index, stack)
-    }
-    cf
+
+    val stacks = itemList.map(_._2)
+    CraftingInput.of(3, 3, CollectionConverters.asJava(stacks))
   }
 
   def getFluidHandler(stack: ItemStack): TankFluidItemHandler = stack.getItem match {

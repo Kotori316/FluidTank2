@@ -2,12 +2,12 @@ package com.kotori316.fluidtank.forge.recipe;
 
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.Tier;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.common.crafting.IShapedRecipe;
 
-public final class TierRecipeForge extends TierRecipe implements IShapedRecipe<CraftingContainer> {
+public final class TierRecipeForge extends TierRecipe implements IShapedRecipe<CraftingInput> {
     public static final RecipeSerializer<TierRecipe> SERIALIZER = new Serializer();
 
     public TierRecipeForge(Tier tier, Ingredient tankItem, Ingredient subItem) {

@@ -193,13 +193,13 @@ dependencies {
     if (System.getenv("RUN_GAME_TEST").toBoolean()) {
         modCompileOnly(
             group = "mezz.jei",
-            name = "jei-1.20.4-forge",
+            name = "jei-1.21-forge",
             version = project.property("jei_forge_version").toString()
         ) { isTransitive = false }
     } else {
         modCompileOnly(
             group = "mezz.jei",
-            name = "jei-1.20.4-forge",
+            name = "jei-1.21-forge",
             version = project.property("jei_forge_version").toString()
         ) { isTransitive = false }
     }

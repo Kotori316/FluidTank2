@@ -99,7 +99,11 @@ dependencies {
         name = "jade-324717",
         version = project.property("jade_fabric_id").toString()
     )
-    // modRuntimeOnly(group="mezz.jei", name="jei-1.20.2-fabric", version=project.jei_fabric_version)
+    /*modRuntimeOnly(
+        group = "mezz.jei",
+        name = "jei-1.21-fabric",
+        version = project.property("jei_fabric_version").toString()
+    )*/
     modCompileOnly(
         group = "appeng",
         name = "appliedenergistics2-fabric",

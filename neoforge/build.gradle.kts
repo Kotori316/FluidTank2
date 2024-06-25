@@ -104,7 +104,7 @@ dependencies {
     ) { isTransitive = false }
     /*modLocalRuntime(
         group = "mezz.jei",
-        name = "jei-1.20.4-neoforge",
+        name = "jei-1.21-neoforge",
         version = project.property("jei_neoforge_version").toString()
     ) { isTransitive = false }*/
     // Test Dependencies.

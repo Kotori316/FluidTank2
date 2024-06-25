@@ -6,12 +6,13 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.alchemy.{Potion, PotionContents, Potions}
 import net.minecraft.world.item.{ItemStack, Items}
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
-import org.junit.jupiter.api.{DynamicTest, Nested, Test, TestFactory}
+import org.junit.jupiter.api.{Disabled, DynamicTest, Nested, Test, TestFactory}
 
 import java.util
 import scala.jdk.OptionConverters.RichOption
 import scala.jdk.javaapi.CollectionConverters
 
+@Disabled("Archtectury doesn't support NeoForge JUnit support system")
 final class NeoForgePlatformAccessTest extends BeforeMC {
   val ACCESS = new NeoForgePlatformAccess
 

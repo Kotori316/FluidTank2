@@ -9,10 +9,11 @@ import net.minecraft.world.item.{ItemStack, Items}
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
 import net.neoforged.neoforge.items.wrapper.InvWrapper
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.{Disabled, Test}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.{Arguments, MethodSource}
 
+@Disabled("Archtectury doesn't support NeoForge JUnit support system")
 class EntityChestAsTankTest extends BeforeMC {
 
   @Test

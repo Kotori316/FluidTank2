@@ -13,7 +13,8 @@ public abstract class BeforeMC {
             // make lazy to avoid accessing forge constants before initialization
             var c = MCTestInitializer.getRegisterer(FluidTank.REGISTER_LIST);
             c.accept(e);
-        }, FluidTank::registerCapabilities);
+        }, e -> {
+        });
     }
 
     private static void setup() {

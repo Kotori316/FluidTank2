@@ -123,15 +123,16 @@ publishing {
     }
 
     repositories {
-        if (System.getenv("CLOUDFLARE_S3_ENDPOINT") != null) {
-            val r2AccessKey = (project.findProperty("r2_access_key") ?: System.getenv("R2_ACCESS_KEY") ?: "") as String
-            val r2SecretKey = (project.findProperty("r2_secret_key") ?: System.getenv("R2_SECRET_KEY") ?: "") as String
+        val u = project.findProperty("maven_username") as? String ?: System.getenv("MAVEN_USERNAME") ?: ""
+        val p = project.findProperty("maven_password") as? String ?: System.getenv("MAVEN_PASSWORD") ?: ""
+        if (u != "" && p != "") {
             maven {
                 name = "kotori316-maven"
-                url = uri("s3://kotori316-maven")
-                credentials(AwsCredentials::class) {
-                    accessKey = r2AccessKey
-                    secretKey = r2SecretKey
+                // For users: Use https://maven.kotori316.com to get artifacts
+                url = uri("https://maven2.kotori316.com/production/maven")
+                credentials {
+                    username = u
+                    password = p
                 }
             }
         }

@@ -1,12 +1,9 @@
 import com.kotori316.plugin.cf.CallVersionCheckFunctionTask
 import com.kotori316.plugin.cf.CallVersionFunctionTask
-import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
     id("java")
     id("scala")
-    id("architectury-plugin")
-    id("dev.architectury.loom")
     id("maven-publish")
     id("signing")
     id("com.kotori316.plugin.cf")
@@ -17,28 +14,15 @@ plugins {
 val minecraftVersion = project.property("minecraft_version") as String
 val releaseDebug = (System.getenv("RELEASE_DEBUG") ?: "true").toBoolean()
 
-val remapJar: RemapJarTask by tasks.named("remapJar", RemapJarTask::class) {
-    if (loom.isForge) {
-        archiveClassifier = "remap"
-    }
-}
-
 signing {
     sign(publishing.publications)
-    sign(remapJar)
-    // sign(tasks.named("sourcesJar").get())
-    sign(tasks.named("shadowJar").get())
 }
 
 val hasGpgSignature = project.hasProperty("signing.keyId") &&
         project.hasProperty("signing.password") &&
         project.hasProperty("signing.secretKeyRingFile")
 
-val jarTask = if (loom.isForge) {
-    tasks.shadowJar
-} else {
-    tasks.remapJar
-}
+val jarTask = tasks.jar
 
 tasks {
     val jksSignJar = register("jksSignJar") {
@@ -183,18 +167,7 @@ fun modrinthChangelog(): String {
 publishMods {
     dryRun = releaseDebug
     type = STABLE
-    if (loom.isForge) {
-        file = tasks.shadowJar.flatMap { it.archiveFile }
-        additionalFiles = files(
-            tasks.named("sourcesJar")
-        )
-    } else {
-        file = remapJar.archiveFile
-        additionalFiles = files(
-            tasks.shadowJar,
-            tasks.named("sourcesJar")
-        )
-    }
+    file = jarTask.flatMap { it.archiveFile }
     modLoaders = listOf(project.name)
     displayName = "${project.version}-${project.name}"
 

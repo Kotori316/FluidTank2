@@ -1,15 +1,19 @@
 [versions]
-plugin_architectury = "3.4.155"
-plugin_loom = "1.7.409"
 plugin_cf = "3.0"
 plugin_shadow = "8.+"
 plugin_publish_all = "0.+"
 plugin_github_release = "2.5.2"
+plugin_idea_ext = "1.1.8"
+
+plugin_fabric_loom = "1.7.2"
+plugin_forge_gradle = "6.1.+"
+plugin_neoforge_gradle = "7.+"
 
 [plugins]
-architectury-plugin = { id = "architectury-plugin", version.ref = "plugin_architectury" }
-architectury-loom = { id = "dev.architectury.loom", version.ref = "plugin_loom" }
 cf = { id = "com.kotori316.plugin.cf", version.ref = "plugin_cf" }
 github-release = { id = "com.github.breadmoirai.github-release", version.ref = "plugin_github_release" }
 publish-all = { id = "me.modmuss50.mod-publish-plugin", version.ref = "plugin_publish_all" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "plugin_shadow" }
+idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "plugin_idea_ext" }
+
+fabric-loom = { id = "fabric-loom", version.ref = "plugin_fabric_loom" }

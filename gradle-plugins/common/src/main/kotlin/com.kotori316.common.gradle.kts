@@ -3,8 +3,6 @@ import org.gradle.jvm.tasks.Jar
 plugins {
     id("java")
     id("scala")
-    id("architectury-plugin")
-    id("dev.architectury.loom")
 }
 
 val minecraftVersion = project.property("minecraft_version") as String
@@ -16,6 +14,14 @@ base {
 }
 
 repositories {
+    maven {
+        name = "Minecraft-Manually"
+        url = uri("https://libraries.minecraft.net/")
+        content {
+            includeGroup("org.lwjgl")
+            includeGroup("com.mojang")
+        }
+    }
     mavenCentral()
     maven {
         name = "ParchmentMC"
@@ -75,26 +81,16 @@ repositories {
     mavenLocal()
 }
 
-architectury {
-    minecraft = minecraftVersion
-}
-
-loom {
-    knownIndyBsms.add("scala/runtime/LambdaDeserialize")
-    knownIndyBsms.add("java/lang/runtime/SwitchBootstraps/typeSwitch")
-    silentMojangMappingsLicense()
-}
-
 val enableScala2 = false
 
 dependencies {
-    minecraft("com.mojang:minecraft:${minecraftVersion}")
+    /*minecraft("com.mojang:minecraft:${minecraftVersion}")
     mappings(loom.layered {
         officialMojangMappings()
         val parchmentMC = project.property("parchment_mapping_mc")
         val parchmentDate = project.property("parchment_mapping_version")
         parchment("org.parchmentmc.data:parchment-$parchmentMC:$parchmentDate@zip")
-    })
+    })*/
 
     compileOnly(
         group = "org.scala-lang",

@@ -2,11 +2,7 @@ plugins {
     id("com.kotori316.common")
     id("com.kotori316.publish")
     id("com.kotori316.subprojects")
-}
-
-architectury {
-    platformSetupLoomIde()
-    fabric()
+    alias(libs.plugins.fabric.loom)
 }
 
 fabricApi {
@@ -56,22 +52,25 @@ loom {
             source(sourceSets["DataGen".lowercase()])
         }
     }
+    knownIndyBsms.add("scala/runtime/LambdaDeserialize")
+    knownIndyBsms.add("java/lang/runtime/SwitchBootstraps/typeSwitch")
 }
 
 repositories {
 
 }
 
-configurations {
-    named("developmentFabric") {
-        extendsFrom(common.get())
-    }
-    named("datagenRuntimeClasspath") {
-        extendsFrom(testRuntimeClasspath.get())
-    }
-}
+val minecraftVersion = project.property("minecraft_version") as String
 
 dependencies {
+    minecraft("com.mojang:minecraft:${minecraftVersion}")
+    mappings(loom.layered {
+        officialMojangMappings()
+        val parchmentMC = project.property("parchment_mapping_mc")
+        val parchmentDate = project.property("parchment_mapping_version")
+        parchment("org.parchmentmc.data:parchment-$parchmentMC:$parchmentDate@zip")
+    })
+
     modImplementation(
         group = "net.fabricmc",
         name = "fabric-loader",
@@ -89,9 +88,6 @@ dependencies {
         version = project.property("slp_fabric_version").toString(),
         classifier = "dev"
     ) { isTransitive = false }
-
-    common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
-    shadowCommon(project(path = ":common", configuration = "transformProductionFabric")) { isTransitive = false }
 
     // Other mods
     modCompileOnly(
@@ -122,6 +118,10 @@ dependencies {
     }
 
     testImplementation("net.fabricmc:fabric-loader-junit:${project.property("fabric_loader_version")}")
+}
+
+configurations {
+    getByName("datagenRuntimeClasspath").extendsFrom(getByName("testRuntimeClasspath"))
 }
 
 ext {

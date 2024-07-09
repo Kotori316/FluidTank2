@@ -12,8 +12,6 @@ repositories {
 
 dependencies {
     mapOf(
-        "architectury-plugin" to libs.versions.plugin.architectury.get(),
-        "dev.architectury.loom" to libs.versions.plugin.loom.get(),
         "com.kotori316.plugin.cf" to libs.versions.plugin.cf.get(),
         "com.github.johnrengelman.shadow" to libs.versions.plugin.shadow.get(),
         "me.modmuss50.mod-publish-plugin" to libs.versions.plugin.publish.all.get(),

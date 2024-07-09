@@ -26,8 +26,9 @@ val commonProject = project.findProject(":common")
 
 dependencies {
     commonProject?.let { p ->
-        implementation(p)
+        compileOnly(p)
         testImplementation(p)
+        // For Fabric
         configurations.findByName("datagen")?.let {
             "datagenImplementation"(p)
         }
@@ -37,6 +38,9 @@ dependencies {
 afterEvaluate {
     tasks.jar {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        manifest {
+            attributes(jarAttributeMap)
+        }
     }
     tasks.withType(ScalaCompile::class) {
         commonProject?.let {

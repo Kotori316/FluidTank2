@@ -6,7 +6,8 @@ plugin_github_release = "2.5.2"
 plugin_idea_ext = "1.1.8"
 
 plugin_fabric_loom = "1.7.2"
-plugin_forge_gradle = "6.1.+"
+plugin_forge_gradle = "[6.0,6.2)"
+plugin_forge_parchment = "1.+"
 plugin_neoforge_gradle = "7.+"
 
 [plugins]
@@ -17,3 +18,5 @@ shadow = { id = "com.github.johnrengelman.shadow", version.ref = "plugin_shadow"
 idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "plugin_idea_ext" }
 
 fabric-loom = { id = "fabric-loom", version.ref = "plugin_fabric_loom" }
+forge-gradle = { id = "net.minecraftforge.gradle", version.ref = "plugin_forge_gradle" }
+forge-parchment = { id = "org.parchmentmc.librarian.forgegradle", version.ref = "plugin_forge_parchment" }

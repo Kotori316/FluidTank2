@@ -9,15 +9,18 @@
     }
   ],
   "type": "fluidtank:crafting_grade_up",
-  "forge:condition": [
-    {
-      "type": "forge:not",
-      "value": {
-        "type": "forge:tag_empty",
-        "tag": "forge:ingots/gold"
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:not",
+        "value": {
+          "type": "forge:tag_empty",
+          "tag": "forge:ingots/gold"
+        }
       }
-    }
-  ],
+    ]
+  },
   "neoforge:conditions": [
     {
       "type": "neoforge:not",

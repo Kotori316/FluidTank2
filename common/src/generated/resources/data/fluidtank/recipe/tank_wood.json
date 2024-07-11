@@ -10,15 +10,18 @@
   ],
   "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "forge:condition": [
-    {
-      "type": "forge:not",
-      "value": {
-        "type": "forge:tag_empty",
-        "tag": "forge:glass"
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:not",
+        "value": {
+          "type": "forge:tag_empty",
+          "tag": "forge:glass"
+        }
       }
-    }
-  ],
+    ]
+  },
   "key": {
     "p": {
       "tag": "minecraft:logs"

@@ -46,15 +46,18 @@
       "trigger": "minecraft:recipe_unlocked"
     }
   },
-  "forge:condition": [
-    {
-      "type": "forge:not",
-      "value": {
-        "type": "forge:tag_empty",
-        "tag": "forge:ingots/lead"
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:not",
+        "value": {
+          "type": "forge:tag_empty",
+          "tag": "forge:ingots/lead"
+        }
       }
-    }
-  ],
+    ]
+  },
   "neoforge:conditions": [
     {
       "type": "neoforge:not",

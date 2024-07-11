@@ -28,20 +28,17 @@ private[data] object PlatformCondition {
 
   def addPlatformConditions(obj: JsonObject, conditions: Chain[PlatformCondition]): JsonObject = {
     for {
-      (key, getter) <- Seq(
-        (NEOFORGE_CONDITION_KEY, (c: PlatformCondition) => c.neoforgeCondition),
-        (FABRIC_CONDITION_KEY, (c: PlatformCondition) => c.fabricCondition),
-        (FORGE_CONDITION_KEY, (c: PlatformCondition) => c.forgeCondition),
+      (key, getter, folder) <- Seq(
+        (NEOFORGE_CONDITION_KEY, (c: PlatformCondition) => c.neoforgeCondition, foldAsJsonArray _),
+        (FABRIC_CONDITION_KEY, (c: PlatformCondition) => c.fabricCondition, foldAsJsonArray _),
+        (FORGE_CONDITION_KEY, (c: PlatformCondition) => c.forgeCondition, foldAsAndObject _),
       )
     } {
       val objects = for {
         condition <- conditions
         pc <- Chain.fromOption(getter(condition))
       } yield pc
-      val arr = objects.filterNot(_.isEmpty).foldLeft(new JsonArray()) { (a, o) => a.add(o); a }
-      if (!arr.isEmpty) {
-        obj.add(key, arr)
-      }
+      folder(objects).foreach(arr => obj.add(key, arr))
     }
 
     obj
@@ -51,6 +48,23 @@ private[data] object PlatformCondition {
     val fabricTag = fabric.map(_.location())
     // Use fabric tag for neoforge, convention tags are shared
     TagCondition(fabricTag, fabricTag, forge.map(s => ResourceLocation.parse(s)))
+  }
+
+  private def foldAsJsonArray(conditions: Chain[JsonObject]): Option[JsonArray] = {
+    val arr = conditions.filterNot(_.isEmpty).foldLeft(new JsonArray()) { (a, o) => a.add(o); a }
+    if (arr.isEmpty) None
+    else Option(arr)
+  }
+
+  private def foldAsAndObject(conditions: Chain[JsonObject]): Option[JsonObject] = {
+    for {
+      arr <- foldAsJsonArray(conditions)
+    } yield {
+      val o = new JsonObject
+      o.addProperty("type", "forge:and")
+      o.add("values", arr)
+      o
+    }
   }
 
   private case class TagCondition(fabric: Option[ResourceLocation], neoforge: Option[ResourceLocation], forge: Option[ResourceLocation]) extends PlatformCondition {

@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.forge.message;
 
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.message.IMessage;
+import net.minecraft.gametest.framework.GameTestServer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.network.CustomPayloadEvent;
@@ -36,6 +37,10 @@ public final class PacketHandler {
     }
 
     public static void sendToClient(IMessage<?> message, Level level) {
+        if (level.getServer() instanceof GameTestServer) {
+            // sending message to test server will cause NPE
+            return;
+        }
         CHANNEL.send(message, PacketDistributor.DIMENSION.with(level.dimension()));
     }
 }

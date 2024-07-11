@@ -8,6 +8,10 @@ loom {
     knownIndyBsms.add("java/lang/runtime/SwitchBootstraps/typeSwitch")
 }
 
+tasks.named("remapJar") {
+    enabled = false
+}
+
 sourceSets {
     main {
         resources {

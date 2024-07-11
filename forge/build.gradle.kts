@@ -32,25 +32,69 @@ minecraft {
             property("bsl.debug", "true")
             workingDirectory(project.file("game-test"))
             jvmArgs("-ea")
+            mods {
+                afterEvaluate {
+                    create("main") {
+                        source(sourceSets["runGame"])
+                    }
+                }
+            }
         }
     }
 }
 
 sourceSets {
+    val mainSourceSet by main
     create("genData") {
+        val sourceSet = this
         scala {
             srcDir("src/genData/scala")
         }
         resources {
             srcDir("src/genData/resources")
         }
+
+        compileClasspath += mainSourceSet.output
+        runtimeClasspath += mainSourceSet.output
+        project.configurations {
+            named(sourceSet.compileClasspathConfigurationName) {
+                extendsFrom(project.configurations.compileClasspath.get())
+            }
+            named(sourceSet.runtimeClasspathConfigurationName) {
+                extendsFrom(project.configurations.runtimeClasspath.get())
+            }
+        }
     }
-    create("gameTest") {
+    val gameTestSourceSet = create("gameTest") {
+        val sourceSet = this
         scala {
             srcDir("src/gameTest/scala")
         }
         resources {
             srcDir("src/gameTest/resources")
+        }
+        compileClasspath += mainSourceSet.output
+        project.configurations {
+            named(sourceSet.compileClasspathConfigurationName) {
+                extendsFrom(project.configurations.compileClasspath.get())
+            }
+            named(sourceSet.runtimeClasspathConfigurationName) {
+                extendsFrom(project.configurations.runtimeClasspath.get())
+            }
+        }
+    }
+
+    create("runGame") {
+        val sourceSet = this
+        runtimeClasspath += mainSourceSet.output
+        runtimeClasspath += gameTestSourceSet.output
+        project.configurations {
+            named(sourceSet.compileClasspathConfigurationName) {
+                extendsFrom(project.configurations.named(gameTestSourceSet.compileClasspathConfigurationName).get())
+            }
+            named(sourceSet.runtimeClasspathConfigurationName) {
+                extendsFrom(project.configurations.named(gameTestSourceSet.runtimeClasspathConfigurationName).get())
+            }
         }
     }
 
@@ -135,8 +179,6 @@ dependencies {
 
     "gameTestImplementation"(platform("org.junit:junit-bom:${project.property("jupiterVersion")}"))
     "gameTestImplementation"("org.junit.jupiter:junit-jupiter")
-    "gameTestCompileOnly"(sourceSets.main.get().output)
-    "genDataCompileOnly"(sourceSets.main.get().output)
 }
 
 ext {
@@ -153,6 +195,22 @@ ext {
         | TheOneProbe | File id: ${project.property("top_forge_id")} |
         """.trimIndent()
     )
+}
+
+tasks.named("compileRunGameScala", ScalaCompile::class) {
+    project.findProject(":common")?.let {
+        source(it.sourceSets.main.get().scala)
+    }
+    source(project.sourceSets.main.get().scala)
+    source(project.sourceSets.named("gameTest").get().scala)
+}
+
+tasks.named("processRunGameResources", ProcessResources::class) {
+    project.findProject(":common")?.let {
+        from(it.sourceSets.main.get().resources)
+    }
+    from(project.sourceSets.main.get().resources)
+    from(project.sourceSets.named("gameTest").get().resources)
 }
 
 idea {

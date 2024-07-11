@@ -63,7 +63,19 @@ private[data] object PlatformCondition {
       } yield json
     }
 
-    override def forgeCondition: Option[JsonObject] = Option.empty
+    override def forgeCondition: Option[JsonObject] = {
+      for (tag <- forge) yield {
+        val tagEmpty = new JsonObject
+        tagEmpty.addProperty("type", "forge:tag_empty")
+        tagEmpty.addProperty("tag", tag.toString)
+
+        val not = new JsonObject
+        not.addProperty("type", "forge:not")
+        not.add("value", tagEmpty)
+
+        not
+      }
+    }
 
     override def neoforgeCondition: Option[JsonObject] = {
       for (tag <- neoforge) yield {

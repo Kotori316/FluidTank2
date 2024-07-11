@@ -49,6 +49,7 @@ loom {
                 file("../common/src/generated/resources/").absolutePath
             )
             property("fabric-api.DataGen.ModId".lowercase(), "fluidtank_data")
+            property("fabric.debug.logClassLoadErrors", "true")
             source(sourceSets["DataGen".lowercase()])
         }
     }

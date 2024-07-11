@@ -40,6 +40,15 @@
       "trigger": "minecraft:recipe_unlocked"
     }
   },
+  "forge:condition": [
+    {
+      "type": "forge:not",
+      "value": {
+        "type": "forge:tag_empty",
+        "tag": "forge:ingots/tin"
+      }
+    }
+  ],
   "neoforge:conditions": [
     {
       "type": "neoforge:not",

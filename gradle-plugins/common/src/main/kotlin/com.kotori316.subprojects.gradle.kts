@@ -1,28 +1,14 @@
-import net.fabricmc.loom.task.RemapJarTask
-import org.gradle.jvm.tasks.Jar
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-    java
-    id("architectury-plugin")
-    id("dev.architectury.loom")
-    id("com.github.johnrengelman.shadow")
+    id("java")
+    id("scala")
 }
 
 val minecraftVersion = project.property("minecraft_version") as String
 val projectVersion = project.version.toString()
 val modId = "FluidTank".lowercase()
-configurations {
-    val common = create("common")
-    create("shadowCommon") // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
-    compileClasspath { extendsFrom(common) }
-    if (!loom.isForge || System.getenv("RUN_JUNIT") != null) {
-        runtimeClasspath { extendsFrom(common) }
-    }
-    testCompileClasspath { extendsFrom(compileClasspath.get()) }
-    testRuntimeClasspath { extendsFrom(runtimeClasspath.get()) }
-}
 
 val jarAttributeMap = mapOf(
     "Specification-Title" to "FluidTank",
@@ -35,49 +21,36 @@ val jarAttributeMap = mapOf(
     "Automatic-Module-Name" to modId,
 )
 
-tasks {
-    jar {
-        archiveClassifier = "dev-only-platform"
-        manifest {
-            attributes(jarAttributeMap)
-        }
-    }
-    shadowJar {
-        exclude("architectury.common.json")
-        configurations = listOf(project.configurations.getAt("shadowCommon"))
-        archiveClassifier = if (loom.isForge) "" else "dev"
-        manifest {
-            attributes(jarAttributeMap)
-        }
-    }
-    named("remapJar", RemapJarTask::class) {
-        val shadowJarProvider = provider { project }.flatMap { p -> p.tasks.shadowJar }
-        inputFile = shadowJarProvider.flatMap { j -> j.archiveFile }
-        dependsOn(shadowJarProvider)
-        archiveClassifier = null
-        manifest {
-            attributes(jarAttributeMap)
-        }
-        onlyIf { !loom.isForge }
-    }
-    named("sourcesJar", Jar::class) {
-        val commonSources = provider { project(":common") }.flatMap { p -> p.tasks.named("sourcesJar", Jar::class) }
-        dependsOn(commonSources)
-        from(commonSources.flatMap { it.archiveFile }.map { zipTree(it) })
-    }
-}
+val commonProject = project.findProject(":common")
 
 dependencies {
-
-}
-
-components.named("java", AdhocComponentWithVariants::class) {
-    withVariantsFromConfiguration(configurations.shadowRuntimeElements.get()) {
-        skip()
+    commonProject?.let { p ->
+        compileOnly(p)
+        testImplementation(p)
+        // For Fabric
+        configurations.findByName("datagen")?.let {
+            "datagenImplementation"(p)
+        }
     }
 }
 
 afterEvaluate {
+    tasks.jar {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        manifest {
+            attributes(jarAttributeMap)
+        }
+    }
+    tasks.compileScala {
+        commonProject?.let {
+            source(it.sourceSets.main.get().scala)
+        }
+    }
+    tasks.compileTestScala {
+        commonProject?.let {
+            source(it.sourceSets.main.get().scala)
+        }
+    }
     tasks.findByName("gameTestClasses")?.let { c ->
         tasks.findByName("runClient")?.dependsOn(c)
         tasks.findByName("runGameTest")?.dependsOn(c)
@@ -88,6 +61,9 @@ afterEvaluate {
     }
     tasks.findByName("genDataClasses")?.let { c ->
         tasks.findByName("runData")?.dependsOn(c)
+    }
+    tasks.processResources {
+        commonProject?.let { from(it.sourceSets.main.get().resources) }
     }
     tasks.withType(ProcessResources::class) {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE

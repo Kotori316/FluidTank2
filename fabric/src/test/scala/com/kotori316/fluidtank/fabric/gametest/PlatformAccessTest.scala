@@ -223,7 +223,7 @@ final class PlatformAccessTest extends FabricGameTest {
 
     val toDrain = potionFluid(potionType, potion).setAmount(GenericUnit.fromFabric(26999))
     val transferred = ACCESS.drainItem(toDrain, stack, player, InteractionHand.MAIN_HAND, true)
-    assertFalse(transferred.shouldMove(), "Transfer failed, so nothing to move")
+    assertFalse(transferred.shouldMove, "Transfer failed, so nothing to move")
     assertTrue(transferred.moved.isEmpty)
     assertTrue(ItemStack.isSameItemSameComponents(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getComponents, transferred.toReplace.getComponents))
     helper.succeed()

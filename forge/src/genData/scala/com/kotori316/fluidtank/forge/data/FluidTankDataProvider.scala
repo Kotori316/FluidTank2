@@ -25,8 +25,11 @@ object FluidTankDataProvider {
     PlatformConfigAccess.setInstance(() => ConfigData.FOR_TEST)
     FluidTankCommon.LOGGER.info(MARKER, "Start data generation")
     // Loot table
-    event.getGenerator.addProvider(event.includeServer(), new LootTableProvider(event.getGenerator.getPackOutput, Collections.emptySet(),
-      CollectionConverters.asJava(Seq(new LootTableProvider.SubProviderEntry(() => new LootSubProvider, LootContextParamSets.BLOCK)))
+    event.getGenerator.addProvider(event.includeServer(), new LootTableProvider(
+      event.getGenerator.getPackOutput,
+      Collections.emptySet(),
+      CollectionConverters.asJava(Seq(new LootTableProvider.SubProviderEntry(p => new LootSubProvider(p), LootContextParamSets.BLOCK))),
+      event.getLookupProvider,
     ))
     // State and model
     event.getGenerator.addProvider(event.includeClient(), new StateAndModelProvider(event.getGenerator, event.getExistingFileHelper))

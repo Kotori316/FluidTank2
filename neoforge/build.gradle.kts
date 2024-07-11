@@ -2,11 +2,7 @@ plugins {
     id("com.kotori316.common")
     id("com.kotori316.publish")
     id("com.kotori316.subprojects")
-}
-
-architectury {
-    platformSetupLoomIde()
-    neoForge()
+    alias(libs.plugins.neoforge.gradle)
 }
 
 sourceSets {
@@ -20,60 +16,37 @@ sourceSets {
     }
 }
 
-loom {
-    neoForge {
-        // useForgeLoggerConfig = true
+runs {
+    configureEach {
+        systemProperty("neoforge.enabledGameTestNamespaces", "fluidtank")
+        systemProperty("mixin.debug.export", "true")
     }
 
-    runs {
-        named("client") {
-            configName = "Client"
-            property("neoforge.enabledGameTestNamespaces", "fluidtank")
-            runDir = "run"
-            mods {
-                create("main") {
-                    sourceSet("main")
-                }
-                create("gameTest") {
-                    sourceSet("gameTest")
-                }
-            }
-        }
-        named("server") {
-            configName = "Server"
-            runDir = "run-server"
-        }
-        create("gameTest") {
-            configName = "GameTest"
-            environment("gameTestServer")
-            forgeTemplate("gameTestServer")
-            vmArg("-ea")
-            property("fabric.dli.env", "gameTestServer")
-            property("neoforge.enabledGameTestNamespaces", "fluidtank")
-            runDir = "game-test"
-            mods {
-                create("main") {
-                    sourceSet("main")
-                }
-                create("gameTest") {
-                    sourceSet("gameTest")
-                }
-            }
-        }
+    create("client") {
+        workingDirectory = project.file("run")
+        programArguments("--username", "Kotori")
+    }
+    create("server") {
+        workingDirectory = project.file("run-server")
+    }
+    create("gameTestServer") {
+        jvmArgument("-ea")
+        workingDirectory = project.file("game-test")
     }
 }
 
-configurations {
-    named("developmentNeoForge").get().extendsFrom(common.get())
-    named("gameTestCompileClasspath").get().extendsFrom(compileClasspath.get())
-    named("gameTestRuntimeClasspath").get().extendsFrom(runtimeClasspath.get())
+subsystems {
+    parchment {
+        minecraftVersion = project.property("parchment_mapping_mc") as String
+        mappingsVersion = project.property("parchment_mapping_version") as String
+    }
 }
 
 repositories {
 }
 
 dependencies {
-    neoForge("net.neoforged:neoforge:${project.property("neoforge_version")}")
+    implementation("net.neoforged:neoforge:${project.property("neoforge_version")}")
 
     runtimeOnly(
         group = "com.kotori316",
@@ -84,20 +57,17 @@ dependencies {
         isTransitive = false
     }
 
-    common(project(path = ":common", configuration = "namedElements")) { isTransitive = false }
-    shadowCommon(project(path = ":common", configuration = "transformProductionNeoForge")) { isTransitive = false }
-
-    modCompileOnly(
+    compileOnly(
         group = "curse.maven",
         name = "jade-324717",
         version = project.property("jade_neoforge_id").toString()
     )
-    modCompileOnly(
+    compileOnly(
         group = "curse.maven",
         name = "the-one-probe-245211",
         version = project.property("top_neoforge_id").toString()
     )
-    modImplementation(
+    implementation(
         group = "appeng",
         name = "appliedenergistics2-neoforge",
         version = project.property("ae2_neoforge_version").toString()
@@ -120,12 +90,10 @@ dependencies {
         name = "mockito-inline",
         version = project.property("mockitoInlineVersion").toString()
     )
-    forgeRuntimeLibrary(platform("org.junit:junit-bom:${project.property("jupiterVersion")}"))
-    forgeRuntimeLibrary("org.junit.jupiter:junit-jupiter")
-    modImplementation("com.kotori316:test-utility-neoforge:${project.property("test_util_version")}") {
+    implementation("com.kotori316:test-utility-neoforge:${project.property("test_util_version")}") {
         exclude(group = "org.mockito")
     }
-    modImplementation("com.kotori316:debug-utility-neoforge:${project.property("debug_util_version")}")
+    implementation("com.kotori316:debug-utility-neoforge:${project.property("debug_util_version")}")
 
     "gameTestImplementation"(sourceSets.main.get().output)
 }

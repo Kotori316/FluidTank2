@@ -10,10 +10,11 @@ import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.items.ItemHandlerHelper
 import net.minecraftforge.items.wrapper.InvWrapper
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.{Disabled, Test}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.{Arguments, MethodSource}
 
+@Disabled("Forge doesn't support item fluid handler yet")
 class EntityChestAsTankTest extends BeforeMC {
 
   @Test

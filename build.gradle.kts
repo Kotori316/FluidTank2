@@ -1,16 +1,11 @@
 plugins {
-    alias(libs.plugins.architectury.plugin)
-    alias(libs.plugins.architectury.loom) apply (false)
     alias(libs.plugins.github.release)
+    alias(libs.plugins.idea.ext)
 }
 
 tasks.named("wrapper", Wrapper::class) {
     gradleVersion = "8.8"
     distributionType = Wrapper.DistributionType.BIN
-}
-
-architectury {
-    minecraft = project.property("minecraft_version") as String
 }
 
 githubRelease {

@@ -40,6 +40,18 @@
       "trigger": "minecraft:inventory_changed"
     }
   },
+  "forge:condition": {
+    "type": "forge:and",
+    "values": [
+      {
+        "type": "forge:not",
+        "value": {
+          "type": "forge:tag_empty",
+          "tag": "forge:glass"
+        }
+      }
+    ]
+  },
   "neoforge:conditions": [
     {
       "type": "neoforge:not",

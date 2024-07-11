@@ -2,8 +2,8 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-    java
-    scala
+    id("java")
+    id("scala")
 }
 
 val minecraftVersion = project.property("minecraft_version") as String

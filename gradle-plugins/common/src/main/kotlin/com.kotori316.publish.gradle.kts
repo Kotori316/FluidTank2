@@ -7,7 +7,6 @@ plugins {
     id("maven-publish")
     id("signing")
     id("com.kotori316.plugin.cf")
-    id("com.github.johnrengelman.shadow")
     id("me.modmuss50.mod-publish-plugin")
 }
 

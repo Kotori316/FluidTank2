@@ -30,6 +30,7 @@ develocity {
 includeBuild("gradle-plugins")
 
 include("common")
+include("dependency-check")
 if (!System.getenv("DISABLE_FABRIC").toBoolean()) {
     include("fabric")
 }

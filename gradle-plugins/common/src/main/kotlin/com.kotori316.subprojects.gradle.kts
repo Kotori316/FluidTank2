@@ -1,3 +1,6 @@
+import gradle.kotlin.dsl.accessors._6b65b5a1365ce9e316fa6d785761b323.compileScala
+import gradle.kotlin.dsl.accessors._6b65b5a1365ce9e316fa6d785761b323.compileTestScala
+import gradle.kotlin.dsl.accessors._6b65b5a1365ce9e316fa6d785761b323.processResources
 import gradle.kotlin.dsl.accessors._6b65b5a1365ce9e316fa6d785761b323.scala
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -42,7 +45,12 @@ afterEvaluate {
             attributes(jarAttributeMap)
         }
     }
-    tasks.withType(ScalaCompile::class) {
+    tasks.compileScala {
+        commonProject?.let {
+            source(it.sourceSets.main.get().scala)
+        }
+    }
+    tasks.compileTestScala {
         commonProject?.let {
             source(it.sourceSets.main.get().scala)
         }
@@ -58,8 +66,10 @@ afterEvaluate {
     tasks.findByName("genDataClasses")?.let { c ->
         tasks.findByName("runData")?.dependsOn(c)
     }
-    tasks.withType(ProcessResources::class) {
+    tasks.processResources {
         commonProject?.let { from(it.sourceSets.main.get().resources) }
+    }
+    tasks.withType(ProcessResources::class) {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         inputs.property("version", projectVersion)
         inputs.property("minecraftVersion", minecraftVersion)

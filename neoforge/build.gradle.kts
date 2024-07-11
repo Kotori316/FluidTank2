@@ -7,11 +7,20 @@ plugins {
 
 sourceSets {
     create("gameTest") {
+        val sourceSet = this
         scala {
             srcDir("src/gameTest/scala")
         }
         resources {
             srcDir("src/gameTest/resources")
+        }
+        project.configurations {
+            named(sourceSet.compileClasspathConfigurationName) {
+                extendsFrom(project.configurations.compileClasspath.get())
+            }
+            named(sourceSet.runtimeClasspathConfigurationName) {
+                extendsFrom(project.configurations.runtimeClasspath.get())
+            }
         }
     }
 }
@@ -32,6 +41,7 @@ runs {
     create("gameTestServer") {
         jvmArgument("-ea")
         workingDirectory = project.file("game-test")
+        modSources.add(sourceSets["gameTest"])
     }
 }
 

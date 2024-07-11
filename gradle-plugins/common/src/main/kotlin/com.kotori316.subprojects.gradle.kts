@@ -1,13 +1,9 @@
-import gradle.kotlin.dsl.accessors._6b65b5a1365ce9e316fa6d785761b323.compileScala
-import gradle.kotlin.dsl.accessors._6b65b5a1365ce9e316fa6d785761b323.compileTestScala
-import gradle.kotlin.dsl.accessors._6b65b5a1365ce9e316fa6d785761b323.processResources
-import gradle.kotlin.dsl.accessors._6b65b5a1365ce9e316fa6d785761b323.scala
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
     java
-    id("com.github.johnrengelman.shadow")
+    scala
 }
 
 val minecraftVersion = project.property("minecraft_version") as String

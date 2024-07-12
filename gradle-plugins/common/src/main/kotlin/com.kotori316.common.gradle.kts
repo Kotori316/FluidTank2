@@ -51,6 +51,13 @@ repositories {
         }
     }
     maven {
+        name = "Kotori316BackUp"
+        url = uri("https://storage.googleapis.com/kotori316-maven-storage/maven/")
+        content {
+            includeGroup("com.kotori316")
+        }
+    }
+    maven {
         name = "Curse"
         url = uri("https://www.cursemaven.com")
         content {

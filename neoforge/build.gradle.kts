@@ -29,6 +29,7 @@ runs {
     configureEach {
         systemProperty("neoforge.enabledGameTestNamespaces", "fluidtank")
         systemProperty("mixin.debug.export", "true")
+        modSources.add("fluidtank", sourceSets["main"])
     }
 
     create("client") {
@@ -41,7 +42,10 @@ runs {
     create("gameTestServer") {
         jvmArgument("-ea")
         workingDirectory = project.file("game-test")
-        modSources.add(sourceSets["gameTest"])
+        modSources.add("fluidtank_gametest", sourceSets["gameTest"])
+        dependencies {
+            runtime(project.configurations["junit"])
+        }
     }
 }
 

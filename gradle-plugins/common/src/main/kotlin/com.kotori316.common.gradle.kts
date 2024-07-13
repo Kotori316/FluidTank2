@@ -88,6 +88,10 @@ repositories {
     mavenLocal()
 }
 
+configurations {
+    create("junit")
+}
+
 val enableScala2 = false
 
 dependencies {
@@ -147,6 +151,8 @@ dependencies {
 
     testImplementation(platform("org.junit:junit-bom:${project.property("jupiterVersion")}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    "junit"(platform("org.junit:junit-bom:${project.property("jupiterVersion")}"))
+    "junit"("org.junit.jupiter:junit-jupiter")
 }
 
 java {

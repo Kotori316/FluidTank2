@@ -47,6 +47,9 @@ runs {
             runtime(project.configurations["junit"])
         }
     }
+    create("junit") {
+        unitTestSources.add("fluidtank_test", sourceSets["test"])
+    }
 }
 
 subsystems {
@@ -110,6 +113,7 @@ dependencies {
     implementation("com.kotori316:debug-utility-neoforge:${project.property("debug_util_version")}")
 
     "gameTestImplementation"(sourceSets.main.get().output)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 ext {

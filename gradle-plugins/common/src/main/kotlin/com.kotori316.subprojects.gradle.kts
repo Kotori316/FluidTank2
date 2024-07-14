@@ -46,11 +46,6 @@ afterEvaluate {
             source(it.sourceSets.main.get().scala)
         }
     }
-    tasks.compileTestScala {
-        commonProject?.let {
-            source(it.sourceSets.main.get().scala)
-        }
-    }
     tasks.findByName("gameTestClasses")?.let { c ->
         tasks.findByName("runClient")?.dependsOn(c)
         tasks.findByName("runGameTest")?.dependsOn(c)

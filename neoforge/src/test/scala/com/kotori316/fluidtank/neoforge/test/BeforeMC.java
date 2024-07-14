@@ -1,8 +1,9 @@
-package com.kotori316.fluidtank.neoforge;
+package com.kotori316.fluidtank.neoforge.test;
 
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.config.ConfigData;
 import com.kotori316.fluidtank.config.PlatformConfigAccess;
+import com.kotori316.fluidtank.neoforge.FluidTank;
 import com.kotori316.testutil.MCTestInitializer;
 import org.junit.jupiter.api.BeforeAll;
 

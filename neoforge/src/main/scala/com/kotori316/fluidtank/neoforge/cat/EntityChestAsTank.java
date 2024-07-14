@@ -189,4 +189,9 @@ public class EntityChestAsTank extends BlockEntity {
                     Collectors.reducing(BigInt.apply(0), f -> GenericUnit.asBigIntFromForge(f.getAmount()), BigInt::$plus)));
         }
     }
+
+    @VisibleForTesting
+    public static IFluidHandler getProxy(IItemHandlerModifiable handler) {
+        return new FluidHandlerProxy(handler);
+    }
 }

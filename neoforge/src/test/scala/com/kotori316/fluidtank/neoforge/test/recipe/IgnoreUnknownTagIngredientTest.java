@@ -1,16 +1,16 @@
-package com.kotori316.fluidtank.neoforge.recipe;
+package com.kotori316.fluidtank.neoforge.test.recipe;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.kotori316.fluidtank.FluidTankCommon;
-import com.kotori316.fluidtank.neoforge.BeforeMC;
+import com.kotori316.fluidtank.neoforge.recipe.IgnoreUnknownTagIngredient;
+import com.kotori316.fluidtank.neoforge.test.BeforeMC;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -103,7 +103,6 @@ class IgnoreUnknownTagIngredientTest extends BeforeMC {
     }
 
     @Nested
-    @Disabled("Archtectury doesn't support NeoForge JUnit support system")
     class DeserializeTest {
 
         @Test
@@ -172,7 +171,6 @@ class IgnoreUnknownTagIngredientTest extends BeforeMC {
     }
 
     @Nested
-    @Disabled("Archtectury doesn't support NeoForge JUnit support system")
     class SerializeTest {
         @Test
         void singleItemInternal() {

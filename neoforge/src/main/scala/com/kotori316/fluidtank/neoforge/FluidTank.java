@@ -58,7 +58,7 @@ public final class FluidTank {
     public static final SideProxy proxy = SideProxy.get();
 
     public FluidTank(IEventBus modBus, ModContainer container) {
-        FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize {} with {}", FluidTankCommon.modId, container.getClass().getName());
+        FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize {} with {}", container.getModId(), container.getClass().getName());
         NeoForgeMod.enableMilkFluid();
         REGISTER_LIST.forEach(r -> r.register(modBus));
         PlatformAccess.setInstance(new NeoForgePlatformAccess());
@@ -69,7 +69,7 @@ public final class FluidTank {
         AE2FluidTankIntegration.onAPIAvailable(modBus);
         FluidTankTopPlugin.sendIMC();
         NeoForge.EVENT_BUS.addListener(FluidTank::onServerStart);
-        FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize finished {}", FluidTankCommon.modId);
+        FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize finished {}", container.getModId());
     }
 
     private static void setupConfig(IEventBus modBus, ModContainer container) {
@@ -88,7 +88,7 @@ public final class FluidTank {
     private static final DeferredRegister<CreativeModeTab> CREATIVE_TAB_REGISTER = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB, FluidTankCommon.modId);
     private static final DeferredRegister<LootItemFunctionType<?>> LOOT_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.LOOT_FUNCTION_TYPE, FluidTankCommon.modId);
     private static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.DATA_COMPONENT_TYPE, FluidTankCommon.modId);
-    static final List<DeferredRegister<?>> REGISTER_LIST = List.of(
+    public static final List<DeferredRegister<?>> REGISTER_LIST = List.of(
         BLOCK_REGISTER, ITEM_REGISTER, BLOCK_ENTITY_REGISTER, RECIPE_REGISTER, INGREDIENT_REGISTER, CREATIVE_TAB_REGISTER, LOOT_TYPE_REGISTER, DATA_COMPONENT_TYPE_REGISTER
     );
 

@@ -1,11 +1,12 @@
-package com.kotori316.fluidtank.neoforge.tank
+package com.kotori316.fluidtank.neoforge.test.tank
 
 import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank, TankUtil}
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, fluidAccess}
 import com.kotori316.fluidtank.item.PlatformItemAccess
-import com.kotori316.fluidtank.neoforge.BeforeMC
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
+import com.kotori316.fluidtank.neoforge.tank.TankFluidItemHandler
+import com.kotori316.fluidtank.neoforge.test.BeforeMC
 import com.kotori316.fluidtank.tank.{Tier, TileTank}
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag

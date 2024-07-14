@@ -1,0 +1,8 @@
+modLoader = "kotori_scala"
+loaderVersion = "[3.3.3,)"
+license = "All rights reserved"
+
+[[mods]]
+modId = "fluidtank_test"
+version = "1.0"
+description = "Unit Test for FluidTank"

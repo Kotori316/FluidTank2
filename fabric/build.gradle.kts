@@ -125,6 +125,15 @@ configurations {
     getByName("datagenRuntimeClasspath").extendsFrom(getByName("testRuntimeClasspath"))
 }
 
+tasks {
+    val jksSignRemapJar = register("jksSignRemapJar", JarSignTask::class) {
+        jarTask = project.tasks.remapJar
+    }
+    remapJar.configure {
+        finalizedBy(jksSignRemapJar)
+    }
+}
+
 ext {
     set(
         "changelogHeader", """

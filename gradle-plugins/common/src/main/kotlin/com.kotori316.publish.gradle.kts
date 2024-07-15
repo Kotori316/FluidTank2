@@ -21,31 +21,11 @@ val hasGpgSignature = project.hasProperty("signing.keyId") &&
         project.hasProperty("signing.password") &&
         project.hasProperty("signing.secretKeyRingFile")
 
-val jarTask = tasks.jar
-
 tasks {
-    val jksSignJar = register("jksSignJar") {
-        dependsOn(jarTask)
-        onlyIf {
-            project.hasProperty("jarSign.keyAlias") &&
-                    project.hasProperty("jarSign.keyLocation") &&
-                    project.hasProperty("jarSign.storePass")
-        }
-        doLast {
-            ant.withGroovyBuilder {
-                "signjar"(
-                    "jar" to jarTask.flatMap { it.archiveFile }.get(),
-                    "alias" to project.findProperty("jarSign.keyAlias"),
-                    "keystore" to project.findProperty("jarSign.keyLocation"),
-                    "storepass" to project.findProperty("jarSign.storePass"),
-                    "sigalg" to "Ed25519",
-                    "digestalg" to "SHA-256",
-                    "tsaurl" to "http://timestamp.digicert.com",
-                )
-            }
-        }
+    val jksSignJar = register("jksSignJar", JarSignTask::class) {
+        jarTask = tasks.jar
     }
-    jarTask.configure {
+    tasks.jar.configure {
         finalizedBy(jksSignJar)
     }
     withType(Sign::class) {
@@ -159,10 +139,18 @@ fun modrinthChangelog(): String {
     return header + System.lineSeparator() + shortFormat
 }
 
+fun modJarFile(): Provider<RegularFile> {
+    return if (project.name == "fabric") {
+        tasks.named("remapJar", org.gradle.jvm.tasks.Jar::class).flatMap { it.archiveFile }
+    } else {
+        tasks.jar.flatMap { it.archiveFile }
+    }
+}
+
 publishMods {
     dryRun = releaseDebug
     type = STABLE
-    file = jarTask.flatMap { it.archiveFile }
+    file = provider { modJarFile() }.flatMap { it }
     modLoaders = listOf(project.name)
     displayName = "${project.version}-${project.name}"
 

@@ -52,10 +52,6 @@ tasks {
         onlyIf { hasGpgSignature }
     }
     withType(AbstractPublishToMaven::class) {
-        if (hasGpgSignature) {
-            dependsOn("signRemapJar")
-            dependsOn("signShadowJar")
-        }
     }
 
     val baseName = project.findProperty("maven_base_name") as String
@@ -101,7 +97,7 @@ publishing {
     publications {
         create("mavenJava", MavenPublication::class) {
             artifactId = base.archivesName.get()
-            from(components.getAt("java"))
+            from(components["java"])
         }
     }
 

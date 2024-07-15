@@ -34,13 +34,29 @@ dependencies {
     }
 }
 
-afterEvaluate {
-    tasks.jar {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        manifest {
-            attributes(jarAttributeMap)
+tasks.jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes(jarAttributeMap)
+    }
+}
+
+tasks.withType(ProcessResources::class) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    inputs.property("version", projectVersion)
+    inputs.property("minecraftVersion", minecraftVersion)
+    listOf("fabric.mod.json", "META-INF/mods.toml", "META-INF/neoforge.mods.toml").forEach { fileName ->
+        filesMatching(fileName) {
+            expand(
+                "version" to projectVersion,
+                "update_url" to "https://version.kotori316.com/get-version/${minecraftVersion}/${project.name}/${modId}",
+                "mc_version" to minecraftVersion,
+            )
         }
     }
+}
+
+afterEvaluate {
     tasks.compileScala {
         commonProject?.let {
             source(it.sourceSets.main.get().scala)
@@ -59,19 +75,5 @@ afterEvaluate {
     }
     tasks.processResources {
         commonProject?.let { from(it.sourceSets.main.get().resources) }
-    }
-    tasks.withType(ProcessResources::class) {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        inputs.property("version", projectVersion)
-        inputs.property("minecraftVersion", minecraftVersion)
-        listOf("fabric.mod.json", "META-INF/mods.toml", "META-INF/neoforge.mods.toml").forEach { fileName ->
-            filesMatching(fileName) {
-                expand(
-                    "version" to projectVersion,
-                    "update_url" to "https://version.kotori316.com/get-version/${minecraftVersion}/${project.name}/${modId}",
-                    "mc_version" to minecraftVersion,
-                )
-            }
-        }
     }
 }

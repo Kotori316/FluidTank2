@@ -32,8 +32,8 @@ repositories {
         url = uri("https://maven.neoforged.net/releases")
     }
     maven {
-        name = "Azure-SLP"
-        url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
+        name = "Kotori316-main"
+        url = uri("https://maven.kotori316.com")
         val catsVersion = project.property("cats_version") as String
         content {
             includeVersion("org.typelevel", "cats-core_3", catsVersion)
@@ -44,16 +44,14 @@ repositories {
         }
     }
     maven {
-        name = "Kotori316-main"
-        url = uri("https://maven.kotori316.com")
-        content {
-            includeGroup("com.kotori316")
-        }
-    }
-    maven {
         name = "Kotori316BackUp"
         url = uri("https://storage.googleapis.com/kotori316-maven-storage/maven/")
+        val catsVersion = project.property("cats_version") as String
         content {
+            includeVersion("org.typelevel", "cats-core_3", catsVersion)
+            includeVersion("org.typelevel", "cats-kernel_3", catsVersion)
+            includeVersion("org.typelevel", "cats-core_2.13", catsVersion)
+            includeVersion("org.typelevel", "cats-kernel_2.13", catsVersion)
             includeGroup("com.kotori316")
         }
     }
@@ -95,13 +93,6 @@ configurations {
 val enableScala2 = false
 
 dependencies {
-    /*minecraft("com.mojang:minecraft:${minecraftVersion}")
-    mappings(loom.layered {
-        officialMojangMappings()
-        val parchmentMC = project.property("parchment_mapping_mc")
-        val parchmentDate = project.property("parchment_mapping_version")
-        parchment("org.parchmentmc.data:parchment-$parchmentMC:$parchmentDate@zip")
-    })*/
 
     compileOnly(
         group = "org.scala-lang",

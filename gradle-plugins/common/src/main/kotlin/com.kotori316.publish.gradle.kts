@@ -11,7 +11,7 @@ plugins {
 }
 
 val minecraftVersion = project.property("minecraft_version") as String
-val releaseDebug = (System.getenv("RELEASE_DEBUG") ?: "true").toBoolean()
+val releaseDebug = true //(System.getenv("RELEASE_DEBUG") ?: "true").toBoolean()
 
 signing {
     sign(publishing.publications)

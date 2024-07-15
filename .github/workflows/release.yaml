@@ -16,7 +16,7 @@ jobs:
       - run: chmod +x ./gradlew
       - uses: gradle/actions/setup-gradle@v3
         with:
-          cache-read-only: true
+          cache-read-only: false
           add-job-summary: 'on-failure'
       - name: Check Release Version
         run: ./gradlew checkReleaseVersion
@@ -28,17 +28,15 @@ jobs:
         run: ./gradlew test
         env:
           RUN_JUNIT: true
-          DISABLE_FORGE: true
       - name: Prepare GameTest
         run: |
-          (./gradlew configureLaunch downloadAssets) || \
-            (sleep 5 && ./gradlew configureLaunch downloadAssets) || \
-            (sleep 5 && ./gradlew configureLaunch downloadAssets) || true
+          (./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer) || \
+            (sleep 5 && ./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer) || \
+            (sleep 5 && ./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer) || true
       - name: GameTest
         run: ./gradlew runGameTest
         env:
           RUN_GAME_TEST: true
-          DISABLE_FORGE: true
 
   release:
     needs: [ check ]
@@ -55,4 +53,5 @@ jobs:
       enable_signature_check: true
       java_version: '21'
       use_attestation: true
+      use_gradle_cache: true
     secrets: inherit

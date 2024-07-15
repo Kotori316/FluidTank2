@@ -28,7 +28,7 @@ loom {
             runDir = "run-server"
         }
 
-        create("gameTest") {
+        create("gameTestServer") {
             name("Fabric GameTest")
             server()
             vmArg("-ea")

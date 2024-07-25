@@ -67,6 +67,12 @@ jobs:
         run: ./gradlew :${{ matrix.platform }}:test
         env:
           RUN_JUNIT: true
+      - name: Prepare Runs
+        if: ${{ matrix.platform == 'forge' }}
+        timeout-minutes: 5
+        run: ./gradlew downloadAssets || ./gradlew downloadAssets || true
+        env:
+          RUN_GAME_TEST: true
       - name: ${{ matrix.platform }} GameTest
         if: ${{ matrix.platform != 'common' }}
         timeout-minutes: 5

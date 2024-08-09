@@ -6,8 +6,10 @@ import com.kotori316.fluidtank.contents.{GenericUnit, Tank}
 import com.kotori316.fluidtank.fluids.*
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
+import net.minecraft.world.level.block.entity.BlockEntityType
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.{Nested, Test}
+import org.mockito.{ArgumentMatchers, Mockito}
 
 class TileTankTest extends BeforeMC {
   private val tankBlock = new BlockTank(Tier.WOOD) {
@@ -16,11 +18,23 @@ class TileTankTest extends BeforeMC {
   private val creativeTankBlock = new BlockCreativeTank
   private val voidTankBlock = new BlockVoidTank
 
-  def createTile(tier: Tier, pos: BlockPos): TileTank = new TileTank(tier, null, pos, tankBlock.defaultBlockState())
+  def createTile(tier: Tier, pos: BlockPos): TileTank = {
+    val tileType: BlockEntityType[? <: TileTank] = Mockito.mock(classOf[BlockEntityType[? <: TileTank]])
+    Mockito.when(tileType.isValid(ArgumentMatchers.any())).thenReturn(true)
+    new TileTank(tier, tileType, pos, tankBlock.defaultBlockState())
+  }
 
-  def createCreativeTile(pos: BlockPos): TileCreativeTank = new TileCreativeTank(pos, creativeTankBlock.defaultBlockState())
+  def createCreativeTile(pos: BlockPos): TileCreativeTank = {
+    val tileType: BlockEntityType[? <: TileTank] = Mockito.mock(classOf[BlockEntityType[? <: TileTank]])
+    Mockito.when(tileType.isValid(ArgumentMatchers.any())).thenReturn(true)
+    new TileCreativeTank(tileType, pos, creativeTankBlock.defaultBlockState())
+  }
 
-  def createVoidTile(pos: BlockPos): TileVoidTank = new TileVoidTank(pos, voidTankBlock.defaultBlockState())
+  def createVoidTile(pos: BlockPos): TileVoidTank = {
+    val tileType: BlockEntityType[? <: TileTank] = Mockito.mock(classOf[BlockEntityType[? <: TileTank]])
+    Mockito.when(tileType.isValid(ArgumentMatchers.any())).thenReturn(true)
+    new TileVoidTank(tileType, pos, voidTankBlock.defaultBlockState())
+  }
 
   @Test
   def create(): Unit = {

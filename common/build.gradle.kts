@@ -32,4 +32,15 @@ dependencies {
     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
     // Do NOT use other classes from fabric loader
     modLocalRuntime("net.fabricmc:fabric-loader:${project.property("fabric_loader_version")}")
+
+    testImplementation(
+        group = "org.mockito",
+        name = "mockito-core",
+        version = project.property("mockitoCoreVersion").toString()
+    )
+    testImplementation(
+        group = "org.mockito",
+        name = "mockito-inline",
+        version = project.property("mockitoInlineVersion").toString()
+    )
 }

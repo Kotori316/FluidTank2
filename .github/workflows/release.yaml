@@ -19,20 +19,20 @@ jobs:
           cache-read-only: false
           add-job-summary: 'on-failure'
       - name: Check Release Version
-        run: ./gradlew checkReleaseVersion
+        run: ./gradlew checkReleaseVersion --no-daemon
         env:
           RELEASE_DEBUG: false
       - name: Compile
-        run: ./gradlew testClasses
+        run: ./gradlew testClasses --no-daemon
       - name: JUnit
-        run: ./gradlew test
+        run: ./gradlew test --no-daemon
         env:
           RUN_JUNIT: true
       - name: Prepare GameTest
         run: |
-          (./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer) || \
-            (sleep 5 && ./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer) || \
-            (sleep 5 && ./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer) || true
+          (./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer --no-daemon) || \
+            (sleep 5 && ./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer --no-daemon) || \
+            (sleep 5 && ./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer --no-daemon) || true
       - name: GameTest
         run: ./gradlew runGameTest
         env:
@@ -48,8 +48,8 @@ jobs:
     # See https://github.com/Kotori316/common-script/blob/main/.github/workflows/release-prod-gradle.yaml
     uses: 'Kotori316/common-script/.github/workflows/release-prod-gradle.yaml@main'
     with:
-      sign_check_command: 'assemble publishToMavenLocal'
-      release_command: 'assemble publishToMavenLocal githubRelease publishMods registerVersion publish --continue'
+      sign_check_command: 'assemble publishToMavenLocal --no-daemon'
+      release_command: 'assemble publishToMavenLocal githubRelease publishMods registerVersion publish --continue --no-daemon'
       enable_signature_check: true
       java_version: '21'
       use_attestation: true

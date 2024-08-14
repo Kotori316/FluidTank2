@@ -76,7 +76,7 @@ jobs:
       - name: ${{ matrix.platform }} GameTest
         if: ${{ matrix.platform != 'common' }}
         timeout-minutes: 5
-        run: ./gradlew :${{ matrix.platform }}:runGameTest
+        run: ./gradlew :${{ matrix.platform }}:runGameTestServer
         env:
           TEST_UTILITY_LOG_ALL_TEST: true
           RUN_GAME_TEST: true

@@ -38,7 +38,6 @@ runs {
     }
     create("server") {
         workingDirectory = project.file("run-server")
-        runType("server")
     }
     create("gameTestServer") {
         jvmArgument("-ea")
@@ -48,11 +47,17 @@ runs {
             runtime(project.configurations["junit"])
         }
     }
-    create("gameClasses") {
-        runType("client")
-    }
     create("junit") {
         unitTestSources.add("fluidtank_test", sourceSets["test"])
+    }
+}
+
+afterEvaluate {
+    // Hack the NeoGradle setting, as it contains stupid configuration
+    tasks.test {
+        // disable test task as it fails due to accessing Minecraft resources
+        // instead Neo adds another test task named "testJunit" and "build" depends on it
+        enabled = false
     }
 }
 

@@ -64,7 +64,7 @@ jobs:
           gradle-home-cache-cleanup: true
           add-job-summary: 'on-failure'
       - name: ${{ matrix.platform }} JUnit
-        run: ./gradlew :${{ matrix.platform }}:build
+        run: ./gradlew :${{ matrix.platform }}:${{ matrix.platform == 'neoforge' && 'testJunit' || 'test' }}
         env:
           RUN_JUNIT: true
       - name: Prepare Runs

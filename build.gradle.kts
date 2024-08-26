@@ -4,7 +4,7 @@ plugins {
 }
 
 tasks.named("wrapper", Wrapper::class) {
-    gradleVersion = "8.9"
+    gradleVersion = "8.10"
     distributionType = Wrapper.DistributionType.BIN
 }
 

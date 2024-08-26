@@ -30,25 +30,31 @@ runs {
         systemProperty("neoforge.enabledGameTestNamespaces", "fluidtank")
         systemProperty("mixin.debug.export", "true")
         modSources.add("fluidtank", sourceSets["main"])
+        runType("client")
     }
 
     create("client") {
+        isClient = true
         workingDirectory = project.file("run")
         programArguments("--username", "Kotori")
     }
     create("server") {
         workingDirectory = project.file("run-server")
+        runType("server")
     }
     create("gameTestServer") {
+        isGameTest = true
         jvmArgument("-ea")
         workingDirectory = project.file("game-test")
         modSources.add("fluidtank_gametest", sourceSets["gameTest"])
         dependencies {
             runtime(project.configurations["junit"])
         }
+        runType("gameTestServer")
     }
     create("junit") {
         unitTestSources.add("fluidtank_test", sourceSets["test"])
+        runType("junit")
     }
 }
 

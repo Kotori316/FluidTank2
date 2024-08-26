@@ -64,7 +64,7 @@ afterEvaluate {
     }
     tasks.findByName("gameTestClasses")?.let { c ->
         tasks.findByName("runClient")?.dependsOn(c)
-        tasks.findByName("runGameTest")?.dependsOn(c)
+        tasks.findByName("runGameTestServer")?.dependsOn(c)
     }
     tasks.findByName("runGameClasses")?.let { c ->
         tasks.findByName("runClient")?.dependsOn(c)

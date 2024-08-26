@@ -156,9 +156,6 @@ java {
 tasks {
     test {
         useJUnitPlatform()
-        testLogging {
-            events("skipped", "failed")
-        }
     }
 
     withType(JavaCompile::class) {

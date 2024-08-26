@@ -64,7 +64,7 @@ jobs:
           gradle-home-cache-cleanup: true
           add-job-summary: 'on-failure'
       - name: ${{ matrix.platform }} JUnit
-        run: ./gradlew :${{ matrix.platform }}:test
+        run: ./gradlew :${{ matrix.platform }}:build
         env:
           RUN_JUNIT: true
       - name: Prepare Runs

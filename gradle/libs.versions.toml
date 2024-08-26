@@ -8,7 +8,7 @@ plugin_idea_ext = "1.1.8"
 plugin_fabric_loom = "1.7.3"
 plugin_forge_gradle = "[6.0,6.2)"
 plugin_forge_parchment = "1.+"
-plugin_neoforge_gradle = "7.0.154"
+plugin_neoforge_gradle = "7.0.161"
 
 [plugins]
 cf = { id = "com.kotori316.plugin.cf", version.ref = "plugin_cf" }

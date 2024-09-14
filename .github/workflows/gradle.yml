@@ -25,7 +25,6 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: ${{ github.event_name != 'push' }}
-          gradle-home-cache-cleanup: true
           add-job-summary: 'on-failure'
       - run: ./gradlew javaToolchains assemble publishToMavenLocal --scan
       - run: ./gradlew checkChangelog
@@ -61,7 +60,6 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: ${{ github.event_name != 'push' }}
-          gradle-home-cache-cleanup: true
           add-job-summary: 'on-failure'
       - name: ${{ matrix.platform }} JUnit
         run: ./gradlew :${{ matrix.platform }}:${{ matrix.platform == 'neoforge' && 'testJunit' || 'test' }}
@@ -99,7 +97,6 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: ${{ github.event_name != 'push' }}
-          gradle-home-cache-cleanup: true
           add-job-summary: 'on-failure'
       - name: Compile
         run: ./gradlew :fabric:datagenClasses

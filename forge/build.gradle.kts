@@ -4,7 +4,6 @@ plugins {
     id("com.kotori316.subprojects")
     alias(libs.plugins.forge.gradle)
     alias(libs.plugins.forge.parchment)
-    idea
 }
 val minecraftVersion = project.property("minecraft_version").toString()
 
@@ -208,11 +207,4 @@ tasks.named("processRunGameResources", ProcessResources::class) {
     }
     from(project.sourceSets.main.get().resources)
     from(project.sourceSets.named("gameTest").get().resources)
-}
-
-idea {
-    module {
-        isDownloadSources = true
-        isDownloadJavadoc = true
-    }
 }

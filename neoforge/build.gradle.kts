@@ -71,6 +71,14 @@ subsystems {
 repositories {
 }
 
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.ow2.asm" && requested.name.startsWith("asm")) {
+            useVersion("9.7")
+        }
+    }
+}
+
 dependencies {
     implementation("net.neoforged:neoforge:${project.property("neoforge_version")}")
 

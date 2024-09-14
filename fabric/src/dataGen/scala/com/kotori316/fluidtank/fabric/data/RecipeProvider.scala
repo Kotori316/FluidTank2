@@ -4,6 +4,7 @@ import cats.data.Chain
 import cats.implicits.catsSyntaxOptionId
 import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.fabric.FluidTank
+import com.kotori316.fluidtank.fabric.data.RecipeProvider.*
 import com.kotori316.fluidtank.fabric.recipe.{IgnoreUnknownTagIngredientFabric, TierRecipeBuilderFabric}
 import com.kotori316.fluidtank.recipe.TierRecipe
 import com.kotori316.fluidtank.tank.Tier

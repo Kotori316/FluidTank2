@@ -6,7 +6,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.crafting.Ingredient
 
 trait IngredientProvider {
-  def glass: Ingredient
+  def glass: Ingredient = Ingredient.of(glassTag)
 
   def glassTag: TagKey[Item]
 

@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.fabric;
 
 import com.kotori316.fluidtank.PlatformAccess;
+import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
 import com.kotori316.fluidtank.contents.Tank;
@@ -8,6 +9,7 @@ import com.kotori316.fluidtank.fabric.cat.ChestAsTankStorage;
 import com.kotori316.fluidtank.fabric.fluid.FabricConverter;
 import com.kotori316.fluidtank.fluids.*;
 import com.kotori316.fluidtank.potions.PotionFluidHandler;
+import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
 import com.kotori316.fluidtank.tank.TankLootFunction;
 import com.kotori316.fluidtank.tank.Tier;
@@ -37,6 +39,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import org.apache.logging.log4j.util.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -198,6 +201,13 @@ final class FabricPlatformAccess implements PlatformAccess {
     }
 
     @Override
+    public Map<Tier, Supplier<? extends ItemReservoir>> getReservoirMap() {
+        return FluidTank.RESERVOIR_MAP.entrySet().stream()
+            .map(e -> Map.entry(e.getKey(), Lazy.value(e.getValue())))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    @Override
     public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
         return stack.getRecipeRemainder();
     }
@@ -211,6 +221,11 @@ final class FabricPlatformAccess implements PlatformAccess {
     @Override
     public DataComponentType<Tank<FluidLike>> fluidTankComponentType() {
         return FluidTank.FLUID_TANK_DATA_COMPONENT;
+    }
+
+    @Override
+    public Supplier<? extends BlockChestAsTank> getCATBlock() {
+        return Lazy.value(FluidTank.BLOCK_CAT);
     }
 
     @Override

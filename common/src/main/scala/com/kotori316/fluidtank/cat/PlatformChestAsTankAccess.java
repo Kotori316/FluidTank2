@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public interface PlatformChestAsTankAccess {
     @NotNull
@@ -21,6 +22,8 @@ public interface PlatformChestAsTankAccess {
     static void setInstance(@NotNull PlatformChestAsTankAccess access) {
         PlatformChestAsTankAccessHolder.access = access;
     }
+
+    Supplier<? extends BlockChestAsTank> getCATBlock();
 
     @Nullable
     BlockEntity createCATEntity(BlockPos pos, BlockState state);
@@ -34,6 +37,11 @@ class PlatformChestAsTankAccessHolder {
 
     @ApiStatus.Internal
     private static final class Default implements PlatformChestAsTankAccess {
+
+        @Override
+        public Supplier<? extends BlockChestAsTank> getCATBlock() {
+            return null;
+        }
 
         @Override
         public @Nullable BlockEntity createCATEntity(BlockPos pos, BlockState state) {

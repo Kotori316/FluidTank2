@@ -2,18 +2,11 @@ plugins {
     id("com.kotori316.common")
     id("com.kotori316.publish")
     id("com.kotori316.subprojects")
+    id("com.kotori316.dg")
     alias(libs.plugins.fabric.loom)
 }
 
 fabricApi {
-    configureDataGeneration {
-        createSourceSet = true
-        outputDirectory = file("../common/src/generated/resources/")
-        modId = "fluidtank_data"
-        // define custom configuration as default one runs on server and never terminate
-        createRunConfiguration = false
-        addToResources = false
-    }
 }
 
 loom {
@@ -40,17 +33,16 @@ loom {
         }
 
         create("data") {
-            name("Fabric Data")
             client()
-            runDir("build/datagen")
+            configName = "Data"
+            runDir = "build/dataGen"
             property("fabric-api.DataGen".lowercase())
-            property(
-                "fabric-api.DataGen.output-dir".lowercase(),
-                file("../common/src/generated/resources/").absolutePath
-            )
+            property("fabric-api.DataGen.output-dir".lowercase(), "${file("src/generated/resources")}")
+            property("fabric-api.DataGen.strict-validation".lowercase())
             property("fabric-api.DataGen.ModId".lowercase(), "fluidtank_data")
-            property("fabric.debug.logClassLoadErrors", "true")
-            source(sourceSets["DataGen".lowercase()])
+
+            isIdeConfigGenerated = true
+            source(sourceSets["dataGen"])
         }
     }
     knownIndyBsms.add("scala/runtime/LambdaDeserialize")
@@ -116,10 +108,6 @@ dependencies {
     }
 
     testImplementation("net.fabricmc:fabric-loader-junit:${project.property("fabric_loader_version")}")
-}
-
-configurations {
-    getByName("datagenRuntimeClasspath").extendsFrom(getByName("testRuntimeClasspath"))
 }
 
 tasks {

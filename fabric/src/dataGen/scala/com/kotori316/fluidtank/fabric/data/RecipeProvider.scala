@@ -15,7 +15,6 @@ import net.minecraft.advancements.critereon.{InventoryChangeTrigger, ItemPredica
 import net.minecraft.advancements.{Advancement, AdvancementHolder, Criterion}
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
-import net.minecraft.data.PackOutput.Target
 import net.minecraft.data.recipes.{RecipeBuilder, RecipeCategory, RecipeOutput, ShapedRecipeBuilder, ShapelessRecipeBuilder}
 import net.minecraft.data.{CachedOutput, DataProvider}
 import net.minecraft.resources.ResourceLocation
@@ -28,8 +27,6 @@ import scala.jdk.CollectionConverters.{MapHasAsScala, SeqHasAsJava}
 
 private[data] final class RecipeProvider(dataOutput: FabricDataOutput, provider: CompletableFuture[HolderLookup.Provider])
   extends DataProvider {
-
-  import RecipeProvider.*
 
   override def getName: String = s"Recipe of ${FluidTankCommon.modId}"
 

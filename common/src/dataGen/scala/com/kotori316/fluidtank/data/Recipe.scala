@@ -45,7 +45,7 @@ class Recipe(ip: IngredientProvider, output: PackOutput, registries: Completable
         .save(recipeOutput)
     }
 
-    ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, PlatformChestAsTankAccess.getInstance().block().get())
+    ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, PlatformChestAsTankAccess.getInstance().getCATBlock().get())
       .define('p', Ingredient.of(Items.CHEST, Items.BARREL))
       .define('x', woodTankBlock)
       .pattern("x x")

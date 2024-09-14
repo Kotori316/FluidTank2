@@ -18,9 +18,11 @@ sourceSets {
         project.configurations {
             named(s.compileClasspathConfigurationName) {
                 extendsFrom(project.configurations.compileClasspath.get())
+                extendsFrom(project.configurations.testCompileClasspath.get())
             }
             named(s.runtimeClasspathConfigurationName) {
                 extendsFrom(project.configurations.runtimeClasspath.get())
+                extendsFrom(project.configurations.testRuntimeClasspath.get())
             }
         }
     }

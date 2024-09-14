@@ -201,7 +201,7 @@ final class FabricPlatformAccess implements PlatformAccess {
     }
 
     @Override
-    public Map<Tier, Supplier<? extends ItemReservoir>> getReservoirMap() {
+    public Map<Tier, ? extends Supplier<? extends ItemReservoir>> getReservoirMap() {
         return FluidTank.RESERVOIR_MAP.entrySet().stream()
             .map(e -> Map.entry(e.getKey(), Lazy.value(e.getValue())))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

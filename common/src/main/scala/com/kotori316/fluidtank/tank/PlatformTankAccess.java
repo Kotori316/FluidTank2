@@ -34,7 +34,7 @@ public interface PlatformTankAccess {
 
     Map<Tier, Supplier<? extends BlockTank>> getTankBlockMap();
 
-    Map<Tier, Supplier<? extends ItemReservoir>> getReservoirMap();
+    Map<Tier, ? extends Supplier<? extends ItemReservoir>> getReservoirMap();
 }
 
 class PlatformTankAccessHolder {
@@ -70,7 +70,7 @@ class PlatformTankAccessHolder {
         }
 
         @Override
-        public Map<Tier, Supplier<? extends ItemReservoir>> getReservoirMap() {
+        public Map<Tier, ? extends Supplier<? extends ItemReservoir>> getReservoirMap() {
             return Map.of();
         }
     }

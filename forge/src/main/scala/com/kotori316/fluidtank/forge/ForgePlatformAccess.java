@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.forge;
 
 import com.kotori316.fluidtank.PlatformAccess;
+import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
 import com.kotori316.fluidtank.contents.Tank;
@@ -11,6 +12,7 @@ import com.kotori316.fluidtank.fluids.VanillaPotion;
 import com.kotori316.fluidtank.forge.cat.EntityChestAsTank;
 import com.kotori316.fluidtank.forge.fluid.ForgeConverter;
 import com.kotori316.fluidtank.potions.PotionFluidHandler;
+import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
 import com.kotori316.fluidtank.tank.TankLootFunction;
 import com.kotori316.fluidtank.tank.Tier;
@@ -183,6 +185,11 @@ final class ForgePlatformAccess implements PlatformAccess {
     }
 
     @Override
+    public Map<Tier, ? extends Supplier<? extends ItemReservoir>> getReservoirMap() {
+        return FluidTank.RESERVOIR_MAP;
+    }
+
+    @Override
     public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
         return stack.getCraftingRemainingItem();
     }
@@ -196,6 +203,11 @@ final class ForgePlatformAccess implements PlatformAccess {
     @Override
     public DataComponentType<Tank<FluidLike>> fluidTankComponentType() {
         return FluidTank.FLUID_TANK_DATA_COMPONENT.get();
+    }
+
+    @Override
+    public Supplier<? extends BlockChestAsTank> getCATBlock() {
+        return FluidTank.BLOCK_CAT;
     }
 
     @Override

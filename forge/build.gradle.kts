@@ -170,9 +170,6 @@ dependencies {
         version = project.property("mockitoInlineVersion").toString()
     )
 
-    implementation("com.kotori316:test-utility-forge:${project.property("test_util_version")}") {
-        isTransitive = false
-    }
     implementation("com.kotori316:debug-utility-forge:${project.property("debug_util_version")}") {
         isTransitive = false
     }

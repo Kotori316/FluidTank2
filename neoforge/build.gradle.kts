@@ -116,10 +116,9 @@ dependencies {
         name = "mockito-inline",
         version = project.property("mockitoInlineVersion").toString()
     )
-    implementation("com.kotori316:test-utility-neoforge:${project.property("test_util_version")}") {
+    implementation("com.kotori316:debug-utility-neoforge:${project.property("debug_util_version")}") {
         exclude(group = "org.mockito")
     }
-    implementation("com.kotori316:debug-utility-neoforge:${project.property("debug_util_version")}")
 
     "gameTestImplementation"(sourceSets.main.get().output)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

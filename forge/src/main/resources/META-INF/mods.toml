@@ -1,5 +1,5 @@
-modLoader = "javafml"
-loaderVersion = "[48,)"
+modLoader = "kotori_scala"
+loaderVersion = "[3.5.0-build-0, ),[48,)"
 issueTrackerURL = "https://github.com/Kotori316/FluidTank2/issues"
 license = "All rights reserved"
 

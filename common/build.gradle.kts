@@ -1,5 +1,6 @@
 plugins {
     id("com.kotori316.common")
+    id("com.kotori316.dg")
     alias(libs.plugins.fabric.loom)
 }
 

@@ -78,6 +78,9 @@ jobs:
         env:
           TEST_UTILITY_LOG_ALL_TEST: true
           RUN_GAME_TEST: true
+      - name: Check report
+        run: |
+          ! test -d "${{ matrix.platform }}/game-test/crash-reports"
 
   fabric-data-gen:
     runs-on: ubuntu-latest

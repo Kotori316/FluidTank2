@@ -11,6 +11,13 @@
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_ingredient": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:ingots/tin"
+          }
+        ]
+      },
       "trigger": "minecraft:inventory_changed"
     },
     "has_tank": {

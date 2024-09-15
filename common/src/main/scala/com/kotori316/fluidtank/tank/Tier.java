@@ -60,7 +60,7 @@ public enum Tier {
     }
 
     public boolean isNormalTankTier() {
-        return getRank() != 0 && getRank() != 10;
+        return getRank() != 0 && this != CREATIVE;
     }
 
     @Override

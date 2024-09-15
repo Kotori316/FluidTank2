@@ -1,7 +1,9 @@
 package com.kotori316.fluidtank.data
 
 import com.kotori316.fluidtank.cat.PlatformChestAsTankAccess
+import com.kotori316.fluidtank.recipe.{TierRecipe, TierRecipeBuilder}
 import com.kotori316.fluidtank.tank.{PlatformTankAccess, Tier}
+import net.minecraft.advancements.critereon.InventoryChangeTrigger
 import net.minecraft.core.HolderLookup
 import net.minecraft.data.PackOutput
 import net.minecraft.data.recipes.{RecipeCategory, RecipeOutput, RecipeProvider, ShapedRecipeBuilder, ShapelessRecipeBuilder}
@@ -34,6 +36,21 @@ class Recipe(ip: IngredientProvider, output: PackOutput, registries: Completable
       .pattern("ooo")
       .unlockedBy(woodTankBlock)
       .save(recipeOutput)
+
+    for {
+      t <- Tier.values().toSeq
+      if t.isNormalTankTier
+      if t != Tier.WOOD
+    } {
+      val tankItem = TierRecipe.Serializer.getIngredientTankForTier(t)
+      val itemArr = tankItem.getItems.map(_.getItem())
+      val subItem = ip.subItemOfTank(t)
+      val subItemArray = subItem.ingredient.getItems.map(_.getItem)
+      TierRecipeBuilder(t, tankItem, subItem.ingredient)
+        .unlockedBy("has_tank", InventoryChangeTrigger.TriggerInstance.hasItems(itemArr *))
+        .unlockedBy("has_ingredient", InventoryChangeTrigger.TriggerInstance.hasItems(subItemArray *))
+        .save(subItem.conditionedOutput(ip, recipeOutput))
+    }
 
     PlatformTankAccess.getInstance().getReservoirMap.forEach { (tier, reservoir) =>
       val tank = PlatformTankAccess.getInstance().getTankBlockMap.get(tier)

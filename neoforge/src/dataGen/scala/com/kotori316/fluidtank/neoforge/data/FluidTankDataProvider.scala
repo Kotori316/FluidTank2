@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.neoforge.data
 
 import com.kotori316.fluidtank.FluidTankCommon
+import com.kotori316.fluidtank.config.{ConfigData, PlatformConfigAccess}
 import com.kotori316.fluidtank.data.Recipe
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.{EventBusSubscriber, Mod}
@@ -12,6 +13,7 @@ object FluidTankDataProvider {
   @static
   @SubscribeEvent
   def onEvent(event: GatherDataEvent): Unit = {
+    PlatformConfigAccess.setInstance(() => ConfigData.FOR_TEST)
     FluidTankCommon.LOGGER.info("Start NeoForge data generation")
     val ingredientProvider = IngredientProviderNeoForge()
     event.getGenerator.addProvider(event.includeServer, new Recipe(ingredientProvider, event.getGenerator.getPackOutput, event.getLookupProvider))

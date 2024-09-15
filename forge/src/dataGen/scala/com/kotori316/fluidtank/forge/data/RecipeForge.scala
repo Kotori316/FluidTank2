@@ -12,7 +12,7 @@ import scala.jdk.javaapi.CollectionConverters
 
 class RecipeForge(output: PackOutput, registries: CompletableFuture[HolderLookup.Provider]) extends DataProvider {
   val ip = new IngredientProviderForge
-  private final val internal = Recipe(ip, output, registries)
+  private final val internal = com.kotori316.fluidtank.data.Recipe(ip, output, registries)
 
   override def run(pOutput: CachedOutput): CompletableFuture[?] = {
     val recipePathProvider = output.createRegistryElementsPathProvider(Registries.RECIPE)

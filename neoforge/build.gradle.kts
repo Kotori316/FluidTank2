@@ -50,20 +50,22 @@ runs {
             runtime(project.configurations["junit"])
         }
     }
-    /*create("data") {
-        client()
-        workingDirectory = project.file("runs/data")
-        arguments(
-            "--mod",
-            "${modId}_data",
-            "--all",
-            "--output",
-            file("src/generated/resources/").toString(),
-            "--existing",
-            file("src/main/resources/").toString()
-        )
-        modSources.add("${modId}_data", sourceSets["dataGen"])
-    }*/
+    if (System.getenv("RUN_DATA_GEN").toBoolean()) {
+        create("data") {
+            client()
+            workingDirectory = project.file("runs/data")
+            arguments(
+                "--mod",
+                "${modId}_data",
+                "--all",
+                "--output",
+                file("src/generated/resources/").toString(),
+                "--existing",
+                file("src/main/resources/").toString()
+            )
+            modSources.add("${modId}_data", sourceSets["dataGen"])
+        }
+    }
     create("junit") {
         unitTestSources.add("${modId}_test", sourceSets["test"])
     }

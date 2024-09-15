@@ -40,5 +40,3 @@ if (!System.getenv("DISABLE_FORGE").toBoolean()) {
 if (!System.getenv("DISABLE_NEOFORGE").toBoolean()) {
     include("neoforge")
 }
-
-rootProject.name = "FluidTank-1.21"

@@ -22,7 +22,7 @@ case class GenericAmount[ContentType](content: ContentType, amount: GenericUnit,
 
   final def getTag: CompoundTag = access.write(this)
 
-  @targetName("addOperator")
+  @targetName("operatorAdd")
   final def +(that: GenericAmount[ContentType]): GenericAmount[ContentType] = {
     val added = this.amount |+| that.amount
     if (this.isEmpty) that.setAmount(added)
@@ -31,7 +31,7 @@ case class GenericAmount[ContentType](content: ContentType, amount: GenericUnit,
 
   final def add(that: GenericAmount[ContentType]): GenericAmount[ContentType] = this + that
 
-  @targetName("minusOperator")
+  @targetName("operatorMinus")
   final def -(that: GenericAmount[ContentType]): GenericAmount[ContentType] = {
     val subtracted = this.amount |-| that.amount
     if (this.isEmpty) that.setAmount(subtracted)

@@ -1,6 +1,8 @@
 package com.kotori316.fluidtank.data
 
 import com.kotori316.fluidtank.tank.Tier
+import net.minecraft.advancements.Criterion
+import net.minecraft.advancements.critereon.{InventoryChangeTrigger, ItemPredicate}
 import net.minecraft.data.recipes.RecipeOutput
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
@@ -24,6 +26,13 @@ case class TankSubitem(subItem: ItemLike | TagKey[Item]) {
     subItem match {
       case i: ItemLike => Ingredient.of(i)
       case tag: TagKey[Item] => Ingredient.of(tag)
+    }
+  }
+
+  def subItemTrigger: Criterion[InventoryChangeTrigger.TriggerInstance] = {
+    subItem match {
+      case i: ItemLike => InventoryChangeTrigger.TriggerInstance.hasItems(i)
+      case tag: TagKey[Item] => InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(tag))
     }
   }
 

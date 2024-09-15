@@ -45,10 +45,9 @@ class Recipe(ip: IngredientProvider, output: PackOutput, registries: Completable
       val tankItem = TierRecipe.Serializer.getIngredientTankForTier(t)
       val itemArr = tankItem.getItems.map(_.getItem())
       val subItem = ip.subItemOfTank(t)
-      val subItemArray = subItem.ingredient.getItems.map(_.getItem)
       TierRecipeBuilder(t, tankItem, subItem.ingredient)
         .unlockedBy("has_tank", InventoryChangeTrigger.TriggerInstance.hasItems(itemArr *))
-        .unlockedBy("has_ingredient", InventoryChangeTrigger.TriggerInstance.hasItems(subItemArray *))
+        .unlockedBy("has_ingredient", subItem.subItemTrigger)
         .save(subItem.conditionedOutput(ip, recipeOutput))
     }
 
@@ -62,7 +61,7 @@ class Recipe(ip: IngredientProvider, output: PackOutput, registries: Completable
         .save(recipeOutput)
     }
 
-    ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, PlatformChestAsTankAccess.getInstance().getCATBlock().get())
+    ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, PlatformChestAsTankAccess.getInstance().getCATBlock.get())
       .define('p', Ingredient.of(Items.CHEST, Items.BARREL))
       .define('x', woodTankBlock)
       .pattern("x x")

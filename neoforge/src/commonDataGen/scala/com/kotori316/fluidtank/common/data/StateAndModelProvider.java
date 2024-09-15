@@ -22,6 +22,11 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 final class StateAndModelProvider extends BlockStateProvider {
+
+    static final String ITEM_TANK_BASE = "item/tanks";
+    static final String ITEM_GAS_TANK_BASE = "item/gas_item_tank";
+    static final String ITEM_RESERVOIR_BASE = "item/reservoirs";
+
     StateAndModelProvider(DataGenerator gen, ExistingFileHelper exFileHelper) {
         super(gen.getPackOutput(), FluidTankCommon.modId, exFileHelper);
     }
@@ -82,7 +87,7 @@ final class StateAndModelProvider extends BlockStateProvider {
                     faceBuilder.texture("#side").uvs(0.0f, 0.0f, 12.0f, 16.0f);
                 }
             });
-        itemModels().getBuilder("item/item_tank")
+        itemModels().getBuilder(ITEM_TANK_BASE)
             .parent(new ModelFile.UncheckedModelFile("builtin/entity"))
             .guiLight(BlockModel.GuiLight.SIDE)
             .transforms()
@@ -94,9 +99,9 @@ final class StateAndModelProvider extends BlockStateProvider {
             .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND).scale(0.4f).translation(0, 0, 0).rotation(0, 225, 0).end()
             .end()
             .ao(false)
-            .texture("particle", "#1")
-            .texture("side", "#1")
-            .texture("top", "#2")
+            .texture("particle", "#side")
+            .texture("side", "#side")
+            .texture("top", "#top")
             .element()
             .from(2.0f, 0.0f, 2.0f).to(14.0f, 16.0f, 14.0f)
             .allFaces((direction, faceBuilder) -> {
@@ -106,11 +111,11 @@ final class StateAndModelProvider extends BlockStateProvider {
                     faceBuilder.texture("#side").uvs(0.0f, 0.0f, 12.0f, 16.0f);
                 }
             });
-        itemModels().withExistingParent("item/gas_item_tank", mcLoc("block/block"))
+        itemModels().withExistingParent(ITEM_GAS_TANK_BASE, mcLoc("block/block"))
             .ao(false)
-            .texture("particle", "#1")
-            .texture("side", "#1")
-            .texture("top", "#2")
+            .texture("particle", "#side")
+            .texture("side", "#side")
+            .texture("top", "#top")
             .element()
             .from(2.0f, 0.0f, 2.0f).to(14.0f, 16.0f, 14.0f)
             .allFaces((direction, faceBuilder) -> {
@@ -133,9 +138,9 @@ final class StateAndModelProvider extends BlockStateProvider {
                     .renderType("cutout")
                 )
             });
-        itemModels().withExistingParent(tier.getBlockName(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/item_tank"))
-            .texture("1", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
-            .texture("2", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"));
+        itemModels().withExistingParent(tier.getBlockName(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, ITEM_TANK_BASE))
+            .texture("side", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
+            .texture("top", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"));
     }
 
     /*void gasTank(BlockGasTank blockGasTank) {
@@ -149,7 +154,7 @@ final class StateAndModelProvider extends BlockStateProvider {
                     .renderType("cutout")
                 )
             });
-        itemModels().withExistingParent(blockGasTank.registryName().getPath(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/gas_item_tank"))
+        itemModels().withExistingParent(blockGasTank.registryName().getPath(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, ITEM_GAS_TANK_BASE))
             .texture("1", blockTexture("gas_%s1".formatted(tier.name().toLowerCase(Locale.ROOT))))
             .texture("2", blockTexture("gas_%s2".formatted(tier.name().toLowerCase(Locale.ROOT))));
     }*/
@@ -252,7 +257,7 @@ final class StateAndModelProvider extends BlockStateProvider {
     }*/
 
     void reservoirBase() {
-        itemModels().getBuilder("item/item_reservoir")
+        itemModels().getBuilder(ITEM_RESERVOIR_BASE)
             .parent(new ModelFile.UncheckedModelFile("builtin/entity"))
             .guiLight(BlockModel.GuiLight.FRONT)
             .transforms()
@@ -268,6 +273,6 @@ final class StateAndModelProvider extends BlockStateProvider {
 
     void reservoir(ItemReservoir reservoirItem) {
         var key = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(reservoirItem));
-        itemModels().withExistingParent(key.getPath(), modLoc("item/item_reservoir"));
+        itemModels().withExistingParent(key.getPath(), modLoc(ITEM_RESERVOIR_BASE));
     }
 }

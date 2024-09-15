@@ -71,7 +71,8 @@ jobs:
         run: ./gradlew downloadAssets || ./gradlew downloadAssets || true
         env:
           RUN_GAME_TEST: true
-      - name: DataGen
+      - name: ${{ matrix.platform }} DataGen
+        if: ${{ matrix.platform != 'common' }}
         run: ./gradlew :${{ matrix.platform }}:runData
         timeout-minutes: 5
         env:

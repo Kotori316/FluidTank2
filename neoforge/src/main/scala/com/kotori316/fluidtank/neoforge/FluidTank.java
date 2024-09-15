@@ -15,9 +15,9 @@ import com.kotori316.fluidtank.neoforge.integration.ae2.AE2FluidTankIntegration;
 import com.kotori316.fluidtank.neoforge.integration.top.FluidTankTopPlugin;
 import com.kotori316.fluidtank.neoforge.message.PacketHandler;
 import com.kotori316.fluidtank.neoforge.recipe.IgnoreUnknownTagIngredient;
-import com.kotori316.fluidtank.neoforge.recipe.TierRecipeNeoForge;
 import com.kotori316.fluidtank.neoforge.reservoir.ItemReservoirNeoForge;
 import com.kotori316.fluidtank.neoforge.tank.*;
+import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.*;
 import com.mojang.datafixers.DSL;
 import net.minecraft.core.component.DataComponentType;
@@ -113,7 +113,7 @@ public final class FluidTank {
         BLOCK_ENTITY_REGISTER.register(TileVoidTank.class.getSimpleName().toLowerCase(Locale.ROOT), () ->
             BlockEntityType.Builder.of(TileVoidTankNeoForge::new, BLOCK_VOID_TANK.get()).build(DSL.emptyPartType()));
     public static final DeferredHolder<LootItemFunctionType<?>, LootItemFunctionType<TankLootFunction>> TANK_LOOT_FUNCTION = LOOT_TYPE_REGISTER.register(TankLootFunction.NAME, () -> new LootItemFunctionType<>(TankLootFunction.CODEC));
-    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<?>> TIER_RECIPE = RECIPE_REGISTER.register(TierRecipeNeoForge.Serializer.LOCATION.getPath(), () -> TierRecipeNeoForge.SERIALIZER);
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<?>> TIER_RECIPE = RECIPE_REGISTER.register(TierRecipe.Serializer.LOCATION.getPath(), () -> TierRecipe.SERIALIZER);
     public static final DeferredHolder<IngredientType<?>, IngredientType<IgnoreUnknownTagIngredient>> IU_INGREDIENT = INGREDIENT_REGISTER.register(IgnoreUnknownTagIngredient.NAME, () -> IgnoreUnknownTagIngredient.SERIALIZER);
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_TAB_REGISTER.register("tab", () -> {
         var b = CreativeModeTab.builder();

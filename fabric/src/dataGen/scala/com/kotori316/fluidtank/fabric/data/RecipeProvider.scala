@@ -5,8 +5,8 @@ import cats.implicits.catsSyntaxOptionId
 import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.fabric.FluidTank
 import com.kotori316.fluidtank.fabric.data.RecipeProvider.*
-import com.kotori316.fluidtank.fabric.recipe.{IgnoreUnknownTagIngredientFabric, TierRecipeBuilderFabric}
-import com.kotori316.fluidtank.recipe.TierRecipe
+import com.kotori316.fluidtank.fabric.recipe.IgnoreUnknownTagIngredientFabric
+import com.kotori316.fluidtank.recipe.{TierRecipe, TierRecipeBuilder}
 import com.kotori316.fluidtank.tank.Tier
 import com.mojang.serialization.JsonOps
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -96,17 +96,17 @@ private[data] final class RecipeProvider(dataOutput: FabricDataOutput, provider:
     )
     val normalTanks = Tier.values().filter(_.isNormalTankTier).filterNot(_ == Tier.WOOD)
       .map { t =>
-        val tankItem = TierRecipe.SerializerBase.getIngredientTankForTier(t)
+        val tankItem = TierRecipe.Serializer.getIngredientTankForTier(t)
         val itemArr = tankItem.getItems.map(_.getItem())
         val location = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, t.getBlockName)
         getSubItem(t) match {
           case a: Ingredient =>
-            val builder = new TierRecipeBuilderFabric(t, tankItem, a)
+            val builder = new TierRecipeBuilder(t, tankItem, a)
               .unlockedBy("has_tank", InventoryChangeTrigger.TriggerInstance.hasItems(itemArr *))
               .unlockedBy("has_ingredient", InventoryChangeTrigger.TriggerInstance.hasItems(a.getItems.map(_.getItem) *))
             RecipeWithCondition(builder, Chain.empty)
           case tuple: TagThings =>
-            val builder = new TierRecipeBuilderFabric(t, tankItem, tuple.ingredient)
+            val builder = new TierRecipeBuilder(t, tankItem, tuple.ingredient)
               .unlockedBy("has_tank", InventoryChangeTrigger.TriggerInstance.hasItems(itemArr *))
               .unlockedBy("has_ingredient", tuple.criterion)
             RecipeWithCondition(builder, Chain.one(tuple.condition))

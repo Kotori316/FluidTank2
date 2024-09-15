@@ -7,7 +7,7 @@ import com.kotori316.fluidtank.contents.GenericUnit;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.forge.FluidTank;
-import com.kotori316.fluidtank.forge.recipe.TierRecipeForge;
+import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.testutil.GameTestUtil;
 import com.mojang.serialization.JsonOps;
@@ -60,14 +60,14 @@ final class RecipeTest {
     }
 
     @NotNull
-    private static TierRecipeForge getRecipe() {
-        return new TierRecipeForge(Tier.STONE,
+    private static TierRecipe getRecipe() {
+        return new TierRecipe(Tier.STONE,
             Ingredient.of(FluidTank.TANK_MAP.get(Tier.WOOD).get()), Ingredient.of(Tags.Items.STONE)
         );
     }
 
     void createInstance() {
-        TierRecipeForge recipe = getRecipe();
+        TierRecipe recipe = getRecipe();
         assertNotNull(recipe);
     }
 
@@ -184,12 +184,12 @@ final class RecipeTest {
     void serializeJson(Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
         var id = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_" + tier.name().toLowerCase(Locale.ROOT));
-        var recipe = new TierRecipeForge(
-            tier, TierRecipeForge.Serializer.getIngredientTankForTier(tier), subItem);
+        var recipe = new TierRecipe(
+            tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
 
-        var fromSerializer = ((TierRecipeForge.Serializer) TierRecipeForge.SERIALIZER).toJson(recipe);
+        var fromSerializer = ((TierRecipe.Serializer) TierRecipe.SERIALIZER).toJson(recipe);
 
-        var deserialized = ((TierRecipeForge.Serializer) TierRecipeForge.SERIALIZER).fromJson(fromSerializer);
+        var deserialized = ((TierRecipe.Serializer) TierRecipe.SERIALIZER).fromJson(fromSerializer);
         assertNotNull(deserialized);
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), deserialized.getResultItem(RegistryAccess.EMPTY)))
@@ -198,10 +198,10 @@ final class RecipeTest {
 
     void serializePacket(GameTestHelper helper, Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
-        var recipe = new TierRecipeForge(tier, TierRecipeForge.Serializer.getIngredientTankForTier(tier), subItem);
+        var recipe = new TierRecipe(tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
 
         var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), helper.getLevel().registryAccess());
-        var codec = TierRecipeForge.SERIALIZER.streamCodec();
+        var codec = TierRecipe.SERIALIZER.streamCodec();
         codec.encode(buffer, recipe);
         var deserialized = codec.decode(buffer);
         assertNotNull(deserialized);
@@ -221,10 +221,10 @@ final class RecipeTest {
                 "item": "minecraft:diamond"
               }
             }
-            """.formatted(TierRecipeForge.Serializer.LOCATION.toString());
+            """.formatted(TierRecipe.Serializer.LOCATION.toString());
         var read = managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess());
-        var recipe = new TierRecipeForge(
-            Tier.STONE, TierRecipeForge.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
+        var recipe = new TierRecipe(
+            Tier.STONE, TierRecipe.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), read.getResultItem(RegistryAccess.EMPTY)))

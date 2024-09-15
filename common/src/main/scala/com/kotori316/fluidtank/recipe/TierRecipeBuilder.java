@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank.fabric.recipe;
+package com.kotori316.fluidtank.recipe;
 
 import com.kotori316.fluidtank.tank.Tier;
 import net.minecraft.advancements.Advancement;
@@ -18,23 +18,23 @@ import org.jetbrains.annotations.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public final class TierRecipeBuilderFabric implements RecipeBuilder {
+public final class TierRecipeBuilder implements RecipeBuilder {
     private final RecipeCategory category = RecipeCategory.DECORATIONS;
     private final Map<String, Criterion<?>> criteria = new LinkedHashMap<>();
-    private final TierRecipeFabric recipe;
+    private final TierRecipe recipe;
 
-    public TierRecipeBuilderFabric(Tier tier, Ingredient tankItem, Ingredient subItem) {
-        this.recipe = new TierRecipeFabric(tier, tankItem, subItem);
+    public TierRecipeBuilder(Tier tier, Ingredient tankItem, Ingredient subItem) {
+        this.recipe = new TierRecipe(tier, tankItem, subItem);
     }
 
     @Override
-    public TierRecipeBuilderFabric unlockedBy(String name, Criterion<?> criterion) {
+    public TierRecipeBuilder unlockedBy(String name, Criterion<?> criterion) {
         criteria.put(name, criterion);
         return this;
     }
 
     @Override
-    public TierRecipeBuilderFabric group(@Nullable String groupName) {
+    public TierRecipeBuilder group(@Nullable String groupName) {
         return this;
     }
 

@@ -12,7 +12,6 @@ import com.kotori316.fluidtank.fabric.config.FabricPlatformConfigAccess;
 import com.kotori316.fluidtank.fabric.integration.ae2.AE2FluidTankIntegration;
 import com.kotori316.fluidtank.fabric.message.PacketHandler;
 import com.kotori316.fluidtank.fabric.recipe.IgnoreUnknownTagIngredientFabric;
-import com.kotori316.fluidtank.fabric.recipe.TierRecipeFabric;
 import com.kotori316.fluidtank.fabric.reservoir.ReservoirFluidStorage;
 import com.kotori316.fluidtank.fabric.tank.*;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
@@ -77,7 +76,7 @@ public final class FluidTank implements ModInitializer {
     public static final BlockEntityType<TileVoidTank> TILE_VOID_TANK_TYPE =
         BlockEntityType.Builder.of(TileVoidTank::new, BLOCK_VOID_TANK).build(DSL.emptyPartType());
     public static final LootItemFunctionType<TankLootFunction> TANK_LOOT_FUNCTION = new LootItemFunctionType<>(TankLootFunction.CODEC);
-    public static final RecipeSerializer<TierRecipe> TIER_RECIPE_SERIALIZER = TierRecipeFabric.SERIALIZER;
+    public static final RecipeSerializer<TierRecipe> TIER_RECIPE_SERIALIZER = TierRecipe.SERIALIZER;
     public static final BlockChestAsTank BLOCK_CAT = new BlockChestAsTank();
     public static final BlockItem ITEM_CAT = new ItemChestAsTank(BLOCK_CAT);
     public static final Map<Tier, ItemReservoir> RESERVOIR_MAP = Stream.of(Tier.WOOD, Tier.STONE, Tier.IRON)
@@ -93,7 +92,7 @@ public final class FluidTank implements ModInitializer {
         Map.of(TileTank.class, TILE_TANK_TYPE, TileCreativeTank.class, TILE_CREATIVE_TANK_TYPE, TileVoidTank.class, TILE_VOID_TANK_TYPE)
             .forEach((c, t) -> Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, c.getSimpleName().toLowerCase(Locale.ROOT)), t));
         Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, TankLootFunction.NAME), TANK_LOOT_FUNCTION);
-        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, TierRecipe.SerializerBase.LOCATION, TIER_RECIPE_SERIALIZER);
+        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, TierRecipe.Serializer.LOCATION, TIER_RECIPE_SERIALIZER);
         Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME()), BLOCK_CAT);
         Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME()), ITEM_CAT);
         RESERVOIR_MAP.values().forEach(e -> Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir_" + e.tier().name().toLowerCase(Locale.ROOT)), e));

@@ -43,8 +43,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public abstract class TierRecipe implements CraftingRecipe {
+public final class TierRecipe implements CraftingRecipe {
     private static final Logger LOGGER = LoggerFactory.getLogger(TierRecipe.class);
+    public static final Serializer SERIALIZER = new Serializer();
 
     private final Tier tier;
     private final Ingredient tankItem;
@@ -53,7 +54,7 @@ public abstract class TierRecipe implements CraftingRecipe {
     private static final int recipeWidth = 3;
     private static final int recipeHeight = 3;
 
-    protected TierRecipe(Tier tier, Ingredient tankItem, Ingredient subItem) {
+    public TierRecipe(Tier tier, Ingredient tankItem, Ingredient subItem) {
         this.tier = tier;
         this.tankItem = tankItem;
         this.subItem = subItem;
@@ -181,6 +182,11 @@ public abstract class TierRecipe implements CraftingRecipe {
         return ingredients;
     }
 
+    @Override
+    public RecipeSerializer<?> getSerializer() {
+        return SERIALIZER;
+    }
+
     @NotNull
     @Override
     public NonNullList<ItemStack> getRemainingItems(CraftingInput inv) {
@@ -210,22 +216,24 @@ public abstract class TierRecipe implements CraftingRecipe {
     public static final String KEY_TIER = "tier";
     public static final String KEY_SUB_ITEM = "sub_item";
 
-    public static abstract class SerializerBase implements RecipeSerializer<TierRecipe> {
+    public static final class Serializer implements RecipeSerializer<TierRecipe> {
         public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "crafting_grade_up");
         private final MapCodec<TierRecipe> codec;
         private final StreamCodec<RegistryFriendlyByteBuf, TierRecipe> streamCodec;
 
-        public SerializerBase(Codec<Ingredient> ingredientCodec) {
+        public Serializer() {
             this.codec = RecordCodecBuilder.mapCodec(instance ->
                 instance.group(
                     Codec.STRING.xmap(Tier::valueOfIgnoreCase, Tier::name).fieldOf(KEY_TIER).forGetter(TierRecipe::getTier),
-                    ingredientCodec.fieldOf(KEY_SUB_ITEM).forGetter(TierRecipe::getSubItem)
+                    Ingredient.CODEC_NONEMPTY.fieldOf(KEY_SUB_ITEM).forGetter(TierRecipe::getSubItem)
                 ).apply(instance, this::createInstanceInternal)
             );
             this.streamCodec = StreamCodec.ofMember(this::toNetwork, this::fromNetwork);
         }
 
-        protected abstract TierRecipe createInstance(Tier tier, Ingredient tankItem, Ingredient subItem);
+        private TierRecipe createInstance(Tier tier, Ingredient tankItem, Ingredient subItem) {
+            return new TierRecipe(tier, tankItem, subItem);
+        }
 
         private TierRecipe createInstanceInternal(Tier tier, Ingredient subItem) {
             return this.createInstance(tier, getIngredientTankForTier(tier), subItem);

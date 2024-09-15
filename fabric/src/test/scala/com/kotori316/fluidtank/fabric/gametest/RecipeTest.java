@@ -7,9 +7,9 @@ import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
 import com.kotori316.fluidtank.fabric.FluidTank;
 import com.kotori316.fluidtank.fabric.recipe.RecipeInventoryUtil;
-import com.kotori316.fluidtank.fabric.recipe.TierRecipeFabric;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
+import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.Tier;
 import io.netty.buffer.ByteBufAllocator;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -73,14 +73,14 @@ public final class RecipeTest implements FabricGameTest {
     }
 
     @NotNull
-    private static TierRecipeFabric getRecipe() {
-        return new TierRecipeFabric(Tier.STONE,
+    private static TierRecipe getRecipe() {
+        return new TierRecipe(Tier.STONE,
             Ingredient.of(FluidTank.TANK_MAP.get(Tier.WOOD)), Ingredient.of(Items.STONE)
         );
     }
 
     void createInstance() {
-        TierRecipeFabric recipe = getRecipe();
+        TierRecipe recipe = getRecipe();
         assertNotNull(recipe);
     }
 
@@ -196,12 +196,12 @@ public final class RecipeTest implements FabricGameTest {
 
     void serializeJson(Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
-        var recipe = new TierRecipeFabric(
-            tier, TierRecipeFabric.Serializer.getIngredientTankForTier(tier), subItem);
+        var recipe = new TierRecipe(
+            tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
 
-        var fromSerializer = TierRecipeFabric.SERIALIZER.toJson(recipe);
+        var fromSerializer = TierRecipe.SERIALIZER.toJson(recipe);
 
-        var deserialized = TierRecipeFabric.SERIALIZER.fromJson(fromSerializer);
+        var deserialized = TierRecipe.SERIALIZER.fromJson(fromSerializer);
         assertNotNull(deserialized);
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), deserialized.getResultItem(RegistryAccess.EMPTY)))
@@ -210,12 +210,12 @@ public final class RecipeTest implements FabricGameTest {
 
     void serializePacket(GameTestHelper helper, Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
-        var recipe = new TierRecipeFabric(
-            tier, TierRecipeFabric.Serializer.getIngredientTankForTier(tier), subItem);
+        var recipe = new TierRecipe(
+            tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
 
         var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), helper.getLevel().registryAccess());
-        TierRecipeFabric.SERIALIZER.toNetwork(recipe, buffer);
-        var deserialized = TierRecipeFabric.SERIALIZER.fromNetwork(buffer);
+        TierRecipe.SERIALIZER.toNetwork(recipe, buffer);
+        var deserialized = TierRecipe.SERIALIZER.fromNetwork(buffer);
         assertNotNull(deserialized);
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResultItem(helper.getLevel().registryAccess()), deserialized.getResultItem(helper.getLevel().registryAccess())))
@@ -233,10 +233,10 @@ public final class RecipeTest implements FabricGameTest {
                 "item": "minecraft:diamond"
               }
             }
-            """.formatted(TierRecipeFabric.Serializer.LOCATION.toString());
+            """.formatted(TierRecipe.Serializer.LOCATION.toString());
         var read = managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess());
-        var recipe = new TierRecipeFabric(
-            Tier.STONE, TierRecipeFabric.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
+        var recipe = new TierRecipe(
+            Tier.STONE, TierRecipe.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResultItem(helper.getLevel().registryAccess()), read.getResultItem(helper.getLevel().registryAccess())))

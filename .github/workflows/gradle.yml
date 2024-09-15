@@ -91,7 +91,7 @@ jobs:
       - name: Check updated files
         run: git status
       - name: Check diff
-        run: git diff
+        run: git diff --exit-code -- ./${{ matrix.platform }}/src/generated
 
   fabric-data-gen:
     runs-on: ubuntu-latest

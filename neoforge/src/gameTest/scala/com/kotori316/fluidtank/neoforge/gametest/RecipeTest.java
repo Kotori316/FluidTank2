@@ -28,6 +28,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.WithConditions;
 import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 import scala.jdk.javaapi.CollectionConverters;
@@ -201,7 +202,7 @@ final class RecipeTest {
         var subItem = Ingredient.of(Items.APPLE);
         var recipe = new TierRecipe(tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
 
-        var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), helper.getLevel().registryAccess());
+        var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), helper.getLevel().registryAccess(), ConnectionType.OTHER);
         var streamCodec = TierRecipe.SERIALIZER.streamCodec();
         streamCodec.encode(buffer, recipe);
         var deserialized = streamCodec.decode(buffer);

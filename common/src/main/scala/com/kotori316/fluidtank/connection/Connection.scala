@@ -72,9 +72,9 @@ object Connection {
       val (s1, s2) = sorted.span { t =>
         val c = t.getContent
         // c is option, so empty tank is ignored in this context
-        c.forall(t => t contentEqual kind)
+        c.forall(t => t.contentEqual(kind))
       }
-      require(s1.map(_.getContent).forall(c => c.forall(t => t contentEqual kind)))
+      require(s1.map(_.getContent).forall(c => c.forall(t => t.contentEqual(kind))))
       val connection = helper.createConnection(s1)
       // Safe cast
       val contentType = kind.setAmount(GenericUnit.MAX).asInstanceOf[GenericAmount[connection.helper.Content]]

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.{assertEquals, assertThrows}
 import org.junit.jupiter.api.{AfterEach, BeforeEach, Test}
 
 class TierConfigTest {
-  private var configInstance: PlatformConfigAccess = _
+  private var configInstance: PlatformConfigAccess = scala.compiletime.uninitialized
 
   @BeforeEach
   def before(): Unit = {

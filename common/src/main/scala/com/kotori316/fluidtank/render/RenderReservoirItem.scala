@@ -19,7 +19,7 @@ import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
 import java.util.Locale
 
 abstract class RenderReservoirItem extends BlockEntityWithoutLevelRenderer(Minecraft.getInstance.getBlockEntityRenderDispatcher, Minecraft.getInstance.getEntityModels) {
-  private var model: ReservoirModel = _
+  private var model: ReservoirModel = scala.compiletime.uninitialized
 
   override def renderByItem(stack: ItemStack, displayContext: ItemDisplayContext, poseStack: PoseStack, buffer: MultiBufferSource, packedLight: Int, packedOverlay: Int): Unit = {
     poseStack.pushPose()

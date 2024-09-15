@@ -29,9 +29,9 @@ private[data] object PlatformCondition {
   def addPlatformConditions(obj: JsonObject, conditions: Chain[PlatformCondition]): JsonObject = {
     for {
       (key, getter, folder) <- Seq(
-        (NEOFORGE_CONDITION_KEY, (c: PlatformCondition) => c.neoforgeCondition, foldAsJsonArray _),
-        (FABRIC_CONDITION_KEY, (c: PlatformCondition) => c.fabricCondition, foldAsJsonArray _),
-        (FORGE_CONDITION_KEY, (c: PlatformCondition) => c.forgeCondition, foldAsAndObject _),
+        (NEOFORGE_CONDITION_KEY, (c: PlatformCondition) => c.neoforgeCondition, (jsons: Chain[JsonObject]) => foldAsJsonArray(jsons)),
+        (FABRIC_CONDITION_KEY, (c: PlatformCondition) => c.fabricCondition, (jsons: Chain[JsonObject]) => foldAsJsonArray(jsons)),
+        (FORGE_CONDITION_KEY, (c: PlatformCondition) => c.forgeCondition, (jsons: Chain[JsonObject]) => foldAsAndObject(jsons)),
       )
     } {
       val objects = for {

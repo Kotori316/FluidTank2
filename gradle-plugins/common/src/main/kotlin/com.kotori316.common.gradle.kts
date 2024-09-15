@@ -168,7 +168,10 @@ tasks {
         ) {
             scalaCompileOptions.additionalParameters = listOf("-X" + "source:3")
         }
-        scalaCompileOptions.additionalParameters.add("-no-indent")
+        //scalaCompileOptions.additionalParameters.add("-no-indent")
+        scalaCompileOptions.additionalParameters.add("-old-syntax")
+        scalaCompileOptions.additionalParameters.add("-source:3.4-migration")
+        scalaCompileOptions.additionalParameters.add("-rewrite")
         options.encoding = "UTF-8"
     }
 

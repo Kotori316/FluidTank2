@@ -7,6 +7,7 @@ import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.nbt.CompoundTag
 
 import java.util.Objects
+import scala.annotation.targetName
 import scala.math.Ordering.Implicits.infixOrderingOps
 
 case class GenericAmount[ContentType](content: ContentType, amount: GenericUnit, componentPatch: Option[DataComponentPatch])
@@ -21,17 +22,17 @@ case class GenericAmount[ContentType](content: ContentType, amount: GenericUnit,
 
   final def getTag: CompoundTag = access.write(this)
 
-  final def +(that: GenericAmount[ContentType]): GenericAmount[ContentType] = this add that
-
-  final def add(that: GenericAmount[ContentType]): GenericAmount[ContentType] = {
+  @targetName("addOperator")
+  final def +(that: GenericAmount[ContentType]): GenericAmount[ContentType] = {
     val added = this.amount |+| that.amount
     if (this.isEmpty) that.setAmount(added)
     else this.setAmount(added)
   }
 
-  final def -(that: GenericAmount[ContentType]): GenericAmount[ContentType] = this minus that
+  final def add(that: GenericAmount[ContentType]): GenericAmount[ContentType] = this + that
 
-  final def minus(that: GenericAmount[ContentType]): GenericAmount[ContentType] = {
+  @targetName("minusOperator")
+  final def -(that: GenericAmount[ContentType]): GenericAmount[ContentType] = {
     val subtracted = this.amount |-| that.amount
     if (this.isEmpty) that.setAmount(subtracted)
     else this.setAmount(subtracted)

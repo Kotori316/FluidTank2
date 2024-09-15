@@ -11,7 +11,7 @@ import scala.math.Ordering.Implicits.infixOrderingOps
 class VisualTank {
   private lazy val lowerBound: Double = PlatformConfigAccess.getInstance().getConfig.renderLowerBound
   private lazy val upperBound: Double = PlatformConfigAccess.getInstance().getConfig.renderUpperBound
-  var box: Box = _
+  var box: Box = scala.compiletime.uninitialized
 
   /**
    * Must be called in client only

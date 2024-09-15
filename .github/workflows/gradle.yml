@@ -113,6 +113,10 @@ jobs:
         with:
           cache-read-only: ${{ github.event_name != 'push' }}
           add-job-summary: 'on-failure'
+      - run: ./gradlew :neoforge:commonDataGenClasses
+        env:
+          TEST_UTILITY_LOG_ALL_DATA: true
+          RUN_DATA_GEN: true
       - name: DataGen
         run: ./gradlew :neoforge:runCommonData
         timeout-minutes: 5

@@ -71,6 +71,12 @@ jobs:
         run: ./gradlew downloadAssets || ./gradlew downloadAssets || true
         env:
           RUN_GAME_TEST: true
+      - name: DataGen
+        run: ./gradlew :${{ matrix.platform }}:runData
+        timeout-minutes: 5
+        env:
+          TEST_UTILITY_LOG_ALL_DATA: true
+          RUN_DATA_GEN: true
       - name: ${{ matrix.platform }} GameTest
         if: ${{ matrix.platform != 'common' }}
         timeout-minutes: 5
@@ -81,9 +87,14 @@ jobs:
       - name: Check report
         run: |
           ! test -d "${{ matrix.platform }}/game-test/crash-reports"
+      - name: Check updated files
+        run: git status
+      - name: Check diff
+        run: git diff
 
   fabric-data-gen:
     runs-on: ubuntu-latest
+    if: false
     env:
       DISABLE_FORGE: true
       DISABLE_FABRIC: false

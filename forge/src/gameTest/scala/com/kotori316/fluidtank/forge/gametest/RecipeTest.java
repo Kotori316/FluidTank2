@@ -53,6 +53,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("unused")
 @GameTestHolder(FluidTankCommon.modId)
 final class RecipeTest {
+    final Path recipeParent = Path.of("../src/generated/resources", "data/fluidtank/recipe");
+
+    public RecipeTest() {
+        FluidTankCommon.LOGGER.info("Search recipe path: {}", recipeParent.toAbsolutePath());
+    }
 
     @GameTestGenerator
     List<TestFunction> generator() {
@@ -187,9 +192,9 @@ final class RecipeTest {
         var recipe = new TierRecipe(
             tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
 
-        var fromSerializer = ((TierRecipe.Serializer) TierRecipe.SERIALIZER).toJson(recipe);
+        var fromSerializer = TierRecipe.SERIALIZER.toJson(recipe);
 
-        var deserialized = ((TierRecipe.Serializer) TierRecipe.SERIALIZER).fromJson(fromSerializer);
+        var deserialized = TierRecipe.SERIALIZER.fromJson(fromSerializer);
         assertNotNull(deserialized);
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), deserialized.getResultItem(RegistryAccess.EMPTY)))
@@ -235,7 +240,6 @@ final class RecipeTest {
     @GameTestGenerator
     @SuppressWarnings("ConstantConditions")
     List<TestFunction> loadJsonInData() throws IOException {
-        var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipe");
         try (var files = Files.find(recipeParent, 1, (path, a) -> path.getFileName().toString().endsWith(".json"))) {
             return files.map(p -> GameTestUtil.create(FluidTankCommon.modId, "recipe_test", "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),
                 (g) -> loadFromFile(g, p))).toList();
@@ -244,7 +248,6 @@ final class RecipeTest {
 
     @SuppressWarnings("UnstableApiUsage")
     void notLoadLeadRecipe(GameTestHelper helper) throws IOException {
-        var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipe");
         var leadRecipe = recipeParent.resolve("tank_lead.json");
         var read = GsonHelper.parse(Files.newBufferedReader(leadRecipe));
         var ops = RegistryOps.create(JsonOps.INSTANCE, helper.getLevel().registryAccess());

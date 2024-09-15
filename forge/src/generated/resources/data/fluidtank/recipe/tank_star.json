@@ -1,0 +1,14 @@
+{
+  "type": "fluidtank:crafting_grade_up",
+  "forge:condition": {
+    "type": "forge:not",
+    "value": {
+      "type": "forge:tag_empty",
+      "tag": "forge:nether_stars"
+    }
+  },
+  "sub_item": {
+    "tag": "forge:nether_stars"
+  },
+  "tier": "STAR"
+}

@@ -1,0 +1,16 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:gems/emerald"
+      }
+    }
+  ],
+  "type": "fluidtank:crafting_grade_up",
+  "sub_item": {
+    "tag": "c:gems/emerald"
+  },
+  "tier": "EMERALD"
+}

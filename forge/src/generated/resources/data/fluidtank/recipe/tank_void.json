@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "o": {
+      "tag": "forge:obsidian"
+    },
+    "t": {
+      "item": "fluidtank:tank_wood"
+    }
+  },
+  "pattern": [
+    "ooo",
+    "oto",
+    "ooo"
+  ],
+  "result": {
+    "count": 1,
+    "id": "fluidtank:tank_void"
+  }
+}

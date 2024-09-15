@@ -1,0 +1,16 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:ingots/tin"
+      }
+    }
+  ],
+  "type": "fluidtank:crafting_grade_up",
+  "sub_item": {
+    "tag": "c:ingots/tin"
+  },
+  "tier": "TIN"
+}

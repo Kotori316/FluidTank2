@@ -1,0 +1,16 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:gems/diamond"
+      }
+    }
+  ],
+  "type": "fluidtank:crafting_grade_up",
+  "sub_item": {
+    "tag": "c:gems/diamond"
+  },
+  "tier": "DIAMOND"
+}

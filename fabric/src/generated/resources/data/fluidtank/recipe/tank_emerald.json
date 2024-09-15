@@ -1,0 +1,16 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:gems/emerald"
+      ]
+    }
+  ],
+  "type": "fluidtank:crafting_grade_up",
+  "sub_item": {
+    "tag": "c:gems/emerald"
+  },
+  "tier": "EMERALD"
+}

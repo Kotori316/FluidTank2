@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:glass_blocks"
+      }
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "p": {
+      "tag": "minecraft:logs"
+    },
+    "x": {
+      "tag": "c:glass_blocks"
+    }
+  },
+  "pattern": [
+    "x x",
+    "xpx",
+    "xxx"
+  ],
+  "result": {
+    "count": 1,
+    "id": "fluidtank:tank_wood"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "fluidtank:tank_stone"
+    },
+    {
+      "item": "minecraft:bucket"
+    },
+    {
+      "item": "minecraft:bucket"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "fluidtank:reservoir_stone"
+  }
+}

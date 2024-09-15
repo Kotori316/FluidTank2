@@ -1,0 +1,30 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:glass_blocks"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "p": {
+      "tag": "minecraft:logs"
+    },
+    "x": {
+      "tag": "c:glass_blocks"
+    }
+  },
+  "pattern": [
+    "x x",
+    "xpx",
+    "xxx"
+  ],
+  "result": {
+    "count": 1,
+    "id": "fluidtank:tank_wood"
+  }
+}

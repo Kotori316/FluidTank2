@@ -1,0 +1,45 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:ingots/copper"
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_ingredient": {
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_tank": {
+      "conditions": {
+        "items": [
+          {
+            "items": "fluidtank:tank_wood"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "fluidtank:tank_copper"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_tank",
+      "has_ingredient"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:tank_copper"
+    ]
+  }
+}

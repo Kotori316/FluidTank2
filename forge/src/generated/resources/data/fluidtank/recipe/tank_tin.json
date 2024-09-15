@@ -1,0 +1,14 @@
+{
+  "type": "fluidtank:crafting_grade_up",
+  "forge:condition": {
+    "type": "forge:not",
+    "value": {
+      "type": "forge:tag_empty",
+      "tag": "forge:ingots/tin"
+    }
+  },
+  "sub_item": {
+    "tag": "forge:ingots/tin"
+  },
+  "tier": "TIN"
+}

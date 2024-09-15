@@ -1,0 +1,7 @@
+{
+  "type": "fluidtank:crafting_grade_up",
+  "sub_item": {
+    "item": "minecraft:nether_star"
+  },
+  "tier": "STAR"
+}

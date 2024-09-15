@@ -4,6 +4,13 @@ plugins {
 }
 
 sourceSets {
+    main {
+        resources {
+            srcDir("src/main/resources")
+            srcDir("src/generated/resources")
+        }
+    }
+
     create("dataGen") {
         val s = this
         java {

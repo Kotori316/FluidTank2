@@ -13,15 +13,6 @@ tasks.named("remapJar") {
     enabled = false
 }
 
-sourceSets {
-    main {
-        resources {
-            srcDir("src/main/resources")
-            srcDir("src/generated/resources")
-        }
-    }
-}
-
 dependencies {
     minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
     mappings(loom.layered {

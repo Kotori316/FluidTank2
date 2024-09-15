@@ -5,7 +5,6 @@ plugins {
     id("com.kotori316.dg")
     alias(libs.plugins.forge.gradle)
     alias(libs.plugins.forge.parchment)
-    idea
 }
 val minecraftVersion = project.property("minecraft_version").toString()
 
@@ -266,11 +265,4 @@ tasks.named("processRunDataGenResources", ProcessResources::class) {
 
 tasks.named("compileDataGenScala") {
     dependsOn("processDataGenResources")
-}
-
-idea {
-    module {
-        isDownloadSources = true
-        isDownloadJavadoc = true
-    }
 }

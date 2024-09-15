@@ -36,11 +36,10 @@ import net.minecraftforge.common.crafting.ingredients.IIngredientSerializer;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -57,13 +56,12 @@ import java.util.stream.Stream;
 public final class FluidTank {
     public static final SideProxy proxy = SideProxy.get();
 
-    public FluidTank() {
+    public FluidTank(IEventBus modBus, ModContainer modContainer) {
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize {}", FluidTankCommon.modId);
         ForgeMod.enableMilkFluid();
-        var modBus = FMLJavaModLoadingContext.get().getModEventBus();
         REGISTER_LIST.forEach(r -> r.register(modBus));
         PlatformAccess.setInstance(new ForgePlatformAccess());
-        setupConfig(modBus);
+        setupConfig(modBus, modContainer);
         modBus.register(this);
         modBus.register(proxy);
         PacketHandler.init();
@@ -73,12 +71,12 @@ public final class FluidTank {
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize finished {}", FluidTankCommon.modId);
     }
 
-    private static void setupConfig(IEventBus modBus) {
+    private static void setupConfig(IEventBus modBus, ModContainer modContainer) {
         var config = new ForgePlatformConfigAccess();
         modBus.register(config);
         var builder = config.setupConfig();
         PlatformConfigAccess.setInstance(config);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, builder.build());
+        modContainer.addConfig(new ModConfig(ModConfig.Type.COMMON, builder.build(), modContainer));
     }
 
     private static final DeferredRegister<Block> BLOCK_REGISTER = DeferredRegister.create(ForgeRegistries.BLOCKS, FluidTankCommon.modId);

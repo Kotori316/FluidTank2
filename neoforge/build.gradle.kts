@@ -26,6 +26,21 @@ sourceSets {
             }
         }
     }
+    create("commonDataGen") {
+        val s = this
+        project.configurations {
+            named(s.compileClasspathConfigurationName) {
+                extendsFrom(project.configurations.dataGenCompileClasspath.get())
+            }
+            named(s.runtimeClasspathConfigurationName) {
+                extendsFrom(project.configurations.dataGenRuntimeClasspath.get())
+            }
+        }
+    }
+}
+
+tasks.named("processCommonDataGenResources", ProcessResources::class) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 runs {
@@ -64,6 +79,22 @@ runs {
                 file("src/main/resources/").toString()
             )
             modSources.add("${modId}_data", sourceSets["dataGen"])
+        }
+        create("commonData") {
+            runType("data")
+            isDataGenerator = true
+            workingDirectory.set(project.file("runs/commonData"))
+            arguments.addAll(
+                "--mod",
+                "${modId}_common_data",
+                "--all",
+                "--output",
+                project(":common").file("src/generated/resources/").toString(),
+                "--existing",
+                project(":common").file("src/main/resources/").toString()
+            )
+
+            modSources.add("${modId}_common_data", sourceSets["commonDataGen"])
         }
     }
     create("junit") {

@@ -3,6 +3,6 @@ loaderVersion = "[3.3.3,)"
 license = "All rights reserved"
 
 [[mods]]
-modId = "fluidtank_data"
+modId = "fluidtank_common_data"
 version = "1.0"
-description = "Data generator for FluidTank"
+description = "Common data generator for FluidTank"

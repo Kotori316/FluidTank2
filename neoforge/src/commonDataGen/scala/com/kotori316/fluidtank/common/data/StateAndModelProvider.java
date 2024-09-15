@@ -1,24 +1,24 @@
-package com.kotori316.fluidtank.forge.data;
+package com.kotori316.fluidtank.common.data;
 
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.cat.BlockChestAsTank;
-import com.kotori316.fluidtank.forge.FluidTank;
+import com.kotori316.fluidtank.neoforge.FluidTank;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 final class StateAndModelProvider extends BlockStateProvider {
@@ -32,18 +32,18 @@ final class StateAndModelProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        FluidTankCommon.LOGGER.info(FluidTankDataProvider.MARKER(), "Generating state and model");
+        FluidTankCommon.LOGGER.info("Generating state and model");
         catBlock();
         // sourceBlock();
         tankBase();
-        FluidTank.TANK_MAP.values().stream().map(RegistryObject::get).forEach(this::tank);
-        Stream.of(FluidTank.BLOCK_CREATIVE_TANK, FluidTank.BLOCK_VOID_TANK).map(RegistryObject::get).forEach(this::tank);
+        FluidTank.TANK_MAP.values().stream().map(Supplier::get).forEach(this::tank);
+        Stream.of(FluidTank.BLOCK_CREATIVE_TANK, FluidTank.BLOCK_VOID_TANK).map(Supplier::get).forEach(this::tank);
         // StreamConverters.asJavaSeqStream(ModObjects.gasTanks()).forEach(this::gasTank);
         // pipeBase();
         // pipe(ModObjects.blockFluidPipe(), "fluid_pipe");
         // pipe(ModObjects.blockItemPipe(), "item_pipe");
         reservoirBase();
-        FluidTank.RESERVOIR_MAP.values().stream().map(RegistryObject::get).forEach(this::reservoir);
+        FluidTank.RESERVOIR_MAP.values().stream().map(Supplier::get).forEach(this::reservoir);
     }
 
     void catBlock() {
@@ -267,7 +267,7 @@ final class StateAndModelProvider extends BlockStateProvider {
     }
 
     void reservoir(ItemReservoir reservoirItem) {
-        var key = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(reservoirItem));
+        var key = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(reservoirItem));
         itemModels().withExistingParent(key.getPath(), modLoc("item/item_reservoir"));
     }
 }

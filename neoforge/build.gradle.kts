@@ -2,8 +2,11 @@ plugins {
     id("com.kotori316.common")
     id("com.kotori316.publish")
     id("com.kotori316.subprojects")
+    id("com.kotori316.dg")
     alias(libs.plugins.neoforge.gradle)
 }
+
+val modId = "FluidTank".lowercase()
 
 sourceSets {
     create("gameTest") {
@@ -27,9 +30,9 @@ sourceSets {
 
 runs {
     configureEach {
-        systemProperty("neoforge.enabledGameTestNamespaces", "fluidtank")
+        systemProperty("neoforge.enabledGameTestNamespaces", modId)
         systemProperty("mixin.debug.export", "true")
-        modSources.add("fluidtank", sourceSets["main"])
+        modSources.add(modId, sourceSets["main"])
     }
 
     create("client") {
@@ -42,13 +45,27 @@ runs {
     create("gameTestServer") {
         jvmArgument("-ea")
         workingDirectory = project.file("game-test")
-        modSources.add("fluidtank_gametest", sourceSets["gameTest"])
+        modSources.add("${modId}_gametest", sourceSets["gameTest"])
         dependencies {
             runtime(project.configurations["junit"])
         }
     }
+    create("data") {
+        workingDirectory.set(project.file("runs/data"))
+        arguments.addAll(
+            "--mod",
+            "${modId}_data",
+            "--all",
+            "--output",
+            file("src/generated/resources/").toString(),
+            "--existing",
+            file("src/main/resources/").toString()
+        )
+
+        modSources.add("${modId}_data", sourceSets["dataGen"])
+    }
     create("junit") {
-        unitTestSources.add("fluidtank_test", sourceSets["test"])
+        unitTestSources.add("${modId}_test", sourceSets["test"])
     }
 }
 
@@ -130,6 +147,10 @@ dependencies {
 
     "gameTestImplementation"(sourceSets.main.get().output)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.compileDataGenScala {
+    source(project(":common").sourceSets["dataGen"].allSource)
 }
 
 ext {

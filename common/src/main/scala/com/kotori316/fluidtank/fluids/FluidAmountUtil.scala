@@ -37,6 +37,7 @@ object FluidAmountUtil {
     from(FluidLike.of(potionType), genericUnit, componentMap)
   }
 
+  @VisibleForTesting
   def fromItem(stack: ItemStack): FluidAmount = {
     stack.getItem match {
       case Items.WATER_BUCKET => BUCKET_WATER
@@ -52,5 +53,8 @@ object FluidAmountUtil {
    */
   def access: GenericAccess[FluidLike] = implicitly[GenericAccess[FluidLike]]
 
+  /**
+   * Helper for Java code
+   */
   def getComponentPatch(amount: FluidAmount): java.util.Optional[DataComponentPatch] = amount.componentPatch.toJava
 }

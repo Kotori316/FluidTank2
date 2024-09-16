@@ -24,13 +24,7 @@ object TankUtil {
       val tankType = tag.getString(KEY_TYPE)
       val content = access.read(tag.getCompound(access.KEY_CONTENT))
       val capacity = GenericUnit.fromByteArray(tag.getByteArray(access.KEY_AMOUNT_GENERIC))
-
-      tankType match {
-        case TYPE_TANK => Tank(content, capacity)
-        case TYPE_CREATIVE_TANK => new CreativeTank(content, capacity)
-        case TYPE_VOID_TANK => new VoidTank(content, capacity)
-        case _ => throw new IllegalArgumentException("Unknown type of tank for %s, %s".formatted(content, tag))
-      }
+      createTank(content, capacity, tankType)
     } else {
       // necessary keys are unavailable
       FluidTankCommon.logOnceInMinute("TankUtil.load No keys",
@@ -42,6 +36,10 @@ object TankUtil {
 
   def createTank[A](content: GenericAmount[A], byteBuffer: ByteBuffer, tankType: String): Tank[A] = {
     val capacity = GenericUnit.fromByteArray(byteBuffer.array())
+    createTank(content, capacity, tankType)
+  }
+
+  private def createTank[A](content: GenericAmount[A], capacity: GenericUnit, tankType: String): Tank[A] = {
     tankType match {
       case TYPE_TANK => Tank(content, capacity)
       case TYPE_CREATIVE_TANK => new CreativeTank(content, capacity)

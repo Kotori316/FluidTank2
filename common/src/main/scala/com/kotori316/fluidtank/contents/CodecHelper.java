@@ -29,7 +29,7 @@ final class CodecHelper {
             instance.group(
                 access.codec().fieldOf(access.KEY_CONTENT()).forGetter(Tank::content),
                 Codec.BYTE_BUFFER.fieldOf(access.KEY_AMOUNT_GENERIC()).forGetter(a -> ByteBuffer.wrap(a.capacity().toByteArray())),
-                Codec.STRING.fieldOf(TankUtil.KEY_TYPE()).forGetter(TankUtil::getType)
+                TankUtil.tankTypeCodec().fieldOf(TankUtil.KEY_TYPE()).forGetter(TankUtil::getType)
             ).apply(instance, TankUtil::createTank)
         );
     }

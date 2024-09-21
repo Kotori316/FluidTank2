@@ -29,6 +29,7 @@ jobs:
       - run: ./gradlew javaToolchains assemble publishToMavenLocal --scan
       - run: ./gradlew checkChangelog
       - run: ./gradlew checkReleaseVersion
+      - run: ./gradlew publishMods
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

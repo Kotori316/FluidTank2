@@ -1,5 +1,4 @@
 plugins {
-    alias(libs.plugins.github.release)
     alias(libs.plugins.publish.all)
     alias(libs.plugins.idea.ext)
 }

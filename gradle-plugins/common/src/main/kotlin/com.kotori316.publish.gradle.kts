@@ -189,12 +189,6 @@ publishMods {
     }
 }
 
-afterEvaluate {
-    rootProject.tasks.named("githubRelease") {
-        dependsOn(tasks.assemble)
-    }
-}
-
 tasks.register("checkChangelog") {
     doLast {
         listOf(

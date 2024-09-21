@@ -109,6 +109,7 @@ fun mapPlatformToCamel(platform: String): String {
 
 val changelogHeader = """
         # Large Fluid Tank
+        
     """.trimIndent()
 
 fun curseChangelog(): String {
@@ -181,6 +182,10 @@ publishMods {
                 slug = "automatic-potato"
             }
         }
+    }
+    github {
+        accessToken = project.findProperty("githubToken") as? String ?: System.getenv("REPO_TOKEN") ?: ""
+        parent(rootProject.tasks.named("publishGithub"))
     }
 }
 

@@ -185,17 +185,3 @@ dependencies {
 tasks.compileDataGenScala {
     source(project(":common").sourceSets["dataGen"].allSource)
 }
-
-ext {
-    set(
-        "changelogHeader", """
-        # Large Fluid Tank for neoforge
-        
-        | Dependency | Version |
-        | -- | -- |
-        | Minecraft | ${project.property("minecraft_version")} |
-        | NeoForge | ${project.property("neoforge_version")} |
-        | scalable-cats-force | ${project.property("slp_neoforge_version")} |
-        """.trimIndent()
-    )
-}

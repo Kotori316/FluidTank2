@@ -197,22 +197,6 @@ dependencies {
     "gameTestImplementation"("org.junit.jupiter:junit-jupiter")
 }
 
-ext {
-    set(
-        "changelogHeader", """
-        # Large Fluid Tank for forge
-        
-        | Dependency | Version |
-        | -- | -- |
-        | Minecraft | $minecraftVersion |
-        | Forge | ${project.property("forge_version")} |
-        | scalable-cats-force | ${project.property("slpVersion")} |
-        | Jade | File id: ${project.property("jade_forge_id")} |
-        | TheOneProbe | File id: ${project.property("top_forge_id")} |
-        """.trimIndent()
-    )
-}
-
 tasks.named("compileRunGameScala", ScalaCompile::class) {
     project.findProject(":common")?.let {
         source(it.sourceSets.main.get().scala)

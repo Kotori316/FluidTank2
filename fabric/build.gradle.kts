@@ -118,19 +118,3 @@ tasks {
         finalizedBy(jksSignRemapJar)
     }
 }
-
-ext {
-    set(
-        "changelogHeader", """
-        # Large Fluid Tank for fabric
-        
-        | Dependency | Version |
-        | -- | -- |
-        | Minecraft | ${project.property("minecraft_version")} |
-        | Fabric | ${project.property("fabric_api_version")} |
-        | Fabric Loader | ${project.property("fabric_loader_version")} |
-        | scalable-cats-force | ${project.property("slp_fabric_version")} |
-        | Jade | File id: ${project.property("jade_fabric_id")} |
-        """.trimIndent()
-    )
-}

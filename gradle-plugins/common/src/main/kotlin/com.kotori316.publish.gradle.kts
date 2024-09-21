@@ -107,15 +107,15 @@ fun mapPlatformToCamel(platform: String): String {
     }
 }
 
+val changelogHeader = """
+        # Large Fluid Tank
+    """.trimIndent()
+
 fun curseChangelog(): String {
-    if (!ext.has("changelogHeader")) {
-        throw IllegalStateException("No changelogHeader in curseChangelog for project(${project.name})")
-    }
-    val header = ext.get("changelogHeader").toString()
     val fromFile = rootProject
         .file(project.property("changelog_file") as String)
         .readText()
-    return header + System.lineSeparator() + fromFile
+    return changelogHeader + System.lineSeparator() + fromFile
 }
 
 fun curseProjectId(platform: String): String {
@@ -128,15 +128,11 @@ fun curseProjectId(platform: String): String {
 }
 
 fun modrinthChangelog(): String {
-    if (!ext.has("changelogHeader")) {
-        throw IllegalStateException("No changelogHeader in modrinthChangelog for project(${project.name})")
-    }
-    val header = ext.get("changelogHeader").toString()
     val fromFile = rootProject
         .file(project.property("changelog_file") as String)
         .readText()
     val shortFormat = fromFile.split("---", limit = 2)[0]
-    return header + System.lineSeparator() + shortFormat
+    return changelogHeader + System.lineSeparator() + shortFormat
 }
 
 fun modJarFile(): Provider<RegularFile> {

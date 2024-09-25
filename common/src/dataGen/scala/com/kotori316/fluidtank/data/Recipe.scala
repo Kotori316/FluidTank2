@@ -35,7 +35,8 @@ class Recipe(ip: IngredientProvider, output: PackOutput, registries: Completable
       .pattern("oto")
       .pattern("ooo")
       .unlockedBy(woodTankBlock)
-      .save(recipeOutput)
+      .unlockedBy(ip.obsidianTag)
+      .save(ip.tagCondition(recipeOutput, ip.obsidianTag))
 
     for {
       t <- Tier.values().toSeq

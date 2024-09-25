@@ -14,7 +14,9 @@ trait IngredientProvider {
 
   def glassTag: TagKey[Item]
 
-  def obsidian: Ingredient
+  def obsidian: Ingredient = Ingredient.of(obsidianTag)
+
+  def obsidianTag: TagKey[Item]
 
   def subItemOfTank(tier: Tier): TankSubitem
 

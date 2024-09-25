@@ -8,14 +8,13 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.data.recipes.RecipeOutput
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.{ItemTags, TagKey}
-import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.{Item, Items}
 
 class IngredientProviderFabric(withCondition: (RecipeOutput, Seq[ResourceCondition]) => RecipeOutput) extends IngredientProvider {
 
   override def glassTag: TagKey[Item] = ConventionalItemTags.GLASS_BLOCKS
 
-  override def obsidian: Ingredient = Ingredient.of(Items.OBSIDIAN)
+  override def obsidianTag: TagKey[Item] = ConventionalItemTags.OBSIDIANS
 
   override def tagCondition(recipeOutput: RecipeOutput, tagKey: TagKey[Item]): RecipeOutput = {
     val condition = ResourceConditions.tagsPopulated(tagKey)
@@ -31,7 +30,7 @@ class IngredientProviderFabric(withCondition: (RecipeOutput, Seq[ResourceConditi
       case Tier.DIAMOND => TankSubitem(ConventionalItemTags.DIAMOND_GEMS)
       case Tier.EMERALD => TankSubitem(ConventionalItemTags.EMERALD_GEMS)
       case Tier.STAR => TankSubitem(Items.NETHER_STAR)
-      case Tier.VOID => TankSubitem(Items.OBSIDIAN)
+      case Tier.VOID => TankSubitem(obsidianTag)
       case Tier.COPPER => TankSubitem(ConventionalItemTags.COPPER_INGOTS)
       case Tier.TIN => TankSubitem(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "ingots/tin")))
       case Tier.BRONZE => TankSubitem(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "ingots/bronze")))

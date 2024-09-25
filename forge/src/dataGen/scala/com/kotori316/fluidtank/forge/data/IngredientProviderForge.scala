@@ -7,7 +7,6 @@ import net.minecraft.data.recipes.RecipeOutput
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.{ItemTags, TagKey}
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.crafting.Ingredient
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.conditions.{NotCondition, TagEmptyCondition}
 
@@ -15,7 +14,7 @@ class IngredientProviderForge extends IngredientProvider {
 
   override def glassTag: TagKey[Item] = Tags.Items.GLASS
 
-  override def obsidian: Ingredient = Ingredient.of(Tags.Items.OBSIDIAN)
+  override def obsidianTag: TagKey[Item] = Tags.Items.OBSIDIAN
 
   override def tagCondition(recipeOutput: RecipeOutput, tagKey: TagKey[Item]): RecipeOutput = {
     recipeOutput match {
@@ -33,7 +32,7 @@ class IngredientProviderForge extends IngredientProvider {
       case Tier.DIAMOND => TankSubitem(Tags.Items.GEMS_DIAMOND)
       case Tier.EMERALD => TankSubitem(Tags.Items.GEMS_EMERALD)
       case Tier.STAR => TankSubitem(Tags.Items.NETHER_STARS)
-      case Tier.VOID => TankSubitem(Tags.Items.OBSIDIAN)
+      case Tier.VOID => TankSubitem(obsidianTag)
       case Tier.COPPER => TankSubitem(Tags.Items.INGOTS_COPPER)
       case Tier.TIN => TankSubitem(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("forge", "ingots/tin")))
       case Tier.BRONZE => TankSubitem(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("forge", "ingots/bronze")))

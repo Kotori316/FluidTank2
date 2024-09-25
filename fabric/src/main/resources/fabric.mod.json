@@ -27,9 +27,9 @@
     ]
   },
   "depends": {
-    "fabric": "*",
+    "fabric": ">=0.105.0+1.21.1",
     "minecraft": ">=${mc_version}",
-    "kotori_scala": ">=2.0.0"
+    "kotori_scala": ">=3.1.0"
   },
   "custom": {
     "kotori316_version_checker": "${update_url}"

@@ -1,9 +1,18 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:obsidians"
+      ]
+    }
+  ],
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
     "o": {
-      "item": "minecraft:obsidian"
+      "tag": "c:obsidians"
     },
     "t": {
       "item": "fluidtank:tank_wood"

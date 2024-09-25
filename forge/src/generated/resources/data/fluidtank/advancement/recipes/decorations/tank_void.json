@@ -1,6 +1,16 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
+    "has_obsidian": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#forge:obsidian"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
     "has_tank_wood": {
       "conditions": {
         "items": [
@@ -18,10 +28,18 @@
       "trigger": "minecraft:recipe_unlocked"
     }
   },
+  "forge:condition": {
+    "type": "forge:not",
+    "value": {
+      "type": "forge:tag_empty",
+      "tag": "forge:obsidian"
+    }
+  },
   "requirements": [
     [
       "has_the_recipe",
-      "has_tank_wood"
+      "has_tank_wood",
+      "has_obsidian"
     ]
   ],
   "rewards": {

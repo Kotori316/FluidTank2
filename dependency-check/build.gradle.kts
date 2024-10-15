@@ -6,17 +6,17 @@ dependencies {
     // JEI
     implementation(
         group = "mezz.jei",
-        name = "jei-1.21-forge",
+        name = "jei-${project.property("jei_forge_repo_version")}-forge",
         version = project.property("jei_forge_version").toString()
     )
     implementation(
         group = "mezz.jei",
-        name = "jei-1.21-fabric",
+        name = "jei-${project.property("jei_fabric_repo_version")}-fabric",
         version = project.property("jei_fabric_version").toString()
     )
     implementation(
         group = "mezz.jei",
-        name = "jei-1.21-neoforge",
+        name = "jei-${project.property("jei_neoforge_repo_version")}-neoforge",
         version = project.property("jei_neoforge_version").toString()
     )
     // Parchment

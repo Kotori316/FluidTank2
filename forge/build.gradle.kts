@@ -159,13 +159,13 @@ dependencies {
     if (System.getenv("RUN_GAME_TEST").toBoolean()) {
         compileOnly(
             group = "mezz.jei",
-            name = "jei-1.21-forge",
+            name = "jei-${project.property("jei_forge_repo_version")}-forge",
             version = project.property("jei_forge_version").toString()
         ) { isTransitive = false }
     } else {
         compileOnly(
             group = "mezz.jei",
-            name = "jei-1.21-forge",
+            name = "jei-${project.property("jei_forge_repo_version")}-forge",
             version = project.property("jei_forge_version").toString()
         ) { isTransitive = false }
     }

@@ -90,7 +90,7 @@ dependencies {
     )
     /*modRuntimeOnly(
         group = "mezz.jei",
-        name = "jei-1.21-fabric",
+        name = "jei-${project.property("jei_fabric_repo_version")}-fabric",
         version = project.property("jei_fabric_version").toString()
     )*/
     modCompileOnly(

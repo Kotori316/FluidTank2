@@ -4,11 +4,11 @@
     "type": "forge:not",
     "value": {
       "type": "forge:tag_empty",
-      "tag": "forge:stone"
+      "tag": "c:stones"
     }
   },
   "sub_item": {
-    "tag": "forge:stone"
+    "tag": "c:stones"
   },
   "tier": "STONE"
 }

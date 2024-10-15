@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_obsidian": {
+    "has_obsidians": {
       "conditions": {
         "items": [
           {
-            "items": "#forge:obsidian"
+            "items": "#c:obsidians"
           }
         ]
       },
@@ -32,14 +32,14 @@
     "type": "forge:not",
     "value": {
       "type": "forge:tag_empty",
-      "tag": "forge:obsidian"
+      "tag": "c:obsidians"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
       "has_tank_wood",
-      "has_obsidian"
+      "has_obsidians"
     ]
   ],
   "rewards": {

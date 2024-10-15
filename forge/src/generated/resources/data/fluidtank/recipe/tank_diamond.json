@@ -4,11 +4,11 @@
     "type": "forge:not",
     "value": {
       "type": "forge:tag_empty",
-      "tag": "forge:gems/diamond"
+      "tag": "c:gems/diamond"
     }
   },
   "sub_item": {
-    "tag": "forge:gems/diamond"
+    "tag": "c:gems/diamond"
   },
   "tier": "DIAMOND"
 }

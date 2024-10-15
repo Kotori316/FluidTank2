@@ -5,12 +5,12 @@
     "type": "forge:not",
     "value": {
       "type": "forge:tag_empty",
-      "tag": "forge:obsidian"
+      "tag": "c:obsidians"
     }
   },
   "key": {
     "o": {
-      "tag": "forge:obsidian"
+      "tag": "c:obsidians"
     },
     "t": {
       "item": "fluidtank:tank_wood"

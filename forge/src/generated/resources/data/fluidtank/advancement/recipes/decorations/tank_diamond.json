@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#forge:gems/diamond"
+            "items": "#c:gems/diamond"
           }
         ]
       },
@@ -32,7 +32,7 @@
     "type": "forge:not",
     "value": {
       "type": "forge:tag_empty",
-      "tag": "forge:gems/diamond"
+      "tag": "c:gems/diamond"
     }
   },
   "requirements": [

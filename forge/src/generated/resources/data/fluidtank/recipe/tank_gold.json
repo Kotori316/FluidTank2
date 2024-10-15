@@ -4,11 +4,11 @@
     "type": "forge:not",
     "value": {
       "type": "forge:tag_empty",
-      "tag": "forge:ingots/gold"
+      "tag": "c:ingots/gold"
     }
   },
   "sub_item": {
-    "tag": "forge:ingots/gold"
+    "tag": "c:ingots/gold"
   },
   "tier": "GOLD"
 }

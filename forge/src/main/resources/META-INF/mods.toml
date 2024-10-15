@@ -20,7 +20,7 @@ logoFile = "assets/fluidtank/textures/icon.png"
 [[dependencies.fluidtank]]
 modId = "forge"
 mandatory = true
-versionRange = "[48,)"
+versionRange = "[52.0.21,)"
 ordering = "NONE"
 side = "BOTH"
 

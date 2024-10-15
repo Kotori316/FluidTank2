@@ -12,9 +12,9 @@ import net.minecraftforge.common.crafting.conditions.{NotCondition, TagEmptyCond
 
 class IngredientProviderForge extends IngredientProvider {
 
-  override def glassTag: TagKey[Item] = Tags.Items.GLASS
+  override def glassTag: TagKey[Item] = Tags.Items.GLASS_BLOCKS
 
-  override def obsidianTag: TagKey[Item] = Tags.Items.OBSIDIAN
+  override def obsidianTag: TagKey[Item] = Tags.Items.OBSIDIANS
 
   override def tagCondition(recipeOutput: RecipeOutput, tagKey: TagKey[Item]): RecipeOutput = {
     recipeOutput match {
@@ -26,7 +26,7 @@ class IngredientProviderForge extends IngredientProvider {
   override def subItemOfTank(tier: Tier): TankSubitem = {
     tier match {
       case Tier.WOOD => TankSubitem(ItemTags.LOGS)
-      case Tier.STONE => TankSubitem(Tags.Items.STONE)
+      case Tier.STONE => TankSubitem(Tags.Items.STONES)
       case Tier.IRON => TankSubitem(Tags.Items.INGOTS_IRON)
       case Tier.GOLD => TankSubitem(Tags.Items.INGOTS_GOLD)
       case Tier.DIAMOND => TankSubitem(Tags.Items.GEMS_DIAMOND)

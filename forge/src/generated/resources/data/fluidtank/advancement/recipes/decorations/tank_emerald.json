@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#forge:gems/emerald"
+            "items": "#c:gems/emerald"
           }
         ]
       },
@@ -32,7 +32,7 @@
     "type": "forge:not",
     "value": {
       "type": "forge:tag_empty",
-      "tag": "forge:gems/emerald"
+      "tag": "c:gems/emerald"
     }
   },
   "requirements": [

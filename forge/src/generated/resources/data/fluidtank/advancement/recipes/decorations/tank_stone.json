@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#forge:stone"
+            "items": "#c:stones"
           }
         ]
       },
@@ -32,7 +32,7 @@
     "type": "forge:not",
     "value": {
       "type": "forge:tag_empty",
-      "tag": "forge:stone"
+      "tag": "c:stones"
     }
   },
   "requirements": [

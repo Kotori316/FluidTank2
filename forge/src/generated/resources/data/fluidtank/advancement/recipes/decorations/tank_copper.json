@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#forge:ingots/copper"
+            "items": "#c:ingots/copper"
           }
         ]
       },
@@ -32,7 +32,7 @@
     "type": "forge:not",
     "value": {
       "type": "forge:tag_empty",
-      "tag": "forge:ingots/copper"
+      "tag": "c:ingots/copper"
     }
   },
   "requirements": [

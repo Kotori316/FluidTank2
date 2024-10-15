@@ -4,11 +4,11 @@
     "type": "forge:not",
     "value": {
       "type": "forge:tag_empty",
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     }
   },
   "sub_item": {
-    "tag": "forge:ingots/iron"
+    "tag": "c:ingots/iron"
   },
   "tier": "IRON"
 }

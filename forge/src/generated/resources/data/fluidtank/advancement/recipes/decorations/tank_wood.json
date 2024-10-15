@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_glass": {
+    "has_glass_blocks": {
       "conditions": {
         "items": [
           {
-            "items": "#forge:glass"
+            "items": "#c:glass_blocks"
           }
         ]
       },
@@ -22,13 +22,13 @@
     "type": "forge:not",
     "value": {
       "type": "forge:tag_empty",
-      "tag": "forge:glass"
+      "tag": "c:glass_blocks"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_glass"
+      "has_glass_blocks"
     ]
   ],
   "rewards": {

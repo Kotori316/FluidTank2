@@ -11,13 +11,13 @@ import com.kotori316.fluidtank.tank.Tier
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
-import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.Vec3
-import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
+import net.minecraft.world.{InteractionHand, InteractionResult}
+import org.junit.jupiter.api.Assertions.{assertEquals, assertInstanceOf, assertTrue}
 
 import scala.jdk.javaapi.CollectionConverters
 
@@ -165,8 +165,8 @@ class ReservoirTest extends FabricGameTest {
     player.setXRot(90f)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
-    val holder = stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND)
-    val tank = WOOD_RESERVOIR.getTank(holder.getObject)
+    val holder = assertInstanceOf(classOf[InteractionResult.Success], stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND))
+    val tank = WOOD_RESERVOIR.getTank(holder.heldItemTransformedTo())
     assertEquals(FluidAmountUtil.BUCKET_LAVA, tank.content)
     helper.assertBlockNotPresent(Blocks.LAVA, basePos)
 
@@ -182,8 +182,8 @@ class ReservoirTest extends FabricGameTest {
     player.setXRot(90f)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
-    val holder = stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND)
-    val tank = WOOD_RESERVOIR.getTank(holder.getObject)
+    val holder = assertInstanceOf(classOf[InteractionResult.Success], stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND))
+    val tank = WOOD_RESERVOIR.getTank(holder.heldItemTransformedTo())
     assertEquals(FluidAmountUtil.BUCKET_LAVA.setAmount(GenericUnit.fromForge(2000)), tank.content)
     helper.assertBlockNotPresent(Blocks.LAVA, basePos)
 
@@ -199,8 +199,8 @@ class ReservoirTest extends FabricGameTest {
     player.setXRot(90f)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
-    val holder = stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND)
-    val tank = WOOD_RESERVOIR.getTank(holder.getObject)
+    val holder = assertInstanceOf(classOf[InteractionResult.Success], stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND))
+    val tank = WOOD_RESERVOIR.getTank(holder.heldItemTransformedTo())
     assertEquals(FluidAmountUtil.BUCKET_WATER, tank.content)
     helper.assertBlockPresent(Blocks.LAVA, basePos)
 

@@ -167,8 +167,8 @@ class ReservoirTest {
     player.setXRot(90f)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
-    val holder = stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND)
-    val tank = WOOD_RESERVOIR.getTank(holder.getObject)
+    val holder = assertInstanceOf(classOf[InteractionResult.Success], stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND))
+    val tank = WOOD_RESERVOIR.getTank(holder.heldItemTransformedTo())
     assertEquals(FluidAmountUtil.BUCKET_LAVA, tank.content)
     helper.assertBlockNotPresent(Blocks.LAVA, basePos)
 
@@ -184,8 +184,8 @@ class ReservoirTest {
     player.setXRot(90f)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
-    val holder = stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND)
-    val tank = WOOD_RESERVOIR.getTank(holder.getObject)
+    val holder = assertInstanceOf(classOf[InteractionResult.Success], stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND))
+    val tank = WOOD_RESERVOIR.getTank(holder.heldItemTransformedTo())
     assertEquals(FluidAmountUtil.BUCKET_LAVA.setAmount(GenericUnit.fromForge(2000)), tank.content)
     helper.assertBlockNotPresent(Blocks.LAVA, basePos)
 
@@ -201,8 +201,8 @@ class ReservoirTest {
     player.setXRot(90f)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
-    val holder = stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND)
-    val tank = WOOD_RESERVOIR.getTank(holder.getObject)
+    val holder = assertInstanceOf(classOf[InteractionResult.Success], stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND))
+    val tank = WOOD_RESERVOIR.getTank(holder.heldItemTransformedTo())
     assertEquals(FluidAmountUtil.BUCKET_WATER, tank.content)
     helper.assertBlockPresent(Blocks.LAVA, basePos)
 

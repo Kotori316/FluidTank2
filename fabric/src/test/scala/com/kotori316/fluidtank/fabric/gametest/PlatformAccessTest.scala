@@ -19,7 +19,6 @@ import org.junit.platform.commons.support.ReflectionSupport
 
 import java.lang.reflect.Modifier
 import java.util.Locale
-import scala.jdk.OptionConverters.RichOption
 import scala.jdk.javaapi.CollectionConverters
 
 final class PlatformAccessTest extends FabricGameTest {
@@ -137,7 +136,7 @@ final class PlatformAccessTest extends FabricGameTest {
   def fillPotion(): java.util.List[TestFunction] = CollectionConverters.asJava(
     potions().map { case (potionType, potion) =>
       GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "fill_potion_%s_%s".formatted(potionType.name(), Potion.getName(Option(potion).toJava, "")).toLowerCase(Locale.ROOT),
+        "fill_potion_%s_%s".formatted(potionType.name(), potion.value().name().toLowerCase(Locale.ROOT)),
         GameTestUtil.NO_PLACE_STRUCTURE,
         g => fillPotion(g, potionType, potion))
     }
@@ -147,7 +146,7 @@ final class PlatformAccessTest extends FabricGameTest {
   def fillFailPotionWithAmount(): java.util.List[TestFunction] = CollectionConverters.asJava(
     potions().map { case (potionType, potion) =>
       GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "fill_fail1_potion_%s_%s".formatted(potionType.name(), Potion.getName(Option(potion).toJava, "")).toLowerCase(Locale.ROOT),
+        "fill_fail1_potion_%s_%s".formatted(potionType.name(), potion.value().name()).toLowerCase(Locale.ROOT),
         GameTestUtil.NO_PLACE_STRUCTURE,
         g => fillFailPotionWithAmount(g, potionType, potion))
     }
@@ -157,7 +156,7 @@ final class PlatformAccessTest extends FabricGameTest {
   def drainPotion(): java.util.List[TestFunction] = CollectionConverters.asJava(
     potions().map { case (potionType, potion) =>
       GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "drain_potion_%s_%s".formatted(potionType.name(), Potion.getName(Option(potion).toJava, "")).toLowerCase(Locale.ROOT),
+        "drain_potion_%s_%s".formatted(potionType.name(), potion.value().name()).toLowerCase(Locale.ROOT),
         GameTestUtil.NO_PLACE_STRUCTURE,
         g => drainPotion(g, potionType, potion))
     }
@@ -167,7 +166,7 @@ final class PlatformAccessTest extends FabricGameTest {
   def drainFailPotionWithAmount(): java.util.List[TestFunction] = CollectionConverters.asJava(
     potions().map { case (potionType, potion) =>
       GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "drain_fail1_potion_%s_%s".formatted(potionType.name(), Potion.getName(Option(potion).toJava, "")).toLowerCase(Locale.ROOT),
+        "drain_fail1_potion_%s_%s".formatted(potionType.name(), potion.value().name()).toLowerCase(Locale.ROOT),
         GameTestUtil.NO_PLACE_STRUCTURE,
         g => drainFailPotionWithAmount(g, potionType, potion))
     }

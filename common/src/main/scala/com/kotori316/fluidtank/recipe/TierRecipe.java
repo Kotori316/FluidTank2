@@ -58,8 +58,6 @@ public final class TierRecipe implements CraftingRecipe {
     final ItemStack result;
     final ShapedRecipePattern pattern;
     final PlacementInfo placementInfo;
-    private static final int recipeWidth = 3;
-    private static final int recipeHeight = 3;
 
     public TierRecipe(Tier tier, Ingredient tankItem, Ingredient subItem) {
         this.tier = tier;
@@ -174,6 +172,10 @@ public final class TierRecipe implements CraftingRecipe {
 
     private Ingredient getSubItem() {
         return this.subItem;
+    }
+
+    public ItemStack getResult() {
+        return result.copy();
     }
 
     @NotNull

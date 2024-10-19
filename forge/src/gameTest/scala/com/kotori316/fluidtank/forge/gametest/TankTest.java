@@ -361,7 +361,7 @@ final class TankTest {
         return Stream.of(PotionType.values()).flatMap(t ->
             Stream.of(Potions.LONG_INVISIBILITY, Potions.WATER, Potions.AWKWARD, Potions.NIGHT_VISION).map(p ->
                 GameTestUtil.create(FluidTankCommon.modId, BATCH,
-                    "drainPotionSurvival1_" + t.name().toLowerCase(Locale.ROOT) + "_" + Potion.getName(Optional.of(p), ""),
+                    "drainPotionSurvival1_" + t.name().toLowerCase(Locale.ROOT) + "_" + p.value().name().toLowerCase(Locale.ROOT),
                     g -> drainPotionSurvival1(g, t, p))
             )).toList();
     }
@@ -387,7 +387,7 @@ final class TankTest {
         return Stream.of(PotionType.values()).flatMap(t ->
             Stream.of(Potions.LONG_INVISIBILITY, Potions.WATER, Potions.AWKWARD, Potions.NIGHT_VISION).map(p ->
                 GameTestUtil.create(FluidTankCommon.modId, BATCH,
-                    "drainPotionFailSurvival" + "_" + t.name().toLowerCase(Locale.ROOT) + "_" + Potion.getName(Optional.of(p), ""),
+                    "drainPotionFailSurvival" + "_" + t.name().toLowerCase(Locale.ROOT) + "_" + p.value().name().toLowerCase(Locale.ROOT),
                     g -> drainPotionSurvival1(g, t, p))
             )).toList();
     }
@@ -412,7 +412,7 @@ final class TankTest {
         var tile = placeTank(helper, basePos, Tier.WOOD);
         var potionStack = new ItemStack(Items.POTION);
         potionStack.set(DataComponents.POTION_CONTENTS,
-            new PotionContents(Optional.of(Potions.NIGHT_VISION), Optional.empty(), Potions.REGENERATION.value().getEffects())
+            new PotionContents(Optional.of(Potions.NIGHT_VISION), Optional.empty(), Potions.REGENERATION.value().getEffects(), Optional.empty())
         );
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, potionStack.copy());
@@ -429,7 +429,7 @@ final class TankTest {
         var tile = placeTank(helper, basePos, Tier.WOOD);
         var potionStack = new ItemStack(Items.POTION);
         potionStack.set(DataComponents.POTION_CONTENTS,
-            new PotionContents(Optional.of(Potions.NIGHT_VISION), Optional.empty(), Potions.REGENERATION.value().getEffects())
+            new PotionContents(Optional.of(Potions.NIGHT_VISION), Optional.empty(), Potions.REGENERATION.value().getEffects(), Optional.empty())
         );
         var content = FluidAmountUtil.from(FluidLike.POTION_NORMAL(), GenericUnit.ONE_BUCKET(), potionStack.getComponentsPatch());
         tile.getConnection().getHandler().fill(content, true);

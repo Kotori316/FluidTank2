@@ -2,9 +2,9 @@ name: Java CI
 
 on:
   push:
-    branches: [ "1.21" ]
+    branches: [ "1.21.2" ]
   pull_request:
-    branches: [ "1.21" ]
+    branches: [ "1.21.2" ]
 
 permissions:
   contents: read
@@ -44,7 +44,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ common, forge, fabric, neoforge ]
+        platform:
+          - common
+          # - forge
+          - fabric
+          # - neoforge
     env:
       DISABLE_FORGE: ${{ matrix.platform != 'forge' }}
       DISABLE_FABRIC: ${{ matrix.platform != 'fabric' }}
@@ -97,6 +101,7 @@ jobs:
   common-data-gen:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    if: false
     env:
       DISABLE_FORGE: true
       DISABLE_FABRIC: true

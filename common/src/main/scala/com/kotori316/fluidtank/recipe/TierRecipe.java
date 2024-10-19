@@ -216,6 +216,7 @@ public final class TierRecipe implements CraftingRecipe {
 
         @NotNull
         @Override
+        @Deprecated
         public StreamCodec<RegistryFriendlyByteBuf, TierRecipe> streamCodec() {
             return this.streamCodec;
         }

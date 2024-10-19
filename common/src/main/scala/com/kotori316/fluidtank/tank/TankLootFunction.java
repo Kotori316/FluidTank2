@@ -20,7 +20,7 @@ public final class TankLootFunction extends LootItemConditionalFunction {
 
     @Override
     protected ItemStack run(ItemStack stack, LootContext context) {
-        var tile = context.getParam(LootContextParams.BLOCK_ENTITY);
+        var tile = context.getParameter(LootContextParams.BLOCK_ENTITY);
         if (stack.getItem() instanceof ItemBlockTank tank) {
             tank.blockTank().saveTankNBT(tile, stack, context.getLevel().registryAccess());
         }

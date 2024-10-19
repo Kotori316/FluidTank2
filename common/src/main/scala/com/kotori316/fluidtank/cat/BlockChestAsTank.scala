@@ -52,7 +52,7 @@ class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
           player.displayClientMessage(message, false)
         }
       }
-      InteractionResult.sidedSuccess(level.isClientSide)
+      InteractionResult.SUCCESS_SERVER
     } else {
       InteractionResult.PASS
     }

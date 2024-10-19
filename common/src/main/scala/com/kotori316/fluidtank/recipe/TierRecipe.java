@@ -27,8 +27,12 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -47,10 +52,12 @@ public final class TierRecipe implements CraftingRecipe {
     private static final Logger LOGGER = LoggerFactory.getLogger(TierRecipe.class);
     public static final Serializer SERIALIZER = new Serializer();
 
-    private final Tier tier;
-    private final Ingredient tankItem;
-    private final Ingredient subItem;
-    private final ItemStack result;
+    final Tier tier;
+    final Ingredient tankItem;
+    final Ingredient subItem;
+    final ItemStack result;
+    final ShapedRecipePattern pattern;
+    final PlacementInfo placementInfo;
     private static final int recipeWidth = 3;
     private static final int recipeHeight = 3;
 
@@ -59,52 +66,25 @@ public final class TierRecipe implements CraftingRecipe {
         this.tankItem = tankItem;
         this.subItem = subItem;
         this.result = new ItemStack(PlatformTankAccess.getInstance().getTankBlockMap().get(tier).get());
+        this.pattern = ShapedRecipePattern.of(Map.of('t', tankItem, 's', subItem),
+            List.of(
+                "tst",
+                "s s",
+                "tst"
+            )
+        );
+        this.placementInfo = PlacementInfo.createFromOptionals(this.pattern.ingredients());
 
         DebugLogging.LOGGER().debug("{} instance created for Tier {}({}).", getClass().getSimpleName(), tier, result);
     }
 
     @Override
-    public boolean matches(CraftingInput inv, @Nullable Level worldIn) {
-        return checkInv(inv);
-    }
-
-    private boolean checkInv(CraftingInput inv) {
-        for (int i = 0; i <= inv.width() - recipeWidth; ++i) {
-            for (int j = 0; j <= inv.height() - recipeHeight; ++j) {
-                if (this.checkMatch(inv, i, j)) {
-                    return true;
-                }
-            }
+    public boolean matches(CraftingInput input, @Nullable Level worldIn) {
+        if (!this.pattern.matches(input)) {
+            return false;
         }
-        return false;
-    }
-
-    /**
-     * Checks if the region of a crafting inventory is match for the recipe.
-     * <p>Copied from {@link net.minecraft.world.item.crafting.ShapedRecipe}</p>
-     */
-    public boolean checkMatch(CraftingInput craftingInventory, int w, int h) {
-        NonNullList<Ingredient> ingredients = this.getIngredients();
-        for (int i = 0; i < craftingInventory.width(); ++i) {
-            for (int j = 0; j < craftingInventory.height(); ++j) {
-                int k = i - w;
-                int l = j - h;
-                Ingredient ingredient;
-                if (k >= 0 && l >= 0 && k < recipeWidth && l < recipeHeight) {
-                    ingredient = ingredients.get(recipeWidth - k - 1 + l * recipeWidth);
-                } else {
-                    ingredient = Ingredient.EMPTY;
-                }
-
-                if (!ingredient.test(craftingInventory.getItem(i + j * craftingInventory.width()))) {
-                    return false;
-                }
-            }
-        }
-
         // Items are placed correctly.
-        List<ItemStack> tankStacks = IntStream.range(0, craftingInventory.size())
-            .mapToObj(craftingInventory::getItem)
+        List<ItemStack> tankStacks = input.items().stream()
             .filter(this.tankItem)
             .toList();
         return tankStacks.size() == 4 &&
@@ -122,13 +102,13 @@ public final class TierRecipe implements CraftingRecipe {
     @NotNull
     @Override
     public ItemStack assemble(CraftingInput inv, HolderLookup.Provider access) {
-        if (!this.checkInv(inv)) {
-            var stacks = IntStream.range(0, inv.size()).mapToObj(inv::getItem).collect(Collectors.toList());
+        if (!this.matches(inv, null)) {
+            var stacks = inv.items();
             LOGGER.error("Requested to return crafting result for invalid inventory. {}", stacks);
             DebugLogging.LOGGER().error("Requested to return crafting result for invalid inventory. {}", stacks);
             return ItemStack.EMPTY;
         }
-        ItemStack result = getResultItem(access);
+        ItemStack result = this.result.copy();
         GenericAmount<FluidLike> fluidAmount = IntStream.range(0, inv.size()).mapToObj(inv::getItem)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
             .map(s -> s.get(DataComponents.BLOCK_ENTITY_DATA))
@@ -155,36 +135,25 @@ public final class TierRecipe implements CraftingRecipe {
         return result;
     }
 
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width >= 3 && height >= 3;
-    }
-
     @NotNull
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider access) {
-        return result.copy();
-    }
-
-    @NotNull
-    @Override
-    public NonNullList<Ingredient> getIngredients() {
-        NonNullList<Ingredient> ingredients = NonNullList.create();
-        ingredients.add(tankItem); // 0
-        ingredients.add(subItem); // 1
-        ingredients.add(tankItem); // 2
-        ingredients.add(subItem); // 3
-        ingredients.add(Ingredient.EMPTY); // 4
-        ingredients.add(subItem); // 5
-        ingredients.add(tankItem); // 6
-        ingredients.add(subItem); // 7
-        ingredients.add(tankItem); // 8
-        return ingredients;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<TierRecipe> getSerializer() {
         return SERIALIZER;
+    }
+
+    @Override
+    public PlacementInfo placementInfo() {
+        return placementInfo;
+    }
+
+    @Override
+    public List<RecipeDisplay> display() {
+        return List.of(new ShapedCraftingRecipeDisplay(
+            this.pattern.width(), this.pattern.height(),
+            this.pattern.ingredients().stream().map((optional) -> optional.map(Ingredient::display).orElse(SlotDisplay.Empty.INSTANCE)).toList(),
+            new SlotDisplay.ItemStackSlotDisplay(this.result),
+            new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)
+        ));
     }
 
     @NotNull
@@ -225,7 +194,7 @@ public final class TierRecipe implements CraftingRecipe {
             this.codec = RecordCodecBuilder.mapCodec(instance ->
                 instance.group(
                     Codec.STRING.xmap(Tier::valueOfIgnoreCase, Tier::name).fieldOf(KEY_TIER).forGetter(TierRecipe::getTier),
-                    Ingredient.CODEC_NONEMPTY.fieldOf(KEY_SUB_ITEM).forGetter(TierRecipe::getSubItem)
+                    Ingredient.CODEC.fieldOf(KEY_SUB_ITEM).forGetter(TierRecipe::getSubItem)
                 ).apply(instance, this::createInstanceInternal)
             );
             this.streamCodec = StreamCodec.ofMember(this::toNetwork, this::fromNetwork);
@@ -277,10 +246,7 @@ public final class TierRecipe implements CraftingRecipe {
             Tier tier = Tier.valueOf(tierName);
             Ingredient tankItem = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
             Ingredient subItem = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
-            if (subItem.isEmpty()) {
-                LOGGER.warn("Empty ingredient was loaded for {}", tierName);
-                DebugLogging.LOGGER().warn("Empty ingredient was loaded for {}", tierName);
-            }
+
             DebugLogging.LOGGER().debug("Serializer loaded from packet for tier {}, sub {}.", tier, PlatformItemAccess.convertIngredientToString(subItem));
             return createInstance(tier, tankItem, subItem);
         }
@@ -294,7 +260,7 @@ public final class TierRecipe implements CraftingRecipe {
 
         public static Ingredient getIngredientTankForTier(Tier tier) {
             var targetTiers = Stream.of(Tier.values()).filter(t -> t.getRank() == tier.getRank() - 1);
-            var itemStream = targetTiers.map(PlatformTankAccess.getInstance().getTankBlockMap()::get).map(Supplier::get).map(ItemStack::new);
+            var itemStream = targetTiers.map(PlatformTankAccess.getInstance().getTankBlockMap()::get).map(Supplier::get);
             return Ingredient.of(itemStream);
         }
     }

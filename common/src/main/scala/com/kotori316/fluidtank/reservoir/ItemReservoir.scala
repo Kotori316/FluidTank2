@@ -10,23 +10,22 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item.TooltipContext
-import net.minecraft.world.item.{Item, ItemStack, ItemUtils, TooltipFlag, UseAnim}
+import net.minecraft.world.item.{Item, ItemStack, ItemUseAnimation, ItemUtils, TooltipFlag}
 import net.minecraft.world.level.block.BucketPickup
 import net.minecraft.world.level.{ClipContext, Level}
 import net.minecraft.world.phys.{BlockHitResult, HitResult}
-import net.minecraft.world.{InteractionHand, InteractionResultHolder}
+import net.minecraft.world.{InteractionHand, InteractionResult}
 
 import java.util
 import java.util.Locale
-import scala.jdk.CollectionConverters.IterableHasAsScala
 import scala.jdk.OptionConverters.RichOptional
 
 class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(1)) {
   override def toString: String = s"ItemReservoir(${tier.name().toLowerCase(Locale.ROOT)})"
 
-  override def getUseAnimation(stack: ItemStack): UseAnim = {
+  override def getUseAnimation(stack: ItemStack): ItemUseAnimation = {
     getTank(stack).content.content match {
-      case v: VanillaPotion if v.potionType == PotionType.NORMAL => UseAnim.DRINK
+      case v: VanillaPotion if v.potionType == PotionType.NORMAL => ItemUseAnimation.DRINK
       case _ => super.getUseAnimation(stack)
     }
   }
@@ -38,7 +37,7 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
     }
   }
 
-  override def use(level: Level, player: Player, usedHand: InteractionHand): InteractionResultHolder[ItemStack] = {
+  override def use(level: Level, player: Player, usedHand: InteractionHand): InteractionResult = {
     val stack = player.getItemInHand(usedHand)
     val content = getTank(stack).content
     content.content match {
@@ -46,7 +45,7 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
       case _: VanillaFluid =>
         val hitResult = Item.getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY)
         if (hitResult.getType != HitResult.Type.BLOCK) {
-          InteractionResultHolder.pass(stack)
+          InteractionResult.PASS
         } else {
           fillOrDrainFluidInLevel(hitResult, stack, level, player, content, usedHand)
         }
@@ -62,13 +61,8 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
         for {
           patch <- content.componentPatch.iterator
           content <- Option(patch.get(DataComponents.POTION_CONTENTS)).flatMap(_.toScala).iterator
-          e <- content.getAllEffects.asScala
         } {
-          if (e.getEffect.value().isInstantenous) {
-            e.getEffect.value().applyInstantenousEffect(livingEntity, livingEntity, livingEntity, e.getAmplifier, 1.0)
-          } else {
-            livingEntity.addEffect(e)
-          }
+          content.applyToLivingEntity(livingEntity)
         }
         val newTank = tank.copy(content = content.setAmount(content.amount |-| GenericUnit.ONE_BOTTLE))
         this.saveTank(stack, newTank)
@@ -102,7 +96,7 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
     }
   }
 
-  private def fillOrDrainFluidInLevel(hitResult: BlockHitResult, stack: ItemStack, level: Level, player: Player, content: FluidAmount, hand: InteractionHand): InteractionResultHolder[ItemStack] = {
+  private def fillOrDrainFluidInLevel(hitResult: BlockHitResult, stack: ItemStack, level: Level, player: Player, content: FluidAmount, hand: InteractionHand): InteractionResult = {
     val hitPos = hitResult.getBlockPos
     val hitFace = hitResult.getDirection
     if (level.mayInteract(player, hitPos) && player.mayUseItemAt(hitPos.relative(hitFace), hitFace, stack)) {
@@ -115,15 +109,15 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
             val picked = pickUp.pickupBlock(null, level, hitPos, blockState)
             val actualFluid = PlatformFluidAccess.getInstance().getFluidContained(picked)
             val result = PlatformFluidAccess.getInstance().fillItem(actualFluid, stack, player, hand, true)
-            InteractionResultHolder.sidedSuccess(result.toReplace, level.isClientSide)
+            InteractionResult.SUCCESS_SERVER.heldItemTransformedTo(result.toReplace)
           } else {
-            InteractionResultHolder.pass(stack)
+            InteractionResult.PASS
           }
         case _ =>
-          InteractionResultHolder.pass(stack)
+          InteractionResult.PASS
       }
     } else {
-      InteractionResultHolder.fail(stack)
+      InteractionResult.FAIL
     }
   }
 }

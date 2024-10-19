@@ -70,9 +70,7 @@ class PlatformItemAccessHolder {
 
         @Override
         public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
-            var remaining = stack.getItem().getCraftingRemainingItem();
-            if (remaining == null) return ItemStack.EMPTY;
-            else return remaining.getDefaultInstance();
+            return stack.getItem().getCraftingRemainder();
         }
 
         @Override

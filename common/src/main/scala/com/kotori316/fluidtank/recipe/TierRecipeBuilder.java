@@ -6,13 +6,13 @@ import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
@@ -40,13 +40,13 @@ public final class TierRecipeBuilder implements RecipeBuilder {
 
     @Override
     public Item getResult() {
-        return recipe.getResultItem(RegistryAccess.EMPTY).getItem();
+        return recipe.result.getItem();
     }
 
     @Override
-    public void save(RecipeOutput recipeOutput, ResourceLocation id) {
+    public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> id) {
         Advancement.Builder builder = recipeOutput.advancement().addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id)).rewards(AdvancementRewards.Builder.recipe(id)).requirements(AdvancementRequirements.Strategy.OR);
         this.criteria.forEach(builder::addCriterion);
-        recipeOutput.accept(id, this.recipe, builder.build(id.withPrefix("recipes/" + this.category.getFolderName() + "/")));
+        recipeOutput.accept(id, this.recipe, builder.build(id.location().withPrefix("recipes/" + this.category.getFolderName() + "/")));
     }
 }

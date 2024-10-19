@@ -6,6 +6,8 @@ import com.kotori316.fluidtank.config.PlatformConfigAccess
 import com.kotori316.fluidtank.item.PlatformItemAccess
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.server.MinecraftServer
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.display.SlotDisplayContext
 import net.minecraft.world.item.crafting.{Ingredient, Recipe}
 import org.apache.logging.log4j.core.config.Configurator
 import org.apache.logging.log4j.{Level, Logger}
@@ -44,9 +46,9 @@ object DebugLogging {
     // Recipes fo FluidTank
     val noPretty = new GsonBuilder().disableHtmlEscaping().create()
     server.getRecipeManager.getRecipes.asScala
-      .filter(_.id().getNamespace === FluidTankCommon.modId)
+      .filter(_.id().location().getNamespace === FluidTankCommon.modId)
       .map(h => (h.id(), h.value().asInstanceOf[Recipe[?]]))
-      .map { case (id, r) => (id, r.getResultItem(server.registryAccess()), ingredientAsMap(r.getIngredients.asScala)) }
+      .map { case (id, r) => (id, getResultItem(r, server), ingredientAsMap(r.placementInfo().ingredients().asScala)) }
       .map { case (id, stack, value) =>
         val location = BuiltInRegistries.ITEM.getKey(stack.getItem)
         s"$id $location x${stack.getCount}(tag: ${stack.getComponents}) -> ${noPretty.toJson(value)}"
@@ -59,5 +61,13 @@ object DebugLogging {
     ingredients.map(PlatformItemAccess.getInstance().ingredientToJson)
       .zipWithIndex
       .foldLeft(new JsonObject()) { case (a, (e, i)) => a.add(i.toString, e); a }
+  }
+
+  private def getResultItem(recipe: Recipe[?], server: MinecraftServer): ItemStack = {
+    recipe.display().asScala
+      .headOption
+      .map(d => d.result())
+      .map(d => d.resolveForFirstStack(SlotDisplayContext.fromLevel(server.overworld())))
+      .getOrElse(ItemStack.EMPTY)
   }
 }

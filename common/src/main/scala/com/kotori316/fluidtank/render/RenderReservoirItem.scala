@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.{BlockEntityWithoutLevelRenderer, MultiBufferSource, RenderType}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.ResourceManager
-import net.minecraft.util.{FastColor, Mth}
+import net.minecraft.util.{ARGB, Mth}
 import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
 
 import java.util.Locale
@@ -26,11 +26,11 @@ abstract class RenderReservoirItem extends BlockEntityWithoutLevelRenderer(Minec
     poseStack.scale(1.0F, 1.0F, 1.0F)
     poseStack.translate(0, 0, 0.5f)
     val reservoir = stack.getItem.asInstanceOf[ItemReservoir]
-    val vertexConsumer = ItemRenderer.getFoilBufferDirect(buffer,
+    val vertexConsumer = ItemRenderer.getFoilBuffer(buffer,
       this.model.renderType(RenderReservoirItem.textureNameMap(reservoir.tier)),
       true, stack.hasFoil)
     RenderSystem.enableCull()
-    this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, FastColor.ARGB32.color(255, -1))
+    this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, ARGB.color(255, -1))
 
     val tank = reservoir.getTank(stack)
     if (tank.hasContent) {

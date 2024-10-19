@@ -19,7 +19,7 @@ import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.level.{BlockGetter, Level, LevelReader}
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.{CollisionContext, VoxelShape}
-import net.minecraft.world.{InteractionHand, InteractionResult, ItemInteractionResult}
+import net.minecraft.world.{InteractionHand, InteractionResult}
 import org.jetbrains.annotations.Nullable
 
 import scala.annotation.nowarn
@@ -60,7 +60,7 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
   }
 
   //noinspection ScalaDeprecation,deprecation
-  override def useItemOn(stack: ItemStack, state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): ItemInteractionResult = {
+  override def useItemOn(stack: ItemStack, state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
     level.getBlockEntity(pos) match {
       case tank: TileTank =>
         if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
@@ -69,22 +69,22 @@ abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties
             if (!level.isClientSide) {
               /*return*/
               TransferFluid.transferFluid(tank.getConnection, stack, player, hand)
-                .map { r => TransferFluid.setItem(player, hand, r, pos); ItemInteractionResult.CONSUME }
-                .getOrElse(ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION)
+                .map { r => TransferFluid.setItem(player, hand, r, pos); InteractionResult.CONSUME }
+                .getOrElse(InteractionResult.PASS)
             } else {
               /*return*/
-              ItemInteractionResult.sidedSuccess(level.isClientSide)
+              InteractionResult.SUCCESS_SERVER
             }
           } else {
-            ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+            InteractionResult.PASS
           }
         } else {
           // Skip useWithoutItem, then place tank
-          ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
+          InteractionResult.PASS
         }
       case tile =>
         FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {} in {}", pos.show, tile, getCallerMethod)
-        ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+        InteractionResult.PASS
     }
   }
 

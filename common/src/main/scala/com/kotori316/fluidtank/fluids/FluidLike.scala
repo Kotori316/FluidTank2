@@ -6,7 +6,7 @@ import net.minecraft.core.component.{DataComponentPatch, DataComponents}
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.item.alchemy.{Potion, PotionContents}
+import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.level.material.{Fluid, Fluids}
 
 import java.util.Locale
@@ -35,7 +35,7 @@ case class VanillaPotion(potionType: PotionType) extends FluidLike {
   def getVanillaPotionName(nbt: Option[DataComponentPatch]): Component = {
     val potion = nbt.map(_.get(DataComponents.POTION_CONTENTS)).filter(_ != null).flatMap(_.toScala).getOrElse(PotionContents.EMPTY)
     val prefix = potionType.getItem.getDescriptionId + ".effect."
-    Component.translatable(Potion.getName(potion.potion(), prefix))
+    potion.getName(prefix)
   }
 }
 
@@ -86,7 +86,7 @@ object FluidLike {
     } else {
       // this is a fluid
       val fluid = Option(key).filter(BuiltInRegistries.FLUID.containsKey)
-        .map(BuiltInRegistries.FLUID.get)
+        .map(BuiltInRegistries.FLUID.getValue)
       fluid.map(FluidLike.of).getOrElse {
         FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_FLUID_LIKE, "[FluidLike] Get unknown fluid type {}", key)
         FLUID_EMPTY

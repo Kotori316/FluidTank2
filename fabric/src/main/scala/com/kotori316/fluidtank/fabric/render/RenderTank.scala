@@ -10,14 +10,17 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.blockentity.{BlockEntityRenderer, BlockEntityRendererProvider}
 import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
 import net.minecraft.core.BlockPos
+import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.level.Level
 
 @Environment(EnvType.CLIENT)
 class RenderTank(d: BlockEntityRendererProvider.Context) extends BlockEntityRenderer[TileTank] {
 
   override def render(te: TileTank, partialTicks: Float, matrix: PoseStack, buffer: MultiBufferSource, light: Int, otherLight: Int): Unit = {
-    Minecraft.getInstance.getProfiler.push("RenderTank")
+    val profiler = Profiler.get()
+    profiler.push("RenderTank")
     if (!te.getTank.isEmpty) {
+      profiler.push("Rendering")
       matrix.pushPose()
       val b = buffer.getBuffer(RenderType.translucent)
       val tank = getVisualTank(te)
@@ -31,8 +34,9 @@ class RenderTank(d: BlockEntityRendererProvider.Context) extends BlockEntityRend
         tank.box.render(b, matrix, texture, alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
       }
       matrix.popPose()
+      profiler.pop()
     }
-    Minecraft.getInstance.getProfiler.pop()
+    profiler.pop()
   }
 }
 

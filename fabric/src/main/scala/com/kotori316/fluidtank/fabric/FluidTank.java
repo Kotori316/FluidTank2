@@ -23,6 +23,7 @@ import com.mojang.datafixers.DSL;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
@@ -70,11 +71,11 @@ public final class FluidTank implements ModInitializer {
         Stream.concat(TANK_MAP.entrySet().stream(), Stream.of(Map.entry(Tier.CREATIVE, BLOCK_CREATIVE_TANK), Map.entry(Tier.VOID, BLOCK_VOID_TANK)))
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().itemBlock()));
     public static final BlockEntityType<TileTankFabric> TILE_TANK_TYPE =
-        BlockEntityType.Builder.of(TileTankFabric::new, TANK_MAP.values().toArray(BlockTank[]::new)).build(DSL.emptyPartType());
+        FabricBlockEntityTypeBuilder.create(TileTankFabric::new, TANK_MAP.values().toArray(BlockTank[]::new)).build(DSL.emptyPartType());
     public static final BlockEntityType<TileCreativeTankFabric> TILE_CREATIVE_TANK_TYPE =
-        BlockEntityType.Builder.of(TileCreativeTankFabric::new, BLOCK_CREATIVE_TANK).build(DSL.emptyPartType());
+        FabricBlockEntityTypeBuilder.create(TileCreativeTankFabric::new, BLOCK_CREATIVE_TANK).build(DSL.emptyPartType());
     public static final BlockEntityType<TileVoidTank> TILE_VOID_TANK_TYPE =
-        BlockEntityType.Builder.of(TileVoidTank::new, BLOCK_VOID_TANK).build(DSL.emptyPartType());
+        FabricBlockEntityTypeBuilder.create(TileVoidTank::new, BLOCK_VOID_TANK).build(DSL.emptyPartType());
     public static final LootItemFunctionType<TankLootFunction> TANK_LOOT_FUNCTION = new LootItemFunctionType<>(TankLootFunction.CODEC);
     public static final RecipeSerializer<TierRecipe> TIER_RECIPE_SERIALIZER = TierRecipe.SERIALIZER;
     public static final BlockChestAsTank BLOCK_CAT = new BlockChestAsTank();

@@ -37,8 +37,7 @@ public final class IgnoreUnknownTagIngredientFabric extends AnyIngredient {
     }
 
     static final class Serializer implements CustomIngredientSerializer<IgnoreUnknownTagIngredientFabric> {
-        static final MapCodec<IgnoreUnknownTagIngredientFabric> ALLOW_EMPTY = createCodec(true);
-        static final MapCodec<IgnoreUnknownTagIngredientFabric> NON_EMPTY = createCodec(false);
+        static final MapCodec<IgnoreUnknownTagIngredientFabric> NON_EMPTY = createCodec();
         static final StreamCodec<RegistryFriendlyByteBuf, IgnoreUnknownTagIngredientFabric> STREAM_CODEC =
             Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list())
                 .map(IgnoreUnknownTagIngredientFabric::new, IgnoreUnknownTagIngredientFabric::getBase);
@@ -49,8 +48,8 @@ public final class IgnoreUnknownTagIngredientFabric extends AnyIngredient {
         }
 
         @Override
-        public MapCodec<IgnoreUnknownTagIngredientFabric> getCodec(boolean allowEmpty) {
-            return allowEmpty ? ALLOW_EMPTY : NON_EMPTY;
+        public MapCodec<IgnoreUnknownTagIngredientFabric> getCodec() {
+            return NON_EMPTY;
         }
 
         @Override
@@ -58,8 +57,8 @@ public final class IgnoreUnknownTagIngredientFabric extends AnyIngredient {
             return STREAM_CODEC;
         }
 
-        static MapCodec<IgnoreUnknownTagIngredientFabric> createCodec(boolean allowEmpty) {
-            var base = allowEmpty ? Ingredient.CODEC : Ingredient.CODEC_NONEMPTY;
+        static MapCodec<IgnoreUnknownTagIngredientFabric> createCodec() {
+            var base = Ingredient.CODEC;
 
             return RecordCodecBuilder.mapCodec(instance ->
                 instance.group(

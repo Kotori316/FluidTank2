@@ -48,7 +48,7 @@ jobs:
           - common
           # - forge
           - fabric
-          # - neoforge
+          - neoforge
     env:
       DISABLE_FORGE: ${{ matrix.platform != 'forge' }}
       DISABLE_FABRIC: ${{ matrix.platform != 'fabric' }}
@@ -101,7 +101,6 @@ jobs:
   common-data-gen:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    if: false
     env:
       DISABLE_FORGE: true
       DISABLE_FABRIC: true

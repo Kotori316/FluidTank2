@@ -38,5 +38,5 @@ if (!System.getenv("DISABLE_FORGE").toBoolean()) {
     // include("forge")
 }
 if (!System.getenv("DISABLE_NEOFORGE").toBoolean()) {
-    // include("neoforge")
+    include("neoforge")
 }

@@ -11,7 +11,6 @@ import com.kotori316.fluidtank.fabric.cat.ChestAsTankStorage;
 import com.kotori316.fluidtank.fabric.config.FabricPlatformConfigAccess;
 import com.kotori316.fluidtank.fabric.integration.ae2.AE2FluidTankIntegration;
 import com.kotori316.fluidtank.fabric.message.PacketHandler;
-import com.kotori316.fluidtank.fabric.recipe.IgnoreUnknownTagIngredientFabric;
 import com.kotori316.fluidtank.fabric.reservoir.ReservoirFluidStorage;
 import com.kotori316.fluidtank.fabric.tank.*;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
@@ -24,7 +23,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -100,7 +98,6 @@ public final class FluidTank implements ModInitializer {
         var builder = FabricItemGroup.builder();
         createTab(builder);
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, FluidTankCommon.modId), builder.build());
-        CustomIngredientSerializer.register(IgnoreUnknownTagIngredientFabric.SERIALIZER);
         Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, Tank.COMPONENT_NAME()), FLUID_TANK_DATA_COMPONENT);
     }
 

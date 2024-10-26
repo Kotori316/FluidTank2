@@ -1,6 +1,5 @@
 package com.kotori316.fluidtank.neoforge;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.kotori316.fluidtank.PlatformAccess;
 import com.kotori316.fluidtank.cat.BlockChestAsTank;
@@ -161,7 +160,7 @@ final class NeoForgePlatformAccess implements PlatformAccess {
 
     @Override
     public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
-        return stack.getCraftingRemainingItem();
+        return stack.getCraftingRemainder();
     }
 
     @Override
@@ -172,10 +171,6 @@ final class NeoForgePlatformAccess implements PlatformAccess {
 
     @Override
     public JsonElement ingredientToJson(Ingredient ingredient) {
-        if (ingredient.hasNoItems()) {
-            // NeoForge throws error when ingredient is empty.
-            return new JsonArray();
-        }
         return PlatformAccess.super.ingredientToJson(ingredient);
     }
 

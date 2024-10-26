@@ -14,12 +14,10 @@ import com.kotori316.fluidtank.neoforge.config.NeoForgePlatformConfigAccess;
 import com.kotori316.fluidtank.neoforge.integration.ae2.AE2FluidTankIntegration;
 import com.kotori316.fluidtank.neoforge.integration.top.FluidTankTopPlugin;
 import com.kotori316.fluidtank.neoforge.message.PacketHandler;
-import com.kotori316.fluidtank.neoforge.recipe.IgnoreUnknownTagIngredient;
 import com.kotori316.fluidtank.neoforge.reservoir.ItemReservoirNeoForge;
 import com.kotori316.fluidtank.neoforge.tank.*;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.*;
-import com.mojang.datafixers.DSL;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -104,17 +102,15 @@ public final class FluidTank {
             .collect(Collectors.toMap(Map.Entry::getKey, e -> ITEM_REGISTER.register(e.getKey().getBlockName(), () -> e.getValue().get().itemBlock())));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileTankNeoForge>> TILE_TANK_TYPE =
         BLOCK_ENTITY_REGISTER.register(TileTank.class.getSimpleName().toLowerCase(Locale.ROOT), () ->
-            BlockEntityType.Builder.of(TileTankNeoForge::new, TANK_MAP.values().stream().map(DeferredHolder::get).toArray(BlockTank[]::new))
-                .build(DSL.emptyPartType()));
+            new BlockEntityType<>(TileTankNeoForge::new, TANK_MAP.values().stream().map(DeferredHolder::get).toArray(BlockTank[]::new)));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCreativeTankNeoForge>> TILE_CREATIVE_TANK_TYPE =
         BLOCK_ENTITY_REGISTER.register(TileCreativeTank.class.getSimpleName().toLowerCase(Locale.ROOT), () ->
-            BlockEntityType.Builder.of(TileCreativeTankNeoForge::new, BLOCK_CREATIVE_TANK.get()).build(DSL.emptyPartType()));
+            new BlockEntityType<>(TileCreativeTankNeoForge::new, BLOCK_CREATIVE_TANK.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileVoidTankNeoForge>> TILE_VOID_TANK_TYPE =
         BLOCK_ENTITY_REGISTER.register(TileVoidTank.class.getSimpleName().toLowerCase(Locale.ROOT), () ->
-            BlockEntityType.Builder.of(TileVoidTankNeoForge::new, BLOCK_VOID_TANK.get()).build(DSL.emptyPartType()));
+            new BlockEntityType<>(TileVoidTankNeoForge::new, BLOCK_VOID_TANK.get()));
     public static final DeferredHolder<LootItemFunctionType<?>, LootItemFunctionType<TankLootFunction>> TANK_LOOT_FUNCTION = LOOT_TYPE_REGISTER.register(TankLootFunction.NAME, () -> new LootItemFunctionType<>(TankLootFunction.CODEC));
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<?>> TIER_RECIPE = RECIPE_REGISTER.register(TierRecipe.Serializer.LOCATION.getPath(), () -> TierRecipe.SERIALIZER);
-    public static final DeferredHolder<IngredientType<?>, IngredientType<IgnoreUnknownTagIngredient>> IU_INGREDIENT = INGREDIENT_REGISTER.register(IgnoreUnknownTagIngredient.NAME, () -> IgnoreUnknownTagIngredient.SERIALIZER);
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_TAB_REGISTER.register("tab", () -> {
         var b = CreativeModeTab.builder();
         createTab(b);
@@ -124,7 +120,7 @@ public final class FluidTank {
     public static final DeferredItem<BlockItem> ITEM_CAT = ITEM_REGISTER.register(BlockChestAsTank.NAME(), () -> new ItemChestAsTank(BLOCK_CAT.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<EntityChestAsTank>> TILE_CAT =
         BLOCK_ENTITY_REGISTER.register(BlockChestAsTank.NAME(), () ->
-            BlockEntityType.Builder.of(EntityChestAsTank::new, BLOCK_CAT.get()).build(DSL.emptyPartType()));
+            new BlockEntityType<>(EntityChestAsTank::new, BLOCK_CAT.get()));
     public static final Map<Tier, DeferredItem<ItemReservoirNeoForge>> RESERVOIR_MAP = Stream.of(Tier.WOOD, Tier.STONE, Tier.IRON)
         .collect(Collectors.toMap(Function.identity(), t -> ITEM_REGISTER.register("reservoir_" + t.name().toLowerCase(Locale.ROOT), () -> new ItemReservoirNeoForge(t))));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Tank<FluidLike>>> FLUID_TANK_DATA_COMPONENT = DATA_COMPONENT_TYPE_REGISTER.register(

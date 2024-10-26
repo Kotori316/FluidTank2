@@ -25,7 +25,7 @@ import scala.jdk.OptionConverters.RichOptional
 class RenderTank(d: BlockEntityRendererProvider.Context) extends BlockEntityRenderer[TileTank] {
 
   override def render(te: TileTank, partialTicks: Float, matrix: PoseStack, buffer: MultiBufferSource, light: Int, otherLight: Int): Unit = {
-    Minecraft.getInstance.getProfiler.push("RenderTank")
+    profiler.push("RenderTank")
     if (!te.getTank.isEmpty) {
       matrix.pushPose()
       val b = buffer.getBuffer(RenderType.translucent)
@@ -42,7 +42,7 @@ class RenderTank(d: BlockEntityRendererProvider.Context) extends BlockEntityRend
       }
       matrix.popPose()
     }
-    Minecraft.getInstance.getProfiler.pop()
+    profiler.pop()
   }
 }
 

@@ -5,21 +5,26 @@ import com.kotori316.fluidtank.recipe.{TierRecipe, TierRecipeBuilder}
 import com.kotori316.fluidtank.tank.{PlatformTankAccess, Tier}
 import net.minecraft.advancements.critereon.InventoryChangeTrigger
 import net.minecraft.core.HolderLookup
-import net.minecraft.data.PackOutput
+import net.minecraft.core.registries.Registries
 import net.minecraft.data.recipes.{RecipeCategory, RecipeOutput, RecipeProvider, ShapedRecipeBuilder, ShapelessRecipeBuilder}
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.crafting.Ingredient
 
-import java.util.concurrent.CompletableFuture
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
-class Recipe(ip: IngredientProvider, output: PackOutput, registries: CompletableFuture[HolderLookup.Provider])
-  extends RecipeProvider(output, registries) {
+class Recipe(ip: IngredientProvider, recipeOutput: RecipeOutput, registries: HolderLookup.Provider)
+  extends RecipeProvider(registries, recipeOutput) {
 
-  override def buildRecipes(recipeOutput: RecipeOutput): Unit = {
+  given HolderLookup.Provider = registries
+
+  given RecipeOutput = recipeOutput
+
+  override def buildRecipes(): Unit = {
     val woodTankBlock = PlatformTankAccess.getInstance().getTankBlockMap.get(Tier.WOOD).get()
     val voidTankBlock = PlatformTankAccess.getInstance().getTankBlockMap.get(Tier.VOID).get()
-    ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, woodTankBlock)
+    val items = registries.lookupOrThrow(Registries.ITEM)
+    ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, woodTankBlock)
       .define('x', ip.glass)
       .define('p', ItemTags.LOGS)
       .pattern("x x")
@@ -28,7 +33,7 @@ class Recipe(ip: IngredientProvider, output: PackOutput, registries: Completable
       .unlockedBy(ip.glassTag)
       .save(ip.tagCondition(recipeOutput, ip.glassTag))
 
-    ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, voidTankBlock)
+    ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, voidTankBlock)
       .define('o', ip.obsidian)
       .define('t', woodTankBlock)
       .pattern("ooo")
@@ -44,7 +49,7 @@ class Recipe(ip: IngredientProvider, output: PackOutput, registries: Completable
       if t != Tier.WOOD
     } {
       val tankItem = TierRecipe.Serializer.getIngredientTankForTier(t)
-      val itemArr = tankItem.getItems.map(_.getItem())
+      val itemArr = tankItem.items().asScala.map(_.value()).toSeq
       val subItem = ip.subItemOfTank(t)
       TierRecipeBuilder(t, tankItem, subItem.ingredient)
         .unlockedBy("has_tank", InventoryChangeTrigger.TriggerInstance.hasItems(itemArr *))
@@ -54,7 +59,7 @@ class Recipe(ip: IngredientProvider, output: PackOutput, registries: Completable
 
     PlatformTankAccess.getInstance().getReservoirMap.forEach { (tier, reservoir) =>
       val tank = PlatformTankAccess.getInstance().getTankBlockMap.get(tier)
-      ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, reservoir.get())
+      ShapelessRecipeBuilder.shapeless(items, RecipeCategory.TOOLS, reservoir.get())
         .requires(tank.get())
         .requires(Items.BUCKET)
         .requires(Items.BUCKET)
@@ -62,7 +67,7 @@ class Recipe(ip: IngredientProvider, output: PackOutput, registries: Completable
         .save(recipeOutput)
     }
 
-    ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, PlatformChestAsTankAccess.getInstance().getCATBlock.get())
+    ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, PlatformChestAsTankAccess.getInstance().getCATBlock.get())
       .define('p', Ingredient.of(Items.CHEST, Items.BARREL))
       .define('x', woodTankBlock)
       .pattern("x x")

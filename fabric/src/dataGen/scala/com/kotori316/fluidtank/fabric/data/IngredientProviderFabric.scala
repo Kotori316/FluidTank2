@@ -4,13 +4,15 @@ import com.kotori316.fluidtank.data.{IngredientProvider, TankSubitem}
 import com.kotori316.fluidtank.tank.Tier
 import net.fabricmc.fabric.api.resource.conditions.v1.{ResourceCondition, ResourceConditions}
 import net.fabricmc.fabric.api.tag.convention.v2.{ConventionalItemTags, TagUtil}
+import net.minecraft.core.HolderGetter
 import net.minecraft.core.registries.Registries
 import net.minecraft.data.recipes.RecipeOutput
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.{ItemTags, TagKey}
 import net.minecraft.world.item.{Item, Items}
 
-class IngredientProviderFabric(withCondition: (RecipeOutput, Seq[ResourceCondition]) => RecipeOutput) extends IngredientProvider {
+class IngredientProviderFabric(i: HolderGetter[Item], withCondition: (RecipeOutput, Seq[ResourceCondition]) => RecipeOutput) extends IngredientProvider {
+  override given itemRegistry: HolderGetter[Item] = i
 
   override def glassTag: TagKey[Item] = ConventionalItemTags.GLASS_BLOCKS
 

@@ -35,6 +35,7 @@ import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.apache.logging.log4j.util.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -57,7 +58,10 @@ public final class TierRecipe implements CraftingRecipe {
     final Ingredient subItem;
     final ItemStack result;
     final ShapedRecipePattern pattern;
-    final PlacementInfo placementInfo;
+    /**
+     * Wrapped with lazy, as it throws error in data generation
+     */
+    final Lazy<PlacementInfo> placementInfo;
 
     public TierRecipe(Tier tier, Ingredient tankItem, Ingredient subItem) {
         this.tier = tier;
@@ -71,7 +75,7 @@ public final class TierRecipe implements CraftingRecipe {
                 "tst"
             )
         );
-        this.placementInfo = PlacementInfo.createFromOptionals(this.pattern.ingredients());
+        this.placementInfo = Lazy.lazy(() -> PlacementInfo.createFromOptionals(this.pattern.ingredients()));
 
         DebugLogging.LOGGER().debug("{} instance created for Tier {}({}).", getClass().getSimpleName(), tier, result);
     }
@@ -141,7 +145,7 @@ public final class TierRecipe implements CraftingRecipe {
 
     @Override
     public PlacementInfo placementInfo() {
-        return placementInfo;
+        return placementInfo.get();
     }
 
     @Override

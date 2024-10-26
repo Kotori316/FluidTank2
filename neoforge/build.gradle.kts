@@ -151,7 +151,7 @@ dependencies {
         name = "the-one-probe-245211",
         version = project.property("top_neoforge_id").toString()
     )
-    implementation(
+    compileOnly(
         group = "appeng",
         name = "appliedenergistics2-neoforge",
         version = project.property("ae2_neoforge_version").toString()

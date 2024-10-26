@@ -28,6 +28,7 @@ loom {
             property("fabric-api.GameTest".lowercase())
             property("fabric-api.GameTest.report-file".lowercase(), "game-test/test-results/game_test.xml")
             property("fabric-tag-conventions-v2.missingTagTranslationWarning", "VERBOSE")
+            property("mixin.debug.export", "true")
             runDir = "game-test"
             source(sourceSets["test"])
         }

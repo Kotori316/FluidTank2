@@ -74,14 +74,14 @@ abstract class BlockTank(val tier: Tier) extends Block(
             if (!level.isClientSide) {
               /*return*/
               TransferFluid.transferFluid(tank.getConnection, stack, player, hand)
-                .map { r => TransferFluid.setItem(player, hand, r, pos); InteractionResult.CONSUME }
+                .map { r => TransferFluid.setItem(player, hand, r, pos); InteractionResult.SUCCESS_SERVER }
                 .getOrElse(InteractionResult.PASS)
             } else {
               /*return*/
               InteractionResult.SUCCESS_SERVER
             }
           } else {
-            InteractionResult.PASS
+            InteractionResult.TRY_WITH_EMPTY_HAND
           }
         } else {
           // Skip useWithoutItem, then place tank

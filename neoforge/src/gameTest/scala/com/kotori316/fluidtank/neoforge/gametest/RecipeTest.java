@@ -176,25 +176,40 @@ final class RecipeTest {
         return Stream.of(Tier.values()).filter(Tier::isNormalTankTier)
             .filter(Predicate.isEqual(Tier.WOOD).negate())
             .flatMap(t -> Stream.of(
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_json_" + t.name().toLowerCase(Locale.ROOT), () -> serializeJson(t)),
+                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_json_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializeJson(g, t)),
                 GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_packet_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializePacket(g, t))
             ))
             .toList();
     }
 
-    void serializeJson(Tier tier) {
+    void serializeJson(GameTestHelper helper, Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
         var id = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_" + tier.name().toLowerCase(Locale.ROOT));
         var recipe = new TierRecipe(
             tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
+        String expected = """
+            {
+              "type": "%s",
+              "tier": "%s",
+              "sub_item": "minecraft:apple"
+            }
+            """.formatted(TierRecipe.Serializer.LOCATION.toString(), tier.name());
+        var expectedJson = GsonHelper.parse(expected);
 
-        var fromSerializer = ((TierRecipe.Serializer) TierRecipe.SERIALIZER).toJson(recipe);
+        var codec = helper.getLevel().registryAccess().createSerializationContext(JsonOps.INSTANCE);
+        var fromSerializer = assertDoesNotThrow(() -> Recipe.CODEC.encodeStart(codec, recipe).getOrThrow());
+        assertEquals(expectedJson, fromSerializer);
 
-        var deserialized = ((TierRecipe.Serializer) TierRecipe.SERIALIZER).fromJson(fromSerializer);
+        var deserialized = assertInstanceOf(TierRecipe.class,
+            assertDoesNotThrow(() ->
+                    Recipe.CODEC.parse(codec, fromSerializer).getOrThrow(),
+                "Failed to parse recipe for %s".formatted(tier)),
+            "Loaded recipe is not TierRecipe");
         assertNotNull(deserialized);
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResult(), deserialized.getResult()))
         );
+        helper.succeed();
     }
 
     void serializePacket(GameTestHelper helper, Tier tier) {

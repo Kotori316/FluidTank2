@@ -1,6 +1,5 @@
 package com.kotori316.fluidtank.recipe;
 
-import com.google.gson.JsonObject;
 import com.kotori316.fluidtank.DebugLogging;
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.contents.GenericAmount;
@@ -16,7 +15,6 @@ import com.kotori316.fluidtank.tank.PlatformTankAccess;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
@@ -225,27 +223,6 @@ public final class TierRecipe implements CraftingRecipe {
         @Deprecated
         public StreamCodec<RegistryFriendlyByteBuf, TierRecipe> streamCodec() {
             return this.streamCodec;
-        }
-
-        public TierRecipe fromJson(JsonObject object) {
-            return this.codec.codec().parse(JsonOps.INSTANCE, object)
-                .getOrThrow(s -> {
-                    var message = "Error in parsing TierRecipe (%s) from JSON %s".formatted(s, object);
-                    LOGGER.error(message);
-                    DebugLogging.LOGGER().error(message);
-                    return new IllegalStateException(message);
-                });
-        }
-
-        public JsonObject toJson(TierRecipe recipe) {
-            return this.codec.codec().encodeStart(JsonOps.INSTANCE, recipe)
-                .getOrThrow(s -> {
-                    var message = "Error in encoding TierRecipe (%s) from Recipe %s".formatted(s, recipe);
-                    LOGGER.error(message);
-                    DebugLogging.LOGGER().error(message);
-                    return new IllegalStateException(message);
-                })
-                .getAsJsonObject();
         }
 
         public TierRecipe fromNetwork(RegistryFriendlyByteBuf buffer) {

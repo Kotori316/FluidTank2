@@ -45,14 +45,14 @@ final class CatTest extends FabricGameTest {
   }
 
   private def getStorage(helper: GameTestHelper) = {
-    val pos = new BlockPos(2, 2, 2)
+    val pos = new BlockPos(2, 1, 2)
     val storage = FluidStorage.SIDED.find(helper.getLevel, helper.absolutePos(pos), null)
     if (storage == null) GameTestUtil.throwExceptionAt(helper, pos, "Storage must be presented")
     assertInstanceOf(classOf[ChestAsTankStorage], storage)
   }
 
   def testGetFluids(helper: GameTestHelper): Unit = {
-    val pos = new BlockPos(2, 2, 2)
+    val pos = new BlockPos(2, 1, 2)
     val fluids = CollectionConverters.asScala(ChestAsTankStorage.getCATFluids(helper.getLevel, helper.absolutePos(pos)))
     assertTrue(fluids.contains(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(2000))),
       s"CAT should recognize fluids, $fluids")
@@ -71,7 +71,7 @@ final class CatTest extends FabricGameTest {
       tr.commit()
     }
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertNotNull(chest)
 
     assertEquals(4, chest.countItem(Items.LAVA_BUCKET))
@@ -88,7 +88,7 @@ final class CatTest extends FabricGameTest {
       tr.commit()
     }
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertNotNull(chest)
 
     assertEquals(3, chest.countItem(Items.WATER_BUCKET))
@@ -123,7 +123,7 @@ final class CatTest extends FabricGameTest {
         tr.commit()
       }
 
-      val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+      val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
       assertNotNull(chest)
 
       assertEquals(expectItemCount, chest.countItem(expectItem))
@@ -168,7 +168,7 @@ final class CatTest extends FabricGameTest {
       tr.abort()
     }
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertEquals(2, chest.countItem(Items.BUCKET))
     assertEquals(2, chest.countItem(Items.WATER_BUCKET))
 
@@ -198,7 +198,7 @@ final class CatTest extends FabricGameTest {
       tr.commit()
     }
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertEquals(emptyBucket, chest.countItem(Items.BUCKET))
     assertEquals(filledBucket, chest.countItem(Items.WATER_BUCKET))
     helper.succeed()
@@ -214,7 +214,7 @@ final class CatTest extends FabricGameTest {
       tr.commit()
     }
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertEquals(4, chest.countItem(Items.BUCKET))
     assertEquals(0, chest.countItem(Items.WATER_BUCKET))
     helper.succeed()
@@ -230,7 +230,7 @@ final class CatTest extends FabricGameTest {
       tr.commit()
     }
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertEquals(3, chest.countItem(Items.BUCKET))
     assertEquals(2, chest.countItem(Items.LAVA_BUCKET))
     helper.succeed()

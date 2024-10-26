@@ -235,9 +235,7 @@ public final class RecipeTest implements FabricGameTest {
             {
               "type": "%s",
               "tier": "STONE",
-              "sub_item": {
-                "item": "minecraft:diamond"
-              }
+              "sub_item": "minecraft:diamond"
             }
             """.formatted(TierRecipe.Serializer.LOCATION.toString());
         var read = assertInstanceOf(TierRecipe.class, managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()));

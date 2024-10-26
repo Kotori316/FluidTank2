@@ -31,7 +31,7 @@ class CatTest {
   }
 
   def testGetFluids(helper: GameTestHelper): Unit = {
-    val pos = new BlockPos(2, 2, 2)
+    val pos = new BlockPos(2, 1, 2)
     val cat = assertInstanceOf(classOf[EntityChestAsTank], helper.getBlockEntity(pos))
 
     val fluids = cat.getFluids.toScala.toSeq.flatMap(_.asScala)
@@ -44,7 +44,7 @@ class CatTest {
   }
 
   private def getHandler(helper: GameTestHelper): IFluidHandler = {
-    val pos = new BlockPos(2, 2, 2)
+    val pos = new BlockPos(2, 1, 2)
     val cat = assertInstanceOf(classOf[EntityChestAsTank], helper.getBlockEntity(pos))
 
     val handler = assertDoesNotThrow(() => helper.getLevel.getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(pos), null))
@@ -58,7 +58,7 @@ class CatTest {
     val filled = handler.fill(FluidAmountUtil.BUCKET_LAVA.toStack, IFluidHandler.FluidAction.EXECUTE)
     assertEquals(1000, filled)
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertNotNull(chest)
 
     assertEquals(4, chest.countItem(Items.LAVA_BUCKET))
@@ -72,7 +72,7 @@ class CatTest {
     val filled = handler.fill(FluidAmountUtil.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
     assertEquals(1000, filled)
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertNotNull(chest)
 
     assertEquals(3, chest.countItem(Items.WATER_BUCKET))
@@ -105,7 +105,7 @@ class CatTest {
       val filled = handler.fill(fluid.toStack, IFluidHandler.FluidAction.EXECUTE)
       assertEquals(2000, filled)
 
-      val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+      val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
       assertNotNull(chest)
 
       assertEquals(expectItemCount, chest.countItem(expectItem))
@@ -144,7 +144,7 @@ class CatTest {
     val handler = getHandler(helper)
     val filled = handler.fill(toFill.toStack, IFluidHandler.FluidAction.SIMULATE)
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertEquals(2, chest.countItem(Items.BUCKET))
     assertEquals(2, chest.countItem(Items.WATER_BUCKET))
 
@@ -171,7 +171,7 @@ class CatTest {
     val drained = handler.drain(toDrain.toStack, IFluidHandler.FluidAction.EXECUTE)
     assertEquals(toDrain.setAmount(GenericUnit.fromForge(drainedAmount)), drained.toAmount)
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertEquals(emptyBucket, chest.countItem(Items.BUCKET))
     assertEquals(filledBucket, chest.countItem(Items.WATER_BUCKET))
     helper.succeed()
@@ -182,7 +182,7 @@ class CatTest {
     val drained = handler.drain(FluidAmountUtil.BUCKET_LAVA.toStack, IFluidHandler.FluidAction.EXECUTE)
     assertEquals(FluidAmountUtil.BUCKET_LAVA, drained.toAmount)
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertEquals(3, chest.countItem(Items.BUCKET))
     assertEquals(2, chest.countItem(Items.LAVA_BUCKET))
     helper.succeed()
@@ -194,7 +194,7 @@ class CatTest {
     val drained = handler.drain(1000, IFluidHandler.FluidAction.SIMULATE)
     assertEquals(toDrain, drained.toAmount)
 
-    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 2, 2)))
+    val chest = HopperBlockEntity.getContainerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)))
     assertEquals(2, chest.countItem(Items.BUCKET))
     assertEquals(2, chest.countItem(Items.WATER_BUCKET))
     assertEquals(3, chest.countItem(Items.LAVA_BUCKET))

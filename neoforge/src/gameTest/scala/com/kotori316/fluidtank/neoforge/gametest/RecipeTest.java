@@ -25,7 +25,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.WithConditions;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.network.connection.ConnectionType;
@@ -64,7 +63,7 @@ final class RecipeTest {
     @NotNull
     private static TierRecipe getRecipe() {
         return new TierRecipe(Tier.STONE,
-            Ingredient.of(FluidTank.TANK_MAP.get(Tier.WOOD).get()), Ingredient.of(Tags.Items.STONES)
+            Ingredient.of(FluidTank.TANK_MAP.get(Tier.WOOD).get()), Ingredient.of(Items.STONE)
         );
     }
 
@@ -194,7 +193,7 @@ final class RecipeTest {
         var deserialized = ((TierRecipe.Serializer) TierRecipe.SERIALIZER).fromJson(fromSerializer);
         assertNotNull(deserialized);
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), deserialized.getResultItem(RegistryAccess.EMPTY)))
+            () -> assertTrue(ItemStack.matches(recipe.getResult(), deserialized.getResult()))
         );
     }
 
@@ -208,7 +207,7 @@ final class RecipeTest {
         var deserialized = streamCodec.decode(buffer);
         assertNotNull(deserialized);
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), deserialized.getResultItem(RegistryAccess.EMPTY)))
+            () -> assertTrue(ItemStack.matches(recipe.getResult(), deserialized.getResult()))
         );
         helper.succeed();
     }
@@ -219,17 +218,15 @@ final class RecipeTest {
             {
               "type": "%s",
               "tier": "STONE",
-              "sub_item": {
-                "item": "minecraft:diamond"
-              }
+              "sub_item": "minecraft:diamond"
             }
             """.formatted(TierRecipe.Serializer.LOCATION.toString());
-        var read = managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()).orElseThrow();
+        var read = assertInstanceOf(TierRecipe.class, managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()).orElseThrow());
         var recipe = new TierRecipe(
             Tier.STONE, TierRecipe.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), read.getResultItem(RegistryAccess.EMPTY)))
+            () -> assertTrue(ItemStack.matches(recipe.getResult(), read.getResult()))
         );
         helper.succeed();
     }

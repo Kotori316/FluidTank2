@@ -38,7 +38,7 @@ class LoadTank2032Test extends FabricGameTest {
   }
 
   def assumptionWood(helper: GameTestHelper): Unit = {
-    val pos = new BlockPos(0, 2, 0)
+    val pos = new BlockPos(0, 1, 0)
     val expectedTier = Tier.WOOD
     helper.startSequence()
       .thenExecuteAfter(2, () => {
@@ -54,7 +54,7 @@ class LoadTank2032Test extends FabricGameTest {
   def woodTypeContents(helper: GameTestHelper): Unit = {
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(0, 2, 0)))
+        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(0, 1, 0)))
         val content = tile.getConnection.getContent.getOrElse(fail("Content is empty!"))
         assertFalse(content.isEmpty)
         assertEquals(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(3000)), content)
@@ -63,7 +63,7 @@ class LoadTank2032Test extends FabricGameTest {
   }
 
   def assumptionStone(helper: GameTestHelper): Unit = {
-    val pos = new BlockPos(0, 2, 1)
+    val pos = new BlockPos(0, 1, 1)
     val expectedTier = Tier.STONE
     helper.startSequence()
       .thenExecuteAfter(2, () => {
@@ -79,7 +79,7 @@ class LoadTank2032Test extends FabricGameTest {
   def stoneTypeContents(helper: GameTestHelper): Unit = {
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(0, 2, 1)))
+        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(0, 1, 1)))
         val content = tile.getConnection.getContent.getOrElse(fail("Content is empty!"))
         assertFalse(content.isEmpty)
         assertEquals(FluidAmountUtil.BUCKET_LAVA.setAmount(GenericUnit.fromForge(24000)), content)
@@ -91,7 +91,7 @@ class LoadTank2032Test extends FabricGameTest {
   }
 
   def assumptionCopper(helper: GameTestHelper): Unit = {
-    val pos = new BlockPos(1, 2, 2)
+    val pos = new BlockPos(1, 1, 2)
     val expectedTier = Tier.COPPER
     helper.startSequence()
       .thenExecuteAfter(2, () => {
@@ -107,7 +107,7 @@ class LoadTank2032Test extends FabricGameTest {
   def copperTypeContents(helper: GameTestHelper): Unit = {
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(1, 2, 2)))
+        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(1, 1, 2)))
         val content = tile.getConnection.getContent.getOrElse(fail("Content is empty!"))
         assertFalse(content.isEmpty)
         assertEquals(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(30000)), content)
@@ -118,7 +118,7 @@ class LoadTank2032Test extends FabricGameTest {
   }
 
   def assumptionStar(helper: GameTestHelper): Unit = {
-    val pos = new BlockPos(1, 2, 1)
+    val pos = new BlockPos(1, 1, 1)
     val expectedTier = Tier.STAR
     helper.startSequence()
       .thenExecuteAfter(2, () => {
@@ -134,7 +134,7 @@ class LoadTank2032Test extends FabricGameTest {
   def starTypeContents(helper: GameTestHelper): Unit = {
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(1, 2, 1)))
+        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(1, 1, 1)))
         val content = tile.getConnection.getContent.getOrElse(fail("Content is empty!"))
         assertFalse(content.isEmpty)
         assertTrue(content.contentEqual(FluidAmountUtil.BUCKET_LAVA))

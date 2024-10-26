@@ -34,7 +34,7 @@ final class TankPlacementTest {
   }
 
   private def notRemovedByFluid(helper: GameTestHelper, tier: Tier, fluid: Block): Unit = {
-    val pos = new BlockPos(4, 2, 4)
+    val pos = new BlockPos(4, 1, 4)
     helper.startSequence
       .thenExecute(() => TankTest.placeTank(helper, pos, tier))
       .thenExecuteAfter(1, () => helper.setBlock(pos.west, fluid))

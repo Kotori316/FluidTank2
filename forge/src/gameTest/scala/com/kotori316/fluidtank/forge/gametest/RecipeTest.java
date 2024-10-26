@@ -197,7 +197,7 @@ final class RecipeTest {
         var deserialized = TierRecipe.SERIALIZER.fromJson(fromSerializer);
         assertNotNull(deserialized);
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), deserialized.getResultItem(RegistryAccess.EMPTY)))
+            () -> assertTrue(ItemStack.matches(recipe.getResult(), deserialized.getResult()))
         );
     }
 
@@ -211,7 +211,7 @@ final class RecipeTest {
         var deserialized = codec.decode(buffer);
         assertNotNull(deserialized);
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), deserialized.getResultItem(RegistryAccess.EMPTY)))
+            () -> assertTrue(ItemStack.matches(recipe.getResult(), deserialized.getResult()))
         );
         helper.succeed();
     }
@@ -232,7 +232,7 @@ final class RecipeTest {
             Tier.STONE, TierRecipe.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResultItem(RegistryAccess.EMPTY), read.getResultItem(RegistryAccess.EMPTY)))
+            () -> assertTrue(ItemStack.matches(recipe.getResult(), read.getResult()))
         );
         helper.succeed();
     }

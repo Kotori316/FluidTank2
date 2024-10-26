@@ -11,14 +11,14 @@ import com.kotori316.fluidtank.tank.Tier
 import com.kotori316.testutil.GameTestUtil
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
-import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.Vec3
+import net.minecraft.world.{InteractionHand, InteractionResult}
 import net.neoforged.neoforge.gametest.GameTestHolder
-import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
+import org.junit.jupiter.api.Assertions.{assertEquals, assertInstanceOf, assertTrue}
 
 import scala.jdk.javaapi.CollectionConverters
 
@@ -201,8 +201,8 @@ class ReservoirTest {
     player.setXRot(90f)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
-    val holder = assertInstanceOf(classOf[InteractionResult.Success], stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND))
-    val tank = WOOD_RESERVOIR.getTank(holder.heldItemTransformedTo())
+    val holder = assertInstanceOf(classOf[InteractionResult.Pass], stack.use(helper.getLevel, player, InteractionHand.MAIN_HAND))
+    val tank = WOOD_RESERVOIR.getTank(player.getItemInHand(InteractionHand.MAIN_HAND))
     assertEquals(FluidAmountUtil.BUCKET_WATER, tank.content)
     helper.assertBlockPresent(Blocks.LAVA, basePos)
 

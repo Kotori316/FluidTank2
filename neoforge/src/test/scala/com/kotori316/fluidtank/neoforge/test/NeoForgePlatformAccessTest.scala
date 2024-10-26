@@ -4,13 +4,12 @@ import com.kotori316.fluidtank.PlatformAccess
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, FluidLike, PotionType}
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.world.item.alchemy.{Potion, PotionContents, Potions}
+import net.minecraft.world.item.alchemy.{PotionContents, Potions}
 import net.minecraft.world.item.{ItemStack, Items}
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
 import org.junit.jupiter.api.{DynamicTest, Nested, Test, TestFactory}
 
 import java.util
-import scala.jdk.OptionConverters.RichOption
 import scala.jdk.javaapi.CollectionConverters
 
 final class NeoForgePlatformAccessTest extends BeforeMC {
@@ -47,7 +46,7 @@ final class NeoForgePlatformAccessTest extends BeforeMC {
       CollectionConverters.asJava(for {
         p <- Seq(Potions.WATER, Potions.AWKWARD, Potions.NIGHT_VISION)
         i <- Seq(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION)
-        name = i.toString + " " + Potion.getName(Option(p).toJava, "")
+        name = i.toString + " " + p.getRegisteredName
       } yield DynamicTest.dynamicTest(name, () => {
         val potion = PotionContents.createItemStack(i, p)
         val fluid = ACCESS.getFluidContained(potion)

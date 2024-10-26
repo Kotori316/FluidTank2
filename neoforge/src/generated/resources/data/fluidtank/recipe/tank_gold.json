@@ -9,8 +9,6 @@
     }
   ],
   "type": "fluidtank:crafting_grade_up",
-  "sub_item": {
-    "tag": "c:ingots/gold"
-  },
+  "sub_item": "#c:ingots/gold",
   "tier": "GOLD"
 }

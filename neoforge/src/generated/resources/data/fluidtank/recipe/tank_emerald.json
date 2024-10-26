@@ -9,8 +9,6 @@
     }
   ],
   "type": "fluidtank:crafting_grade_up",
-  "sub_item": {
-    "tag": "c:gems/emerald"
-  },
+  "sub_item": "#c:gems/emerald",
   "tier": "EMERALD"
 }

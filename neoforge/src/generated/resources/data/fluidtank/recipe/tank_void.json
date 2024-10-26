@@ -11,12 +11,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "o": {
-      "tag": "c:obsidians"
-    },
-    "t": {
-      "item": "fluidtank:tank_wood"
-    }
+    "o": "#c:obsidians",
+    "t": "fluidtank:tank_wood"
   },
   "pattern": [
     "ooo",

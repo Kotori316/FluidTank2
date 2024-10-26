@@ -9,8 +9,6 @@
     }
   ],
   "type": "fluidtank:crafting_grade_up",
-  "sub_item": {
-    "tag": "c:ingots/copper"
-  },
+  "sub_item": "#c:ingots/copper",
   "tier": "COPPER"
 }

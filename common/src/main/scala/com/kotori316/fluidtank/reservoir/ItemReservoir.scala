@@ -1,12 +1,15 @@
 package com.kotori316.fluidtank.reservoir
 
 import cats.implicits.catsSyntaxGroup
+import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank}
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, FluidLike, PlatformFluidAccess, PotionType, VanillaFluid, VanillaPotion}
 import com.kotori316.fluidtank.item.PlatformItemAccess
 import com.kotori316.fluidtank.tank.Tier
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.{ResourceKey, ResourceLocation}
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item.TooltipContext
@@ -20,7 +23,9 @@ import java.util
 import java.util.Locale
 import scala.jdk.OptionConverters.RichOptional
 
-class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(1)) {
+class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(1)
+  .setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir_" + tier.name().toLowerCase(Locale.ROOT))))
+) {
   override def toString: String = s"ItemReservoir(${tier.name().toLowerCase(Locale.ROOT)})"
 
   override def getUseAnimation(stack: ItemStack): ItemUseAnimation = {

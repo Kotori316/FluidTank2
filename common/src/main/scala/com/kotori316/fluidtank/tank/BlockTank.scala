@@ -8,7 +8,9 @@ import com.kotori316.fluidtank.fluids.{PlatformFluidAccess, TransferFluid}
 import com.kotori316.fluidtank.item.PlatformItemAccess
 import com.mojang.serialization.MapCodec
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.Registries
 import net.minecraft.core.{BlockPos, Direction, HolderLookup}
+import net.minecraft.resources.{ResourceKey, ResourceLocation}
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.{Item, ItemStack}
@@ -24,7 +26,10 @@ import org.jetbrains.annotations.Nullable
 
 import scala.annotation.nowarn
 
-abstract class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of().strength(1f).dynamicShape().pushReaction(PushReaction.BLOCK).forceSolidOn()) with EntityBlock {
+abstract class BlockTank(val tier: Tier) extends Block(
+  BlockBehaviour.Properties.of().strength(1f).dynamicShape().pushReaction(PushReaction.BLOCK).forceSolidOn()
+    .setId(ResourceKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, tier.getBlockName)))
+) with EntityBlock {
 
   registerDefaultState(this.getStateDefinition.any.setValue[TankPos, TankPos](TankPos.TANK_POS_PROPERTY, TankPos.SINGLE))
   final val itemBlock: ItemBlockTank = createTankItem()

@@ -1,9 +1,12 @@
 package com.kotori316.fluidtank.cat
 
+import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.fluids.PlatformFluidAccess
 import net.minecraft.ChatFormatting
+import net.minecraft.core.registries.Registries
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.{ResourceKey, ResourceLocation}
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.context.BlockPlaceContext
@@ -18,7 +21,9 @@ import net.minecraft.world.phys.BlockHitResult
 import scala.jdk.javaapi.CollectionConverters
 
 class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
-  .strength(0.7f).pushReaction(PushReaction.BLOCK).forceSolidOn())
+  .strength(0.7f).pushReaction(PushReaction.BLOCK).forceSolidOn()
+  .setId(ResourceKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME)))
+)
   with EntityBlock {
 
   registerDefaultState(getStateDefinition.any().setValue(BlockStateProperties.FACING, Direction.NORTH))

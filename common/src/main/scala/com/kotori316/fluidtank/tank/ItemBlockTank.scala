@@ -1,15 +1,21 @@
 package com.kotori316.fluidtank.tank
 
+import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, PlatformFluidAccess}
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.{ResourceKey, ResourceLocation}
 import net.minecraft.world.item.Item.TooltipContext
 import net.minecraft.world.item.{BlockItem, Item, ItemStack, TooltipFlag}
 
 import java.util
 
-class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, new Item.Properties()) {
+class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, new Item.Properties()
+  .useBlockDescriptionPrefix()
+  .setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, blockTank.tier.getBlockName)))
+) {
   override def toString: String = blockTank.tier.getBlockName
 
   override def appendHoverText(stack: ItemStack, context: TooltipContext, tooltip: util.List[Component], isAdvanced: TooltipFlag): Unit = {

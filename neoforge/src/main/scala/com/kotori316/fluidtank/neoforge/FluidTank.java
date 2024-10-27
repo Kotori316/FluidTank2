@@ -9,6 +9,7 @@ import com.kotori316.fluidtank.config.PlatformConfigAccess;
 import com.kotori316.fluidtank.contents.Tank;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
+import com.kotori316.fluidtank.neoforge.cat.BlockChestAsTankNeoForge;
 import com.kotori316.fluidtank.neoforge.cat.EntityChestAsTank;
 import com.kotori316.fluidtank.neoforge.config.NeoForgePlatformConfigAccess;
 import com.kotori316.fluidtank.neoforge.integration.ae2.AE2FluidTankIntegration;
@@ -116,7 +117,7 @@ public final class FluidTank {
         createTab(b);
         return b.build();
     });
-    public static final DeferredBlock<BlockChestAsTank> BLOCK_CAT = BLOCK_REGISTER.register(BlockChestAsTank.NAME(), BlockChestAsTank::new);
+    public static final DeferredBlock<BlockChestAsTank> BLOCK_CAT = BLOCK_REGISTER.register(BlockChestAsTank.NAME(), BlockChestAsTankNeoForge::new);
     public static final DeferredItem<BlockItem> ITEM_CAT = ITEM_REGISTER.register(BlockChestAsTank.NAME(), () -> new ItemChestAsTank(BLOCK_CAT.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<EntityChestAsTank>> TILE_CAT =
         BLOCK_ENTITY_REGISTER.register(BlockChestAsTank.NAME(), () ->

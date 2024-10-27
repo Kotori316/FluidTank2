@@ -2,6 +2,9 @@ package com.kotori316.fluidtank.fabric.gametest;
 
 import com.google.common.base.CaseFormat;
 import com.kotori316.fluidtank.FluidTankCommon;
+import com.kotori316.fluidtank.tank.PlatformTankAccess;
+import com.kotori316.fluidtank.tank.Tier;
+import com.kotori316.fluidtank.tank.TileTank;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
@@ -110,6 +113,18 @@ public final class GameTestUtil {
         if (maybeTest instanceof TestFunction testFunction) {
             FluidTankCommon.LOGGER.info("Register {}(batch: {}, structure: {}) from {}",
                 testFunction.testName(), testFunction.batchName(), testFunction.structureName(), createFrom);
+        }
+    }
+
+    public static TileTank placeTank(GameTestHelper helper, BlockPos pos, Tier tier) {
+        var block = PlatformTankAccess.getInstance().getTankBlockMap().get(tier).get();
+        helper.setBlock(pos, block);
+        var tile = helper.getBlockEntity(pos);
+        if (tile instanceof TileTank tileTank) {
+            tileTank.onBlockPlacedBy();
+            return tileTank;
+        } else {
+            throw new GameTestAssertPosException("Expect tank tile", helper.absolutePos(pos), pos, helper.getTick());
         }
     }
 }

@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.fabric.FluidTank
 import com.kotori316.fluidtank.fabric.recipe.ModifiableSingleItemStorage
 import com.kotori316.fluidtank.fabric.tank.FabricTankItemStorage
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
-import com.kotori316.fluidtank.tank.Tier
+import com.kotori316.fluidtank.tank.{PlatformTankAccess, Tier}
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
@@ -36,11 +36,11 @@ final class TankPlacementTest extends FabricGameTest {
   private def notRemovedByFluid(helper: GameTestHelper, tier: Tier, fluid: Block): Unit = {
     val pos = new BlockPos(4, 1, 4)
     helper.startSequence
-      .thenExecute(() => TankTest.placeTank(helper, pos, tier))
+      .thenExecute(() => GameTestUtil.placeTank(helper, pos, tier))
       .thenExecuteAfter(1, () => helper.setBlock(pos.west, fluid))
       .thenIdle(40)
       .thenExecute(() => helper.assertBlockPresent(fluid, pos.west.north))
-      .thenExecute(() => helper.assertBlockPresent(TankTest.getBlock(tier), pos))
+      .thenExecute(() => helper.assertBlockPresent(PlatformTankAccess.getInstance().getTankBlockMap.get(tier).get(), pos))
       .thenSucceed()
   }
 
@@ -64,7 +64,7 @@ final class TankPlacementTest extends FabricGameTest {
 
   private def testGetTankDrop(helper: GameTestHelper, tier: Tier, fillContent: FluidAmount): Unit = {
     val pos = BlockPos.ZERO.above()
-    val tankTile = TankTest.placeTank(helper, pos, tier)
+    val tankTile = GameTestUtil.placeTank(helper, pos, tier)
     tankTile.getConnection.getHandler.fill(fillContent, execute = true)
 
     val drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel, helper.absolutePos(pos), tankTile, helper.makeMockPlayer(GameType.CREATIVE), ItemStack.EMPTY)
@@ -82,7 +82,7 @@ final class TankPlacementTest extends FabricGameTest {
 
   private def testGetTankClone(helper: GameTestHelper, tier: Tier, fillContent: FluidAmount): Unit = {
     val pos = BlockPos.ZERO.above()
-    val tankTile = TankTest.placeTank(helper, pos, tier)
+    val tankTile = GameTestUtil.placeTank(helper, pos, tier)
     tankTile.getConnection.getHandler.fill(fillContent, execute = true)
 
     val state = helper.getBlockState(pos)
@@ -111,17 +111,17 @@ final class TankPlacementTest extends FabricGameTest {
 
   private def testPlaceTankAboveTank(helper: GameTestHelper, tier: Tier, tankContent: FluidAmount): Unit = {
     val pos = BlockPos.ZERO.above()
-    val tankTile = TankTest.placeTank(helper, pos, tier)
+    val tankTile = GameTestUtil.placeTank(helper, pos, tier)
     tankTile.getConnection.getHandler.fill(tankContent, execute = true)
 
-    val stack = new ItemStack(TankTest.getBlock(tier))
+    val stack = new ItemStack(PlatformTankAccess.getInstance().getTankBlockMap.get(tier).get())
     val player = helper.makeMockPlayer(GameType.SURVIVAL)
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
     val absolutePos = helper.absolutePos(pos)
     helper.useBlock(pos, player, new BlockHitResult(Vec3.atBottomCenterOf(absolutePos.above()), Direction.UP, absolutePos, false))
 
-    helper.assertBlockPresent(TankTest.getBlock(tier), pos.above())
+    helper.assertBlockPresent(PlatformTankAccess.getInstance().getTankBlockMap.get(tier).get(), pos.above())
     assertEquals(2, tankTile.getConnection.getTiles.size)
     assertEquals(Option(tankContent), tankTile.getConnection.getContent)
 

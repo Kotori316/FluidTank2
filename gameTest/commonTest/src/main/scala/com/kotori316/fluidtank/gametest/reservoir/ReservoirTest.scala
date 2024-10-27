@@ -1,37 +1,26 @@
-package com.kotori316.fluidtank.neoforge.gametest
+package com.kotori316.fluidtank.gametest.reservoir
 
 import cats.implicits.catsSyntaxSemigroup
-import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank}
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, PotionType, VanillaFluid, VanillaPotion}
-import com.kotori316.fluidtank.neoforge.FluidTank
-import com.kotori316.fluidtank.neoforge.gametest.GetGameTestMethods.{assertEqualHelper, assertEqualStack}
-import com.kotori316.fluidtank.neoforge.gametest.TankTest.placeTank
-import com.kotori316.fluidtank.tank.Tier
-import com.kotori316.testutil.GameTestUtil
+import com.kotori316.fluidtank.gametest.GameTestFunctions
+import com.kotori316.fluidtank.gametest.GameTestFunctions.{assertEqualStack, create}
+import com.kotori316.fluidtank.tank.{PlatformTankAccess, Tier, TileTank}
 import net.minecraft.core.BlockPos
-import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
+import net.minecraft.gametest.framework.{GameTestAssertPosException, GameTestHelper, TestFunction}
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.{InteractionHand, InteractionResult}
-import net.neoforged.neoforge.gametest.GameTestHolder
 import org.junit.jupiter.api.Assertions.{assertEquals, assertInstanceOf, assertTrue}
 
-import scala.jdk.javaapi.CollectionConverters
+import scala.jdk.StreamConverters.IterableHasSeqStream
 
-//noinspection ScalaUnusedSymbol,DuplicatedCode
-@GameTestHolder(FluidTankCommon.modId)
 class ReservoirTest {
-  private final val BATCH = "defaultBatch"
-  private final val WOOD_RESERVOIR = FluidTank.RESERVOIR_MAP.get(Tier.WOOD).get()
-
-  @GameTestGenerator
-  def generator(): java.util.List[TestFunction] = {
-    GetGameTestMethods.getTests(getClass, this, BATCH)
-  }
+  private final lazy val WOOD_RESERVOIR = PlatformTankAccess.getInstance().getReservoirMap.get(Tier.WOOD).get()
 
   private def createReservoirStack(amount: FluidAmount): ItemStack = {
     val stack = new ItemStack(WOOD_RESERVOIR)
@@ -40,8 +29,18 @@ class ReservoirTest {
     stack
   }
 
-  @GameTestGenerator
-  def fillTank(): java.util.List[TestFunction] = CollectionConverters.asJava(
+  private def placeTank(helper: GameTestHelper, pos: BlockPos, tier: Tier): TileTank = {
+    val block = PlatformTankAccess.getInstance().getTankBlockMap.get(tier)
+    helper.setBlock(pos, block.get)
+    helper.getBlockEntity[BlockEntity](pos) match {
+      case tileTank: TileTank =>
+        tileTank.onBlockPlacedBy()
+        tileTank
+      case _ => throw new GameTestAssertPosException("Expect tank tile", helper.absolutePos(pos), pos, helper.getTick)
+    }
+  }
+
+  def fillTank(batch: String, structure: String): Seq[TestFunction] = {
     for {
       f <- (Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
         ++ PotionType.values().map(p => FluidAmountUtil.from(p, Potions.POISON, GenericUnit.ONE_BUCKET)))
@@ -51,7 +50,7 @@ class ReservoirTest {
       }
       fluid = f.setAmount(amount)
       initial <- Seq(FluidAmountUtil.EMPTY, fluid)
-    } yield GameTestUtil.create(FluidTankCommon.modId, BATCH,
+    } yield GameTestFunctions.create(batch, structure,
       s"ReservoirTestFillTank_${initial.content.getKey.getPath}_${fluid.content.getKey.getPath}_${fluid.amount.asForge}", g => {
         val basePos = BlockPos.ZERO.above
         val tile = placeTank(g, basePos, Tier.WOOD)
@@ -68,7 +67,7 @@ class ReservoirTest {
 
         g.succeed()
       })
-  )
+  }
 
   def fillTank1(helper: GameTestHelper): Unit = {
     val basePos = BlockPos.ZERO.above
@@ -103,13 +102,12 @@ class ReservoirTest {
     helper.succeed()
   }
 
-  @GameTestGenerator
-  def fillTankFail(): java.util.List[TestFunction] = CollectionConverters.asJava(
+  def fillTankFail(batch: String, structure: String): Seq[TestFunction] = {
     for {
       fluid <- (Seq(FluidAmountUtil.BUCKET_WATER)
         ++ PotionType.values().map(p => FluidAmountUtil.from(p, Potions.POISON, GenericUnit.ONE_BUCKET)))
       initial <- Seq(FluidAmountUtil.BUCKET_LAVA, FluidAmountUtil.from(PotionType.SPLASH, Potions.WATER, GenericUnit.ONE_BUCKET))
-    } yield GameTestUtil.create(FluidTankCommon.modId, BATCH,
+    } yield GameTestFunctions.create(batch, structure,
       s"ReservoirTestFillTankFail_${initial.content.getKey.getPath}_${fluid.content.getKey.getPath}_${fluid.amount.asForge}", g => {
         val basePos = BlockPos.ZERO.above
         val tile = placeTank(g, basePos, Tier.WOOD)
@@ -127,10 +125,9 @@ class ReservoirTest {
 
         g.succeed()
       })
-  )
+  }
 
-  @GameTestGenerator
-  def drainTank(): java.util.List[TestFunction] = CollectionConverters.asJava(
+  def drainTank(batch: String, structure: String): Seq[TestFunction] = {
     for {
       f <- (Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
         ++ PotionType.values().map(p => FluidAmountUtil.from(p, Potions.POISON, GenericUnit.ONE_BUCKET)))
@@ -139,7 +136,7 @@ class ReservoirTest {
         case _: VanillaPotion => Seq(GenericUnit.ONE_BOTTLE, GenericUnit.ONE_BUCKET, GenericUnit.fromForge(2000))
       }
       fluid = f.setAmount(amount)
-    } yield GameTestUtil.create(FluidTankCommon.modId, BATCH,
+    } yield GameTestFunctions.create(batch, structure,
       s"ReservoirTestDrainTank_${fluid.content.getKey.getPath}_${fluid.amount.asForge}", g => {
         val basePos = BlockPos.ZERO.above
         val tile = placeTank(g, basePos, Tier.WOOD)
@@ -152,11 +149,11 @@ class ReservoirTest {
 
         assertEquals(fluid, tile.getTank.content)
         val modified = WOOD_RESERVOIR.getTank(player.getItemInHand(InteractionHand.MAIN_HAND))
-        assertEqualHelper(fluid.setAmount(GenericUnit.fromForge(4000)), modified.content)
+        assertEquals(fluid.setAmount(GenericUnit.fromForge(4000)), modified.content)
 
         g.succeed()
       })
-  )
+  }
 
   def drainFromWorld1(helper: GameTestHelper): Unit = {
     val basePos: BlockPos = BlockPos.ZERO.above
@@ -207,5 +204,19 @@ class ReservoirTest {
     helper.assertBlockPresent(Blocks.LAVA, basePos)
 
     helper.succeed()
+  }
+}
+
+object ReservoirTest {
+  def tests(batch: String, structure: String): java.util.stream.Stream[TestFunction] = {
+    val instance = new ReservoirTest
+    val normalTest = instance.getClass.getMethods.toSeq
+      .filter(m => m.getParameterTypes sameElements Array(classOf[GameTestHelper]))
+      .filter(m => m.getReturnType == Void.TYPE)
+      .map { m =>
+        create(batch, structure, f"ReservoirTest_${m.getName}", g => m.invoke(instance, g))
+      }
+    val combined = normalTest ++ instance.fillTank(batch, structure) ++ instance.fillTankFail(batch, structure) ++ instance.drainTank(batch, structure)
+    combined.asJavaSeqStream
   }
 }

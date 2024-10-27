@@ -1,40 +1,20 @@
-package com.kotori316.fluidtank.fabric.gametest
+package com.kotori316.fluidtank.gametest
 
-import com.kotori316.fluidtank.FluidTankCommon
+import com.google.common.base.CaseFormat
 import com.kotori316.fluidtank.contents.GenericUnit
-import com.kotori316.fluidtank.fabric.FluidTank
-import com.kotori316.fluidtank.fabric.tank.TileTankFabric
 import com.kotori316.fluidtank.fluids.FluidAmountUtil
-import com.kotori316.fluidtank.tank.Tier
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest
+import com.kotori316.fluidtank.tank.{BlockTank, PlatformTankAccess, Tier, TileTank}
 import net.minecraft.core.BlockPos
-import net.minecraft.gametest.framework.{GameTest, GameTestGenerator, GameTestHelper, TestFunction}
+import net.minecraft.gametest.framework.{GameTestHelper, TestFunction}
 import org.junit.jupiter.api.Assertions.{assertEquals, assertFalse, assertInstanceOf, assertTrue, fail}
-import org.junit.platform.commons.support.ReflectionSupport
 
-import java.lang.reflect.Modifier
-import scala.jdk.javaapi.CollectionConverters
+import scala.jdk.StreamConverters.*
 
-class LoadTank2032Test extends FabricGameTest {
-  private final val BATCH = "defaultBatch"
-  private type TankType = TileTankFabric
+class LoadTank2032Test {
+  private type TankType = TileTank
 
-  @GameTestGenerator
-  def generator(): java.util.List[TestFunction] = {
-    val withHelper = getClass.getDeclaredMethods.toSeq
-      .filter(m => m.getReturnType == Void.TYPE)
-      .filter(m => !m.isAnnotationPresent(classOf[GameTest]))
-      .filter(m => m.getParameterTypes.toSeq == Seq(classOf[GameTestHelper]))
-      .filter(m => (Modifier.PRIVATE & m.getModifiers) == 0)
-      .map { m =>
-        val test: java.util.function.Consumer[GameTestHelper] = g => ReflectionSupport.invokeMethod(m, this, g)
-        GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH, getClass.getSimpleName + "_" + m.getName,
-          "load_20_3_tanks",
-          test
-        )
-      }
-
-    CollectionConverters.asJava(withHelper)
+  private def getTankByTier(tier: Tier): BlockTank = {
+    PlatformTankAccess.getInstance().getTankBlockMap.get(tier).get()
   }
 
   def assumptionWood(helper: GameTestHelper): Unit = {
@@ -42,7 +22,7 @@ class LoadTank2032Test extends FabricGameTest {
     val expectedTier = Tier.WOOD
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        helper.assertBlockPresent(FluidTank.TANK_MAP.get(expectedTier), pos)
+        helper.assertBlockPresent(getTankByTier(expectedTier), pos)
       })
       .thenExecuteAfter(2, () => {
         val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(pos))
@@ -67,7 +47,7 @@ class LoadTank2032Test extends FabricGameTest {
     val expectedTier = Tier.STONE
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        helper.assertBlockPresent(FluidTank.TANK_MAP.get(expectedTier), pos)
+        helper.assertBlockPresent(getTankByTier(expectedTier), pos)
       })
       .thenExecuteAfter(2, () => {
         val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(pos))
@@ -95,7 +75,7 @@ class LoadTank2032Test extends FabricGameTest {
     val expectedTier = Tier.COPPER
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        helper.assertBlockPresent(FluidTank.TANK_MAP.get(expectedTier), pos)
+        helper.assertBlockPresent(getTankByTier(expectedTier), pos)
       })
       .thenExecuteAfter(2, () => {
         val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(pos))
@@ -122,7 +102,7 @@ class LoadTank2032Test extends FabricGameTest {
     val expectedTier = Tier.STAR
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        helper.assertBlockPresent(FluidTank.TANK_MAP.get(expectedTier), pos)
+        helper.assertBlockPresent(getTankByTier(expectedTier), pos)
       })
       .thenExecuteAfter(2, () => {
         val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(pos))
@@ -143,5 +123,19 @@ class LoadTank2032Test extends FabricGameTest {
         assertEquals(3, tanks.size)
       })
       .thenSucceed()
+  }
+}
+
+object LoadTank2032Test {
+  def tests(batch: String, structure: String): java.util.stream.Stream[TestFunction] = {
+    val instance = new LoadTank2032Test
+    instance.getClass.getMethods.toSeq
+      .filter(m => m.getParameterTypes sameElements Array(classOf[GameTestHelper]))
+      .filter(m => m.getReturnType == Void.TYPE)
+      .map { m =>
+        val name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, f"LoadTank2032Test_${m.getName}")
+        new TestFunction(batch, name, structure, 100, 0, true, g => m.invoke(instance, g))
+      }
+      .asJavaSeqStream
   }
 }

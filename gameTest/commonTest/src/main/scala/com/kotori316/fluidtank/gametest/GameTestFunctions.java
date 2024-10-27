@@ -2,10 +2,14 @@ package com.kotori316.fluidtank.gametest;
 
 import com.google.common.base.CaseFormat;
 import com.kotori316.fluidtank.gametest.cat.CatGameTest;
+import com.kotori316.fluidtank.gametest.reservoir.ReservoirTest;
+import com.kotori316.fluidtank.gametest.tank.TankTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Assertions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,6 +21,8 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public final class GameTestFunctions {
+    public static final String BATCH = "from_common";
+
     public static List<TestFunction> createTestFunctionsNoPlace(String batchName, String structureName) {
         ResourceLocation.parse(structureName);
         List<Class<?>> classes = List.of(
@@ -34,7 +40,9 @@ public final class GameTestFunctions {
         var fromClass = getTestFunctionStream(batchName, structureName, classes, 100);
         return Stream.of(
             fromClass,
-            CatGameTest.tests(batchName, structureName)
+            CatGameTest.tests(batchName, structureName),
+            ReservoirTest.tests(batchName, structureName),
+            TankTest.tests(batchName, structureName)
         ).flatMap(Function.identity()).toList();
     }
 
@@ -47,10 +55,10 @@ public final class GameTestFunctions {
             .filter(m -> m.getParameterCount() == 1)
             .filter(m -> m.getParameterTypes()[0] == GameTestHelper.class)
             .filter(m -> m.getReturnType() == void.class)
-            .peek(m -> m.setAccessible(true))
             .map(m ->
                 new TestFunction(batchName, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "%s_%s".formatted(m.getDeclaringClass().getSimpleName(), m.getName())), structureName, maxTicks, 0, true, g -> {
                     try {
+                        m.setAccessible(true);
                         m.invoke(null, g);
                     } catch (InvocationTargetException e) {
                         if (e.getCause() instanceof RuntimeException r) throw r;
@@ -70,5 +78,15 @@ public final class GameTestFunctions {
                 throw new RuntimeException(e);
             }
         };
+    }
+
+    public static @NotNull TestFunction create(String batchName, String structureName, String name, Consumer<GameTestHelper> test) {
+        var formatted = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
+        return new TestFunction(batchName, formatted, structureName, 100, 0, true, wrapper(test));
+    }
+
+    public static void assertEqualStack(ItemStack expected, ItemStack actual) {
+        Assertions.assertTrue(ItemStack.matches(expected, actual),
+            "Expected: %s(%s), Actual: %s(%s)".formatted(expected, expected.getComponentsPatch(), actual, actual.getComponentsPatch()));
     }
 }

@@ -56,7 +56,7 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def capacity1(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    TankTest.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos, Tier.WOOD)
     val storage = getStorage(helper, pos)
     assertEquals(4 * FluidConstants.BUCKET, storage.getCapacity)
     assertEquals(0, storage.getAmount)
@@ -67,8 +67,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def capacity2(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.STONE)
+    GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.STONE)
     val storage = getStorage(helper, pos)
     assertEquals(20 * FluidConstants.BUCKET, storage.getCapacity)
     assertEquals(0, storage.getAmount)
@@ -79,8 +79,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def capacity3(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.CREATIVE)
+    GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.CREATIVE)
     val storage = getStorage(helper, pos)
     assertEquals(GenericUnit.CREATIVE_TANK, GenericUnit(storage.getCapacity), "Connection capacity must not be over GenericUnit.CREATIVE_TANK")
     helper.succeed()
@@ -88,8 +88,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def amountWithCreative1(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tank = TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.CREATIVE)
+    val tank = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.CREATIVE)
     tank.getConnection.getHandler.fill(FluidAmountUtil.BUCKET_WATER, execute = true)
     val storage = getStorage(helper, pos)
     assertEquals(GenericUnit.CREATIVE_TANK, GenericUnit(storage.getAmount), "Connection capacity must not be over GenericUnit.CREATIVE_TANK")
@@ -98,9 +98,9 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def amountWithCreative2(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tank = TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above(1), Tier.CREATIVE)
-    TankTest.placeTank(helper, pos.above(2), Tier.CREATIVE)
+    val tank = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above(1), Tier.CREATIVE)
+    GameTestUtil.placeTank(helper, pos.above(2), Tier.CREATIVE)
     tank.getConnection.getHandler.fill(FluidAmountUtil.BUCKET_WATER, execute = true)
     val storage = getStorage(helper, pos)
     assertEquals(GenericUnit.CREATIVE_TANK, GenericUnit(storage.getAmount), "Connection capacity must not be over GenericUnit.CREATIVE_TANK")
@@ -109,8 +109,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def fillToEmpty(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.STONE)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.STONE)
     val storage = getStorage(helper, pos)
     val filled = Using(Transaction.openOuter()) { transaction =>
       val filled = storage.insert(FluidVariant.of(Fluids.WATER), 6 * FluidConstants.BUCKET, transaction)
@@ -128,8 +128,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def fillToFilled(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.STONE)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.STONE)
     val connection = tile.getConnection
     connection.getHandler.fill(FluidAmountUtil.BUCKET_WATER, execute = true)
     val storage = getStorage(helper, pos)
@@ -148,8 +148,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def fillToFilled2(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.STONE)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.STONE)
     val connection = tile.getConnection
     connection.getHandler.fill(FluidAmountUtil.BUCKET_LAVA, execute = true)
     val storage = getStorage(helper, pos)
@@ -167,8 +167,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def fillToFilled3(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.STONE)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.STONE)
     val connection = tile.getConnection
     connection.getHandler.fill(FluidAmountUtil.BUCKET_WATER, execute = true)
     val storage = getStorage(helper, pos)
@@ -187,8 +187,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def abort1(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.STONE)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.STONE)
     val storage = getStorage(helper, pos)
     val filled = Using(Transaction.openOuter()) { transaction =>
       val filled = storage.insert(FluidVariant.of(Fluids.WATER), 6 * FluidConstants.BUCKET, transaction)
@@ -206,8 +206,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def abort2(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.STONE)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.STONE)
     val connection = tile.getConnection
     connection.getHandler.fill(FluidAmountUtil.BUCKET_WATER, execute = true)
     val storage = getStorage(helper, pos)
@@ -226,8 +226,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def drainFromEmpty(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.STONE)
+    GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.STONE)
     val storage = getStorage(helper, pos)
     val drained = Using(Transaction.openOuter()) { transaction =>
       val drained = storage.extract(FluidVariant.of(Fluids.WATER), 6 * FluidConstants.BUCKET, transaction)
@@ -241,8 +241,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def drainFromFilled1(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.STONE)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.STONE)
     val connection = tile.getConnection
     connection.getHandler.fill(FluidAmountUtil.BUCKET_WATER, execute = true)
     val storage = getStorage(helper, pos)
@@ -259,8 +259,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def drainFromFilled2(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.STONE)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.STONE)
     val connection = tile.getConnection
     connection.getHandler.fill(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(20000)), execute = true)
     val storage = getStorage(helper, pos)
@@ -277,8 +277,8 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def drainFromFilled3(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
-    TankTest.placeTank(helper, pos.above, Tier.STONE)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
+    GameTestUtil.placeTank(helper, pos.above, Tier.STONE)
     val connection = tile.getConnection
     connection.getHandler.fill(FluidAmountUtil.BUCKET_WATER, execute = true)
     val storage = getStorage(helper, pos)
@@ -295,7 +295,7 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def potionStorage(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
     val storage = getStorage(helper, pos)
     tile.getConnection.getHandler.fill(FluidAmountUtil.from(PotionType.NORMAL, Potions.INVISIBILITY, GenericUnit.ONE_BUCKET), execute = true)
     assertTrue(storage.isResourceBlank)
@@ -306,7 +306,7 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def fillPotionStorage(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
     val storage: Storage[FluidVariant] = getStorage(helper, pos)
     tile.getConnection.getHandler.fill(FluidAmountUtil.from(PotionType.NORMAL, Potions.INVISIBILITY, GenericUnit.ONE_BUCKET), execute = true)
     val filled = StorageUtil.simulateInsert(storage, FluidVariant.of(Fluids.WATER), FluidConstants.BUCKET, null)
@@ -316,7 +316,7 @@ final class ConnectionStorageTest extends FabricGameTest {
 
   def drainPotionStorage(helper: GameTestHelper): Unit = {
     val pos = BlockPos.ZERO.above
-    val tile = TankTest.placeTank(helper, pos, Tier.WOOD)
+    val tile = GameTestUtil.placeTank(helper, pos, Tier.WOOD)
     val storage: Storage[FluidVariant] = getStorage(helper, pos)
     tile.getConnection.getHandler.fill(FluidAmountUtil.from(PotionType.NORMAL, Potions.INVISIBILITY, GenericUnit.ONE_BUCKET), execute = true)
     val drained = StorageUtil.simulateExtract(storage, FluidVariant.of(Fluids.WATER), FluidConstants.BUCKET, null)

@@ -179,9 +179,14 @@ dependencies {
     }
 
     "gameTestImplementation"(sourceSets.main.get().output)
+    "gameTestCompileOnly"(project(":gameTest:commonTest"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.compileDataGenScala {
     source(project(":common").sourceSets["dataGen"].allSource)
+}
+
+tasks.named("compileGameTestScala", ScalaCompile::class) {
+    source(project(":gameTest:commonTest").layout.projectDirectory.file("src/main/scala"))
 }

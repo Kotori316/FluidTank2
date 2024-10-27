@@ -12,7 +12,8 @@
       "com.kotori316.fluidtank.fabric.gametest.LoadTank2032Test",
       "com.kotori316.fluidtank.fabric.gametest.CatTest",
       "com.kotori316.fluidtank.fabric.gametest.ReservoirTest",
-      "com.kotori316.fluidtank.fabric.gametest.RecipeTest"
+      "com.kotori316.fluidtank.fabric.gametest.RecipeTest",
+      "com.kotori316.fluidtank.fabric.gametest.FromCommon"
     ]
   }
 }

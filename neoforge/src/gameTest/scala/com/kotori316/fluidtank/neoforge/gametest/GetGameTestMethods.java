@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 
 @Mod("fluidtank_game_test")
 public class GetGameTestMethods {
-    public static final String DEFAULT_BATCH = "fluidtank.defaultBatch";
+    public static final String DEFAULT_BATCH = "defaultBatch";
 
     public GetGameTestMethods() {
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Loaded FluidTank GameTest mod");

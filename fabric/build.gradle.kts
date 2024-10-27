@@ -109,6 +109,7 @@ dependencies {
     }
 
     testImplementation("net.fabricmc:fabric-loader-junit:${project.property("fabric_loader_version")}")
+    testImplementation(project(":gameTest:commonTest"))
 }
 
 tasks {

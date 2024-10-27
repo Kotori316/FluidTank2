@@ -7,6 +7,7 @@ import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.cat.ItemChestAsTank;
 import com.kotori316.fluidtank.config.PlatformConfigAccess;
 import com.kotori316.fluidtank.contents.Tank;
+import com.kotori316.fluidtank.fabric.cat.BlockChestAsTankFabric;
 import com.kotori316.fluidtank.fabric.cat.ChestAsTankStorage;
 import com.kotori316.fluidtank.fabric.config.FabricPlatformConfigAccess;
 import com.kotori316.fluidtank.fabric.integration.ae2.AE2FluidTankIntegration;
@@ -76,7 +77,7 @@ public final class FluidTank implements ModInitializer {
         FabricBlockEntityTypeBuilder.create(TileVoidTank::new, BLOCK_VOID_TANK).build(DSL.emptyPartType());
     public static final LootItemFunctionType<TankLootFunction> TANK_LOOT_FUNCTION = new LootItemFunctionType<>(TankLootFunction.CODEC);
     public static final RecipeSerializer<TierRecipe> TIER_RECIPE_SERIALIZER = TierRecipe.SERIALIZER;
-    public static final BlockChestAsTank BLOCK_CAT = new BlockChestAsTank();
+    public static final BlockChestAsTank BLOCK_CAT = new BlockChestAsTankFabric();
     public static final BlockItem ITEM_CAT = new ItemChestAsTank(BLOCK_CAT);
     public static final Map<Tier, ItemReservoir> RESERVOIR_MAP = Stream.of(Tier.WOOD, Tier.STONE, Tier.IRON)
         .collect(Collectors.toMap(Function.identity(), ItemReservoir::new));

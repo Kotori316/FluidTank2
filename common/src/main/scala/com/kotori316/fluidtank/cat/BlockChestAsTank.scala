@@ -7,8 +7,8 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.{ResourceKey, ResourceLocation}
-import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -17,10 +17,11 @@ import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateD
 import net.minecraft.world.level.block.{Block, EntityBlock, Mirror, Rotation}
 import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.{InteractionHand, InteractionResult}
 
 import scala.jdk.javaapi.CollectionConverters
 
-class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
+abstract class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
   .strength(0.7f).pushReaction(PushReaction.BLOCK).forceSolidOn()
   .setId(ResourceKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME)))
 )
@@ -57,21 +58,33 @@ class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
           player.displayClientMessage(message, false)
         }
       }
-      InteractionResult.SUCCESS_SERVER
+      InteractionResult.SUCCESS
     } else {
       InteractionResult.PASS
     }
   }
 
-  //noinspection ScalaDeprecation,deprecation
+  override def useItemOn(stack: ItemStack, state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
+    if (PlatformFluidAccess.getInstance().isFluidContainer(stack)) {
+      if (!level.isClientSide) {
+        transferFluid(level, pos, player, hand, stack)
+      } else {
+        InteractionResult.SUCCESS_SERVER
+      }
+    } else {
+      super.useItemOn(stack, state, level, pos, player, hand, hit)
+    }
+  }
+
   override def rotate(state: BlockState, rotation: Rotation): BlockState = {
     state.setValue(BlockStateProperties.FACING, rotation.rotate(state.getValue(BlockStateProperties.FACING)))
   }
 
-  //noinspection ScalaDeprecation,deprecation
   override def mirror(state: BlockState, mirror: Mirror): BlockState = {
     this.rotate(state, mirror.getRotation(state.getValue(BlockStateProperties.FACING)))
   }
+
+  def transferFluid(level: Level, pos: BlockPos, player: Player, hand: InteractionHand, stack: ItemStack): InteractionResult
 }
 
 object BlockChestAsTank {

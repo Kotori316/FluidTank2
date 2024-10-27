@@ -24,7 +24,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@SuppressWarnings("UnstableApiUsage")
 public class ChestAsTankStorage implements SlottedStorage<FluidVariant> {
 
     private final SlottedStorage<ItemVariant> items;

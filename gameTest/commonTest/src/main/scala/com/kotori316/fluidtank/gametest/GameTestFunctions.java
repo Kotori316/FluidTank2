@@ -7,6 +7,7 @@ import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -51,6 +52,9 @@ public final class GameTestFunctions {
                 new TestFunction(batchName, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "%s_%s".formatted(m.getDeclaringClass().getSimpleName(), m.getName())), structureName, maxTicks, 0, true, g -> {
                     try {
                         m.invoke(null, g);
+                    } catch (InvocationTargetException e) {
+                        if (e.getCause() instanceof RuntimeException r) throw r;
+                        else throw new RuntimeException(e.getCause());
                     } catch (ReflectiveOperationException | AssertionError e) {
                         throw new RuntimeException(e);
                     }

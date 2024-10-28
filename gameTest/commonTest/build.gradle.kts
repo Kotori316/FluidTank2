@@ -1,6 +1,7 @@
 plugins {
     id("com.kotori316.common")
     alias(libs.plugins.fabric.loom)
+    id("signing")
 }
 
 dependencies {
@@ -17,11 +18,27 @@ dependencies {
     implementation("org.junit.jupiter:junit-jupiter")
 }
 
-tasks.remapJar {
-    enabled = false
+val hasGpgSignature = project.hasProperty("signing.keyId") &&
+        project.hasProperty("signing.password") &&
+        project.hasProperty("signing.secretKeyRingFile")
+
+signing {
+    sign(tasks.jar.get())
 }
 
-tasks.jar {
-    destinationDirectory = project.layout.buildDirectory.dir("libs")
-    archiveClassifier = ""
+tasks {
+    remapJar {
+        enabled = false
+    }
+    val jksSignJar = register("jksSignJar", JarSignTask::class) {
+        jarTask = jar
+    }
+    jar {
+        destinationDirectory = project.layout.buildDirectory.dir("libs")
+        archiveClassifier = ""
+        finalizedBy(jksSignJar)
+    }
+    withType(Sign::class) {
+        onlyIf { hasGpgSignature }
+    }
 }

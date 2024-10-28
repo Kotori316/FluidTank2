@@ -120,3 +120,8 @@ tasks {
         finalizedBy(jksSignRemapJar)
     }
 }
+
+// Workaround?
+tasks.remapJar {
+    mustRunAfter("compileTestScala")
+}

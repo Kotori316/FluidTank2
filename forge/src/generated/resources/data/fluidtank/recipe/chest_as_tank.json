@@ -3,16 +3,10 @@
   "category": "misc",
   "key": {
     "p": [
-      {
-        "item": "minecraft:chest"
-      },
-      {
-        "item": "minecraft:barrel"
-      }
+      "minecraft:chest",
+      "minecraft:barrel"
     ],
-    "x": {
-      "item": "fluidtank:tank_wood"
-    }
+    "x": "fluidtank:tank_wood"
   },
   "pattern": [
     "x x",

@@ -7,8 +7,6 @@
       "tag": "forge:ingots/tin"
     }
   },
-  "sub_item": {
-    "tag": "forge:ingots/tin"
-  },
+  "sub_item": "#forge:ingots/tin",
   "tier": "TIN"
 }

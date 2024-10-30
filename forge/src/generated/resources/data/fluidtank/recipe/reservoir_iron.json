@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "equipment",
   "ingredients": [
-    {
-      "item": "fluidtank:tank_iron"
-    },
-    {
-      "item": "minecraft:bucket"
-    },
-    {
-      "item": "minecraft:bucket"
-    }
+    "fluidtank:tank_iron",
+    "minecraft:bucket",
+    "minecraft:bucket"
   ],
   "result": {
     "count": 1,

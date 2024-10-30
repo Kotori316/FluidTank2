@@ -7,8 +7,6 @@
       "tag": "forge:ingots/lead"
     }
   },
-  "sub_item": {
-    "tag": "forge:ingots/lead"
-  },
+  "sub_item": "#forge:ingots/lead",
   "tier": "LEAD"
 }

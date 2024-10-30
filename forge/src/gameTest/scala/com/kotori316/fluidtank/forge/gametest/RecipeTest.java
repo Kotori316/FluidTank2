@@ -14,11 +14,13 @@ import com.mojang.serialization.JsonOps;
 import io.netty.buffer.ByteBufAllocator;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.RegistryOps;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +30,6 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.gametest.GameTestHolder;
 import org.apache.commons.io.FilenameUtils;
@@ -67,7 +68,7 @@ final class RecipeTest {
     @NotNull
     private static TierRecipe getRecipe() {
         return new TierRecipe(Tier.STONE,
-            Ingredient.of(FluidTank.TANK_MAP.get(Tier.WOOD).get()), Ingredient.of(Tags.Items.STONE)
+            Ingredient.of(FluidTank.TANK_MAP.get(Tier.WOOD).get()), Ingredient.of(Items.STONE)
         );
     }
 
@@ -180,25 +181,39 @@ final class RecipeTest {
         return Stream.of(Tier.values()).filter(Tier::isNormalTankTier)
             .filter(Predicate.isEqual(Tier.WOOD).negate())
             .flatMap(t -> Stream.of(
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_json_" + t.name().toLowerCase(Locale.ROOT), () -> serializeJson(t)),
+                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_json_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializeJson(g, t)),
                 GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_packet_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializePacket(g, t))
             ))
             .toList();
     }
 
-    void serializeJson(Tier tier) {
+    void serializeJson(GameTestHelper helper, Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
-        var id = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_" + tier.name().toLowerCase(Locale.ROOT));
         var recipe = new TierRecipe(
             tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
+        String expected = """
+            {
+              "type": "%s",
+              "tier": "%s",
+              "sub_item": "minecraft:apple"
+            }
+            """.formatted(TierRecipe.Serializer.LOCATION.toString(), tier.name());
+        var expectedJson = GsonHelper.parse(expected);
 
-        var fromSerializer = TierRecipe.SERIALIZER.toJson(recipe);
+        var codec = helper.getLevel().registryAccess().createSerializationContext(JsonOps.INSTANCE);
+        var fromSerializer = assertDoesNotThrow(() -> Recipe.CODEC.encodeStart(codec, recipe).getOrThrow());
+        assertEquals(expectedJson, fromSerializer);
 
-        var deserialized = TierRecipe.SERIALIZER.fromJson(fromSerializer);
+        var deserialized = assertInstanceOf(TierRecipe.class,
+            assertDoesNotThrow(() ->
+                    Recipe.CODEC.parse(codec, fromSerializer).getOrThrow(),
+                "Failed to parse recipe for %s".formatted(tier)),
+            "Loaded recipe is not TierRecipe");
         assertNotNull(deserialized);
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResult(), deserialized.getResult()))
         );
+        helper.succeed();
     }
 
     void serializePacket(GameTestHelper helper, Tier tier) {
@@ -227,7 +242,7 @@ final class RecipeTest {
               }
             }
             """.formatted(TierRecipe.Serializer.LOCATION.toString());
-        var read = managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess());
+        var read = assertInstanceOf(TierRecipe.class, managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()));
         var recipe = new TierRecipe(
             Tier.STONE, TierRecipe.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
@@ -267,8 +282,8 @@ final class RecipeTest {
     }
 
     private static Recipe<?> managerFromJson(ResourceLocation location, JsonObject jsonObject, HolderLookup.Provider provider) {
-        return Try.call(() -> RecipeManager.class.getDeclaredMethod("fromJson", ResourceLocation.class, JsonObject.class, HolderLookup.Provider.class))
-            .andThenTry(m -> ReflectionSupport.invokeMethod(m, null, location, jsonObject, provider))
+        return Try.call(() -> RecipeManager.class.getDeclaredMethod("fromJson", ResourceKey.class, JsonObject.class, HolderLookup.Provider.class))
+            .andThenTry(m -> ReflectionSupport.invokeMethod(m, null, ResourceKey.create(Registries.RECIPE, location), jsonObject, provider))
             .andThenTry(RecipeHolder.class::cast)
             .andThenTry(RecipeHolder::value)
             .andThenTry(Recipe.class::cast)

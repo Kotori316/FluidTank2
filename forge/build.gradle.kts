@@ -193,6 +193,7 @@ dependencies {
         isTransitive = false
     }
 
+    "gameTestCompileOnly"(project(":gameTest:commonTest"))
     "gameTestImplementation"(platform("org.junit:junit-bom:${project.property("jupiterVersion")}"))
     "gameTestImplementation"("org.junit.jupiter:junit-jupiter")
 }
@@ -203,6 +204,9 @@ tasks.named("compileRunGameScala", ScalaCompile::class) {
     }
     source(project.sourceSets.main.get().scala)
     source(project.sourceSets.named("gameTest").get().scala)
+    project.findProject(":gameTest:commonTest")?.let {
+        source(it.layout.projectDirectory.file("src/main/scala"))
+    }
 }
 
 tasks.named("processRunGameResources", ProcessResources::class) {

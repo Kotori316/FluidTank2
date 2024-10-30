@@ -11,13 +11,13 @@ import com.kotori316.fluidtank.tank.Tier
 import com.kotori316.testutil.GameTestUtil
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
-import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.Vec3
-import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
+import net.minecraft.world.{InteractionHand, InteractionResult}
+import org.junit.jupiter.api.Assertions.*
 
 import scala.jdk.javaapi.CollectionConverters
 

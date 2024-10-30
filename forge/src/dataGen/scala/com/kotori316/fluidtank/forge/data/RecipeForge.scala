@@ -11,23 +11,23 @@ import java.util.concurrent.CompletableFuture
 import scala.jdk.javaapi.CollectionConverters
 
 class RecipeForge(output: PackOutput, registries: CompletableFuture[HolderLookup.Provider]) extends DataProvider {
-  val ip = new IngredientProviderForge
-  private final val internal = com.kotori316.fluidtank.data.Recipe(ip, output, registries)
 
   override def run(pOutput: CachedOutput): CompletableFuture[?] = {
     val recipePathProvider = output.createRegistryElementsPathProvider(Registries.RECIPE)
     val advancementPathProvider = output.createRegistryElementsPathProvider(Registries.ADVANCEMENT)
 
     registries.thenApplyAsync[CollectRecipe] { provider =>
+      val ip = new IngredientProviderForge(provider.lookupOrThrow(Registries.ITEM))
       val collector = CollectRecipe(provider)
-      internal.buildRecipes(collector)
+      val internal = com.kotori316.fluidtank.data.Recipe(ip, collector, provider)
+      internal.buildRecipes()
       collector
     }.thenCompose { collected =>
       val registryOps = collected.registry().createSerializationContext(JsonOps.INSTANCE)
       val recipeFeatures = collected.getSavedRecipes.map { (id, recipe, conditions) =>
         val json = net.minecraft.world.item.crafting.Recipe.CODEC.encodeStart(registryOps, recipe).getOrThrow().getAsJsonObject
         saveConditions(registryOps, conditions, json)
-        val path = recipePathProvider.json(id)
+        val path = recipePathProvider.json(id.location())
         DataProvider.saveStable(pOutput, json, path)
       }
 

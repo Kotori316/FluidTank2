@@ -4,30 +4,30 @@ import com.kotori316.fluidtank.BeforeMC
 import com.kotori316.fluidtank.connection.Connection
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank}
 import com.kotori316.fluidtank.fluids.*
+import com.kotori316.fluidtank.tank.TileTankTest.{BlockCreativeTankForTest, BlockTankForTest, TileCreativeTankForTest, TileTankForTest}
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
-import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
+import net.minecraft.world.level.block.state.BlockState
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.{Nested, Test}
 import org.mockito.{ArgumentMatchers, Mockito}
 
 class TileTankTest extends BeforeMC {
-  private val tankBlock = new BlockTank(Tier.WOOD) {
-    override protected def createBlockInstance(): BlockTank = throw new UnsupportedOperationException("TileTankTest#createBlockInstance")
-  }
-  private val creativeTankBlock = new BlockCreativeTank
+  private val tankBlock = new BlockTankForTest()
+  private val creativeTankBlock = new BlockCreativeTankForTest
   private val voidTankBlock = new BlockVoidTank
 
   def createTile(tier: Tier, pos: BlockPos): TileTank = {
     val tileType: BlockEntityType[? <: TileTank] = Mockito.mock(classOf[BlockEntityType[? <: TileTank]])
     Mockito.when(tileType.isValid(ArgumentMatchers.any())).thenReturn(true)
-    new TileTank(tier, tileType, pos, tankBlock.defaultBlockState())
+    new TileTankForTest(tier, tileType, pos, tankBlock.defaultBlockState())
   }
 
   def createCreativeTile(pos: BlockPos): TileCreativeTank = {
     val tileType: BlockEntityType[? <: TileTank] = Mockito.mock(classOf[BlockEntityType[? <: TileTank]])
     Mockito.when(tileType.isValid(ArgumentMatchers.any())).thenReturn(true)
-    new TileCreativeTank(tileType, pos, creativeTankBlock.defaultBlockState())
+    new TileCreativeTankForTest(tileType, pos, creativeTankBlock.defaultBlockState())
   }
 
   def createVoidTile(pos: BlockPos): TileVoidTank = {
@@ -209,5 +209,31 @@ class TileTankTest extends BeforeMC {
       assertEquals(name, tile.getCustomName)
       assertEquals(name, tile.getDisplayName)
     }
+  }
+}
+
+object TileTankTest {
+
+  class BlockTankForTest extends BlockTank(Tier.WOOD) {
+
+    override protected def createBlockInstance(): BlockTank = throw new UnsupportedOperationException("BlockTankForTest#createBlockInstance")
+
+    override def newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = new TileTankForTest(this.tier, null, pos, state)
+  }
+
+  class TileTankForTest(tier: Tier, t: BlockEntityType[? <: TileTank], p: BlockPos, s: BlockState) extends TileTank(tier, t, p, s) {
+    override def getVisualTank: VisualTank = new VisualTank
+
+    override def isValidBlockState(blockState: BlockState): Boolean = true
+  }
+
+  class BlockCreativeTankForTest extends BlockCreativeTank {
+    override def newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = throw new UnsupportedOperationException("BlockCreativeTankForTest#createBlockInstance")
+  }
+
+  class TileCreativeTankForTest(t: BlockEntityType[? <: TileTank], p: BlockPos, s: BlockState) extends TileCreativeTank(t, p, s) {
+    override def getVisualTank: VisualTank = new VisualTank
+
+    override def isValidBlockState(blockState: BlockState): Boolean = true
   }
 }

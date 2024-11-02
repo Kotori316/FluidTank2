@@ -4,6 +4,9 @@ import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.forge.render.RenderReservoirItemForge;
 import com.kotori316.fluidtank.forge.render.RenderTank;
 import com.kotori316.fluidtank.render.ReservoirModel;
+import com.kotori316.fluidtank.tank.PlatformTankAccess;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
@@ -18,6 +21,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public abstract class SideProxy {
 
@@ -41,7 +45,16 @@ public abstract class SideProxy {
             FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Client Initialize {}", FluidTankCommon.modId);
             BlockEntityRenderers.register(FluidTank.TILE_TANK_TYPE.get(), RenderTank::new);
             BlockEntityRenderers.register(FluidTank.TILE_CREATIVE_TANK_TYPE.get(), RenderTank::new);
+
+            setRenderLayer();
             FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Client Initialize finished {}", FluidTankCommon.modId);
+        }
+
+        @SuppressWarnings("deprecation")
+        private void setRenderLayer() {
+            // Loading from JSON is now broken in Forge?
+            PlatformTankAccess.getInstance().getTankBlockMap().values().stream().map(Supplier::get)
+                .forEach(b -> ItemBlockRenderTypes.setRenderLayer(b, RenderType.cutout()));
         }
 
         @Override

@@ -18,7 +18,7 @@ import org.jetbrains.annotations.{NotNull, Nullable}
 
 import java.util.Locale
 
-class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: BlockPos, s: BlockState)
+abstract class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: BlockPos, s: BlockState)
   extends BlockEntity(t, p, s) with Nameable {
 
   def this(p: BlockPos, s: BlockState) = {
@@ -43,6 +43,8 @@ class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: BlockPos, s
   }
 
   def getTank: Tank[FluidLike] = this.tank
+
+  def getVisualTank: VisualTank
 
   // Override of BlockEntity
   override def loadAdditional(tag: CompoundTag, provider: HolderLookup.Provider): Unit = {

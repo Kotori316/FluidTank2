@@ -15,7 +15,7 @@ public final class TileCreativeTankFabric extends TileCreativeTank {
         super(p, s);
     }
 
-    public VisualTank visualTank = new VisualTank();
+    private VisualTank visualTank = new VisualTank();
 
     @Override
     public void setTank(Tank<FluidLike> tank) {
@@ -29,5 +29,10 @@ public final class TileCreativeTankFabric extends TileCreativeTank {
             if (visualTank == null) visualTank = new VisualTank();
             visualTank.updateContent(tank.capacity(), tank.amount(), tank.content().isGaseous());
         }
+    }
+
+    @Override
+    public VisualTank getVisualTank() {
+        return visualTank;
     }
 }

@@ -44,9 +44,7 @@ abstract class BlockTank(val tier: Tier) extends Block(
 
   override def toString: String = s"Block{${tier.getBlockName}}"
 
-  override def newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = {
-    new TileTank(tier, pos, state)
-  }
+  override def newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity
 
   //noinspection ScalaDeprecation,deprecation
   override final def skipRendering(state: BlockState, adjacentBlockState: BlockState, side: Direction) = true

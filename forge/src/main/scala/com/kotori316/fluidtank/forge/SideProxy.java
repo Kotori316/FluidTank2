@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.forge;
 
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.forge.render.RenderReservoirItemForge;
-import com.kotori316.fluidtank.forge.render.RenderTank;
+import com.kotori316.fluidtank.forge.render.RenderTankForge;
 import com.kotori316.fluidtank.render.ReservoirModel;
 import com.kotori316.fluidtank.tank.PlatformTankAccess;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -43,8 +43,8 @@ public abstract class SideProxy {
         @SubscribeEvent
         public void registerTESR(FMLClientSetupEvent event) {
             FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Client Initialize {}", FluidTankCommon.modId);
-            BlockEntityRenderers.register(FluidTank.TILE_TANK_TYPE.get(), RenderTank::new);
-            BlockEntityRenderers.register(FluidTank.TILE_CREATIVE_TANK_TYPE.get(), RenderTank::new);
+            BlockEntityRenderers.register(FluidTank.TILE_TANK_TYPE.get(), RenderTankForge::new);
+            BlockEntityRenderers.register(FluidTank.TILE_CREATIVE_TANK_TYPE.get(), RenderTankForge::new);
 
             setRenderLayer();
             FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Client Initialize finished {}", FluidTankCommon.modId);

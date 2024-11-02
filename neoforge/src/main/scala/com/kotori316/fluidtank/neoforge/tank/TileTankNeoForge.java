@@ -26,7 +26,7 @@ public final class TileTankNeoForge extends TileTank {
 
     @NotNull
     private IFluidHandler fluidHandler = createHandler();
-    public final VisualTank visualTank = new VisualTank();
+    private final VisualTank visualTank = new VisualTank();
 
     @Override
     public void setConnection(FluidConnection c) {
@@ -45,6 +45,11 @@ public final class TileTankNeoForge extends TileTank {
             // If level is null, it is the instance in RenderItemTank
             visualTank.updateContent(tank.capacity(), tank.amount(), tank.content().isGaseous());
         }
+    }
+
+    @Override
+    public VisualTank getVisualTank() {
+        return visualTank;
     }
 
     @NotNull

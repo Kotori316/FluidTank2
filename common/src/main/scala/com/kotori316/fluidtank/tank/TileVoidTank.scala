@@ -13,4 +13,6 @@ class TileVoidTank(t: BlockEntityType[? <: TileTank], p: BlockPos, s: BlockState
   }
 
   setTank(VoidTank.apply)
+
+  override def getVisualTank: VisualTank = throw new UnsupportedOperationException("Visual tank for Void tank is not needed as void tank never has content.")
 }

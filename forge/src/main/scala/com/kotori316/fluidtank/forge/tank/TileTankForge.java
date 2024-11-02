@@ -11,7 +11,6 @@ import com.kotori316.fluidtank.tank.VisualTank;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -29,7 +28,7 @@ public final class TileTankForge extends TileTank {
     }
 
     private LazyOptional<IFluidHandler> fluidHandler = createHandler();
-    public final VisualTank visualTank = new VisualTank();
+    private final VisualTank visualTank = new VisualTank();
 
     @Override
     public void setConnection(FluidConnection c) {
@@ -48,6 +47,11 @@ public final class TileTankForge extends TileTank {
             // If level is null, it is the instance in RenderItemTank
             visualTank.updateContent(tank.capacity(), tank.amount(), tank.content().isGaseous());
         }
+    }
+
+    @Override
+    public VisualTank getVisualTank() {
+        return visualTank;
     }
 
     @Override

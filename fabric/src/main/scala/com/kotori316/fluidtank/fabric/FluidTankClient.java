@@ -4,7 +4,7 @@ import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.fabric.message.PacketHandler;
 import com.kotori316.fluidtank.fabric.render.RenderItemTank;
 import com.kotori316.fluidtank.fabric.render.RenderReservoirItemFabric;
-import com.kotori316.fluidtank.fabric.render.RenderTank;
+import com.kotori316.fluidtank.fabric.render.RenderTankFabric;
 import com.kotori316.fluidtank.render.ReservoirModel;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -33,8 +33,8 @@ public final class FluidTankClient implements ClientModInitializer {
         FluidTank.RESERVOIR_MAP.values().forEach(b -> BuiltinItemRendererRegistry.INSTANCE.register(b, reservoirRenderer));
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(reservoirRenderer);
 
-        BlockEntityRenderers.register(FluidTank.TILE_TANK_TYPE, RenderTank::new);
-        BlockEntityRenderers.register(FluidTank.TILE_CREATIVE_TANK_TYPE, RenderTank::new);
+        BlockEntityRenderers.register(FluidTank.TILE_TANK_TYPE, RenderTankFabric::new);
+        BlockEntityRenderers.register(FluidTank.TILE_CREATIVE_TANK_TYPE, RenderTankFabric::new);
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Client Initialize finished {}", FluidTankCommon.modId);
     }
 }

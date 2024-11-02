@@ -21,7 +21,7 @@ public final class TileCreativeTankNeoForge extends TileCreativeTank {
 
     @NotNull
     private IFluidHandler fluidHandler = createHandler();
-    public VisualTank visualTank;
+    private VisualTank visualTank;
 
     @Override
     public void setConnection(FluidConnection c) {
@@ -41,6 +41,11 @@ public final class TileCreativeTankNeoForge extends TileCreativeTank {
             if (visualTank == null) visualTank = new VisualTank();
             visualTank.updateContent(tank.capacity(), tank.amount(), tank.content().isGaseous());
         }
+    }
+
+    @Override
+    public VisualTank getVisualTank() {
+        return visualTank;
     }
 
     @NotNull

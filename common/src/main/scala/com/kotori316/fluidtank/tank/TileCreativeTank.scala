@@ -11,5 +11,8 @@ abstract class TileCreativeTank(t: BlockEntityType[? <: TileTank], p: BlockPos, 
     this(PlatformTankAccess.getInstance().getCreativeType, p, s)
   }
 
+  protected final val visualTank = new VisualTank
   setTank(new CreativeTank(this.getTank.content, this.getTank.capacity))
+
+  override final def getVisualTank: VisualTank = visualTank
 }

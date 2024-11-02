@@ -6,7 +6,6 @@ import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.forge.message.FluidTankContentMessageForge;
 import com.kotori316.fluidtank.forge.message.PacketHandler;
 import com.kotori316.fluidtank.tank.TileCreativeTank;
-import com.kotori316.fluidtank.tank.VisualTank;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,7 +22,6 @@ public final class TileCreativeTankForge extends TileCreativeTank {
     }
 
     private LazyOptional<IFluidHandler> fluidHandler = createHandler();
-    private VisualTank visualTank;
 
     @Override
     public void setConnection(FluidConnection c) {
@@ -40,14 +38,8 @@ public final class TileCreativeTankForge extends TileCreativeTank {
         } else {
             // In client side
             // If level is null, it is the instance in RenderItemTank
-            if (visualTank == null) visualTank = new VisualTank();
-            visualTank.updateContent(tank.capacity(), tank.amount(), tank.content().isGaseous());
+            visualTank().updateContent(tank.capacity(), tank.amount(), tank.content().isGaseous());
         }
-    }
-
-    @Override
-    public VisualTank getVisualTank() {
-        return visualTank;
     }
 
     @Override

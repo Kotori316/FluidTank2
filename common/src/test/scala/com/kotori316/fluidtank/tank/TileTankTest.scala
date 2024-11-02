@@ -232,8 +232,6 @@ object TileTankTest {
   }
 
   class TileCreativeTankForTest(t: BlockEntityType[? <: TileTank], p: BlockPos, s: BlockState) extends TileCreativeTank(t, p, s) {
-    override def getVisualTank: VisualTank = new VisualTank
-
     override def isValidBlockState(blockState: BlockState): Boolean = true
   }
 }

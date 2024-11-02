@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.forge.data
 
 import com.kotori316.fluidtank.data.{IngredientProvider, TankSubitem}
 import com.kotori316.fluidtank.tank.Tier
+import net.minecraft.core.HolderGetter
 import net.minecraft.core.registries.Registries
 import net.minecraft.data.recipes.RecipeOutput
 import net.minecraft.resources.ResourceLocation
@@ -10,7 +11,9 @@ import net.minecraft.world.item.Item
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.conditions.{NotCondition, TagEmptyCondition}
 
-class IngredientProviderForge extends IngredientProvider {
+class IngredientProviderForge(i: HolderGetter[Item]) extends IngredientProvider {
+
+  given itemRegistry: HolderGetter[Item] = i
 
   override def glassTag: TagKey[Item] = Tags.Items.GLASS_BLOCKS
 

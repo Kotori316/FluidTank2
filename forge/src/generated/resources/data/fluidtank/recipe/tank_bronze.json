@@ -7,8 +7,6 @@
       "tag": "forge:ingots/bronze"
     }
   },
-  "sub_item": {
-    "tag": "forge:ingots/bronze"
-  },
+  "sub_item": "#forge:ingots/bronze",
   "tier": "BRONZE"
 }

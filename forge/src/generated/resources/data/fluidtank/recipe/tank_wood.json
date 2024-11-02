@@ -9,12 +9,8 @@
     }
   },
   "key": {
-    "p": {
-      "tag": "minecraft:logs"
-    },
-    "x": {
-      "tag": "c:glass_blocks"
-    }
+    "p": "#minecraft:logs",
+    "x": "#c:glass_blocks"
   },
   "pattern": [
     "x x",

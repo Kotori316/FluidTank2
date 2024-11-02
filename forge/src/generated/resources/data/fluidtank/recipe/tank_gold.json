@@ -7,8 +7,6 @@
       "tag": "c:ingots/gold"
     }
   },
-  "sub_item": {
-    "tag": "c:ingots/gold"
-  },
+  "sub_item": "#c:ingots/gold",
   "tier": "GOLD"
 }

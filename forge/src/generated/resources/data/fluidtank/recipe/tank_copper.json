@@ -7,8 +7,6 @@
       "tag": "c:ingots/copper"
     }
   },
-  "sub_item": {
-    "tag": "c:ingots/copper"
-  },
+  "sub_item": "#c:ingots/copper",
   "tier": "COPPER"
 }

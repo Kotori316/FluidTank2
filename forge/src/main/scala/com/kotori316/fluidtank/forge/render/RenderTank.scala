@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.blockentity.{BlockEntityRenderer, BlockEnti
 import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
 import net.minecraft.core.BlockPos
 import net.minecraft.core.component.DataComponents
+import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.inventory.InventoryMenu
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.material.Fluids
@@ -25,8 +26,10 @@ import scala.jdk.OptionConverters.RichOptional
 class RenderTank(d: BlockEntityRendererProvider.Context) extends BlockEntityRenderer[TileTank] {
 
   override def render(te: TileTank, partialTicks: Float, matrix: PoseStack, buffer: MultiBufferSource, light: Int, otherLight: Int): Unit = {
+    val profiler = Profiler.get()
     profiler.push("RenderTank")
     if (!te.getTank.isEmpty) {
+      profiler.push("Rendering")
       matrix.pushPose()
       val b = buffer.getBuffer(RenderType.translucent)
       val tank = getVisualTank(te)
@@ -41,6 +44,7 @@ class RenderTank(d: BlockEntityRendererProvider.Context) extends BlockEntityRend
         tank.box.render(b, matrix, texture, alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
       }
       matrix.popPose()
+      profiler.pop()
     }
     profiler.pop()
   }

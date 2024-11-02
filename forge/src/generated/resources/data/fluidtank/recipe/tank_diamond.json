@@ -7,8 +7,6 @@
       "tag": "c:gems/diamond"
     }
   },
-  "sub_item": {
-    "tag": "c:gems/diamond"
-  },
+  "sub_item": "#c:gems/diamond",
   "tier": "DIAMOND"
 }

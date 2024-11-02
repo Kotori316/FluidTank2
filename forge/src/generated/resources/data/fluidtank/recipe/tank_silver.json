@@ -7,8 +7,6 @@
       "tag": "forge:ingots/silver"
     }
   },
-  "sub_item": {
-    "tag": "forge:ingots/silver"
-  },
+  "sub_item": "#forge:ingots/silver",
   "tier": "SILVER"
 }

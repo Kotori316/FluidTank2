@@ -191,7 +191,7 @@ final class ForgePlatformAccess implements PlatformAccess {
 
     @Override
     public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
-        return stack.getCraftingRemainingItem();
+        return stack.getCraftingRemainder();
     }
 
     @Override

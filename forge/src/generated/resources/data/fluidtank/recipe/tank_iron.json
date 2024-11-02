@@ -7,8 +7,6 @@
       "tag": "c:ingots/iron"
     }
   },
-  "sub_item": {
-    "tag": "c:ingots/iron"
-  },
+  "sub_item": "#c:ingots/iron",
   "tier": "IRON"
 }

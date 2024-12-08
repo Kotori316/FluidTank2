@@ -1,6 +1,6 @@
 [versions]
 plugin_architectury = "3.4.160"
-plugin_loom = "1.7.417"
+plugin_loom = "1.9.420"
 plugin_cf = "3.3"
 plugin_shadow = "8.+"
 plugin_publish_all = "0.+"

@@ -65,37 +65,35 @@ runs {
             runtime(project.configurations["junit"])
         }
     }
-    if (System.getenv("RUN_DATA_GEN").toBoolean()) {
-        create("data") {
-            client()
-            workingDirectory = project.file("runs/data")
-            arguments(
-                "--mod",
-                "${modId}_data",
-                "--all",
-                "--output",
-                file("src/generated/resources/").toString(),
-                "--existing",
-                file("src/main/resources/").toString()
-            )
-            modSources.add("${modId}_data", sourceSets["dataGen"])
-        }
-        create("commonData") {
-            runType("data")
-            isDataGenerator = true
-            workingDirectory.set(project.file("runs/commonData"))
-            arguments.addAll(
-                "--mod",
-                "${modId}_common_data",
-                "--all",
-                "--output",
-                project(":common").file("src/generated/resources/").toString(),
-                "--existing",
-                project(":common").file("src/main/resources/").toString()
-            )
+    create("clientData") {
+        client()
+        workingDirectory = project.file("runs/data")
+        arguments(
+            "--mod",
+            "${modId}_data",
+            "--all",
+            "--output",
+            file("src/generated/resources/").toString(),
+            "--existing",
+            file("src/main/resources/").toString()
+        )
+        modSources.add("${modId}_data", sourceSets["dataGen"])
+    }
+    create("commonData") {
+        runType("clientData")
+        isDataGenerator = true
+        workingDirectory.set(project.file("runs/commonData"))
+        arguments.addAll(
+            "--mod",
+            "${modId}_common_data",
+            "--all",
+            "--output",
+            project(":common").file("src/generated/resources/").toString(),
+            "--existing",
+            project(":common").file("src/main/resources/").toString()
+        )
 
-            modSources.add("${modId}_common_data", sourceSets["commonDataGen"])
-        }
+        modSources.add("${modId}_common_data", sourceSets["commonDataGen"])
     }
     create("junit") {
         unitTestSources.add("${modId}_test", sourceSets["test"])

@@ -78,7 +78,7 @@ jobs:
           RUN_GAME_TEST: true
       - name: ${{ matrix.platform }} DataGen
         if: ${{ matrix.platform != 'common' }}
-        run: ./gradlew :${{ matrix.platform }}:runData
+        run: ./gradlew :${{ matrix.platform }}:${{ matrix.platform == 'neoforge' && 'runClientData' || 'runData' }}
         timeout-minutes: 5
         env:
           TEST_UTILITY_LOG_ALL_DATA: true

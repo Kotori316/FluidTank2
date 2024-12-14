@@ -48,6 +48,7 @@ runs {
         systemProperty("neoforge.enabledGameTestNamespaces", modId)
         systemProperty("mixin.debug.export", "true")
         modSources.add(modId, sourceSets["main"])
+        shouldExportToIDE = false
     }
 
     create("client") {
@@ -96,6 +97,7 @@ runs {
         modSources.add("${modId}_common_data", sourceSets["commonDataGen"])
     }
     create("junit") {
+        isJUnit = true
         unitTestSources.add("${modId}_test", sourceSets["test"])
     }
 }

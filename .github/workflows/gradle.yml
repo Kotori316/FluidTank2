@@ -109,6 +109,16 @@ jobs:
         run: git status
       - name: Check diff
         run: git diff --exit-code -- ./${{ matrix.platform }}/src/generated
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: FluidTank2-${{ github.run_number }}-test-${{ matrix.platform }}
+          path: |
+            build/reports
+            game-test/logs
+          if-no-files-found: ignore
+          retention-days: 1
 
   common-data-gen:
     runs-on: ubuntu-latest

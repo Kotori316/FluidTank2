@@ -14,7 +14,7 @@ object FluidTankDataProvider {
   def onEvent(event: GatherDataEvent): Unit = {
     PlatformConfigAccess.setInstance(() => ConfigData.FOR_TEST)
     FluidTankCommon.LOGGER.info("Start NeoForge data generation")
-    event.getGenerator.addProvider(event.includeServer, new RecipeNeoForge(event.getGenerator.getPackOutput, event.getLookupProvider))
+    event.addProvider(new RecipeNeoForge(event.getGenerator.getPackOutput, event.getLookupProvider))
   }
 }
 

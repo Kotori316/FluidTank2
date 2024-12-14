@@ -11,7 +11,7 @@ import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.level.ItemLike
 
 trait IngredientProvider {
-  given itemRegistry: HolderGetter[Item]
+  given itemRegistry: HolderGetter[Item] = scala.compiletime.deferred
 
   def glass: Ingredient = Ingredient.of(itemRegistry.getOrThrow(glassTag))
 

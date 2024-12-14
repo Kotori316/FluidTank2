@@ -7,13 +7,13 @@ import com.kotori316.fluidtank.fabric.FluidTank;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
 import com.kotori316.fluidtank.tank.TankPos;
+import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
-import net.minecraft.data.models.BlockModelGenerators;
-import net.minecraft.data.models.ItemModelGenerators;
-import net.minecraft.data.models.blockstates.PropertyDispatch;
-import net.minecraft.data.models.blockstates.Variant;
-import net.minecraft.data.models.model.*;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.blockstates.PropertyDispatch;
+import net.minecraft.client.data.models.blockstates.Variant;
+import net.minecraft.client.data.models.model.*;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.IOException;
@@ -69,7 +69,7 @@ final class ModelProvider extends FabricModelProvider {
         var modelLocation = ModelTemplates.CUBE_TOP.create(blockCat, textureMapping, generators.modelOutput);
         generators.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(blockCat, modelLocation)
             .with(generators.createColumnWithFacing()));
-        generators.delegateItemModel(blockCat, modelLocation);
+        generators.registerSimpleItemModel(blockCat, modelLocation);
     }
 
     void tankBase(BlockModelGenerators generators) {
@@ -105,11 +105,10 @@ final class ModelProvider extends FabricModelProvider {
             .put(TextureSlot.SIDE, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
             .put(TextureSlot.PARTICLE, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
             .put(TextureSlot.TOP, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"));
-        var modelLocation = this.tankBlockParent.create(ModelLocationUtils.getModelLocation(blockTank), textureMapping, generators.modelOutput, (resourceLocation, map) -> {
-            var jsonObject = this.tankBlockParent.createBaseTemplate(resourceLocation, map);
+        var modelLocation = this.tankBlockParent.create(ModelLocationUtils.getModelLocation(blockTank), textureMapping, (resourceLocation, o) -> {
+            var jsonObject = (JsonObject) o.get();
             // required in forge
             jsonObject.addProperty("render_type", "minecraft:cutout");
-            return jsonObject;
         });
         generators.blockStateOutput.accept(
             BlockModelGenerators.createSimpleBlock(blockTank, modelLocation)
@@ -123,7 +122,7 @@ final class ModelProvider extends FabricModelProvider {
         try (var inputStream = ModelProvider.class.getResourceAsStream("/template/item/reservoirs.json");
              var reader = new InputStreamReader(Objects.requireNonNull(inputStream))) {
             var modelJson = gson.fromJson(reader, JsonObject.class);
-            generators.output.accept(
+            generators.modelOutput.accept(
                 // No need to add extension
                 ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/reservoirs"),
                 () -> modelJson
@@ -134,6 +133,6 @@ final class ModelProvider extends FabricModelProvider {
     }
 
     void reservoir(ItemReservoir reservoir, ItemModelGenerators generators) {
-        generators.output.accept(ModelLocationUtils.getModelLocation(reservoir), new DelegatedModel(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/reservoirs")));
+        generators.modelOutput.accept(ModelLocationUtils.getModelLocation(reservoir), new DelegatedModel(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/reservoirs")));
     }
 }

@@ -10,8 +10,9 @@ import net.minecraft.data.recipes.{RecipeCategory, RecipeOutput, RecipeProvider,
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.level.ItemLike
 
-import scala.jdk.CollectionConverters.CollectionHasAsScala
+import scala.jdk.StreamConverters.StreamHasToScala
 
 class Recipe(ip: IngredientProvider, recipeOutput: RecipeOutput, registries: HolderLookup.Provider)
   extends RecipeProvider(registries, recipeOutput) {
@@ -49,7 +50,7 @@ class Recipe(ip: IngredientProvider, recipeOutput: RecipeOutput, registries: Hol
       if t != Tier.WOOD
     } {
       val tankItem = TierRecipe.Serializer.getIngredientTankForTier(t)
-      val itemArr = tankItem.items().asScala.map(_.value()).toSeq
+      val itemArr: Seq[? <: ItemLike] = TierRecipe.Serializer.getTankForTier(t).toScala(Seq)
       val subItem = ip.subItemOfTank(t)
       TierRecipeBuilder(t, tankItem, subItem.ingredient)
         .unlockedBy("has_tank", InventoryChangeTrigger.TriggerInstance.hasItems(itemArr *))

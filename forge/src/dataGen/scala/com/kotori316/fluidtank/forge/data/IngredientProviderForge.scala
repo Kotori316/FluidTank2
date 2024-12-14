@@ -13,7 +13,7 @@ import net.minecraftforge.common.crafting.conditions.{NotCondition, TagEmptyCond
 
 class IngredientProviderForge(i: HolderGetter[Item]) extends IngredientProvider {
 
-  given itemRegistry: HolderGetter[Item] = i
+  override given itemRegistry: HolderGetter[Item] = i
 
   override def glassTag: TagKey[Item] = Tags.Items.GLASS_BLOCKS
 

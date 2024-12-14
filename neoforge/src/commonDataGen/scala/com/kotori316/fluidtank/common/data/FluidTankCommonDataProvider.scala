@@ -24,12 +24,12 @@ object FluidTankCommonDataProvider {
     PlatformConfigAccess.setInstance(() => ConfigData.FOR_TEST)
     FluidTankCommon.LOGGER.info("Start NeoForge common data generation")
 
-    event.getGenerator.addProvider(event.includeServer, new LootTableProvider(event.getGenerator.getPackOutput, Collections.emptySet(),
+    event.addProvider(new LootTableProvider(event.getGenerator.getPackOutput, Collections.emptySet(),
       CollectionConverters.asJava(Seq(new LootTableProvider.SubProviderEntry(r => new LootSubProvider(r), LootContextParamSets.BLOCK))),
       event.getLookupProvider
     ))
-    event.getGenerator.addProvider(event.includeClient, StateAndModelProvider(event.getGenerator, event.getExistingFileHelper))
-    event.getGenerator.addProvider(true, PackMetadataGenerator(event.getGenerator.getPackOutput)
+    event.addProvider(StateAndModelProvider(event.getGenerator, event.getExistingFileHelper))
+    event.addProvider(PackMetadataGenerator(event.getGenerator.getPackOutput)
       .add(PackMetadataSection.TYPE, PackMetadataSection(Component.literal("FluidTank Resources"), DetectedVersion.BUILT_IN.getPackVersion(PackType.CLIENT_RESOURCES)))
     )
   }

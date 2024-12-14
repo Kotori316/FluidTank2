@@ -10,10 +10,7 @@ import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.fluids.FluidLikeKey;
 import com.kotori316.fluidtank.item.PlatformItemAccess;
-import com.kotori316.fluidtank.tank.ItemBlockTank;
-import com.kotori316.fluidtank.tank.PlatformTankAccess;
-import com.kotori316.fluidtank.tank.Tier;
-import com.kotori316.fluidtank.tank.TileTank;
+import com.kotori316.fluidtank.tank.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -243,9 +240,12 @@ public final class TierRecipe implements CraftingRecipe {
         }
 
         public static Ingredient getIngredientTankForTier(Tier tier) {
+            return Ingredient.of(getTankForTier(tier));
+        }
+
+        public static Stream<? extends BlockTank> getTankForTier(Tier tier) {
             var targetTiers = Stream.of(Tier.values()).filter(t -> t.getRank() == tier.getRank() - 1);
-            var itemStream = targetTiers.map(PlatformTankAccess.getInstance().getTankBlockMap()::get).map(Supplier::get);
-            return Ingredient.of(itemStream);
+            return targetTiers.map(PlatformTankAccess.getInstance().getTankBlockMap()::get).map(Supplier::get);
         }
     }
 }

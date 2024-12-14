@@ -14,6 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - name: Collect Workflow Telemetry
+        uses: catchpoint/workflow-telemetry-action@v2
+        with:
+          comment_on_pr: 'false'
+          job_summary: 'true'
+          theme: 'dark'
       - uses: actions/checkout@v4
       - uses: gradle/actions/wrapper-validation@v4
       - name: Setup Java JDK
@@ -54,6 +60,12 @@ jobs:
       DISABLE_FABRIC: ${{ matrix.platform != 'fabric' }}
       DISABLE_NEOFORGE: ${{ matrix.platform != 'neoforge' }}
     steps:
+      - name: Collect Workflow Telemetry
+        uses: catchpoint/workflow-telemetry-action@v2
+        with:
+          comment_on_pr: 'false'
+          job_summary: 'true'
+          theme: 'dark'
       - uses: actions/checkout@v4
       - uses: gradle/actions/wrapper-validation@v4
       - name: Setup Java JDK

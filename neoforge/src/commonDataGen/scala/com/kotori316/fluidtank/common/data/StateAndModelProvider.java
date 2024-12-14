@@ -5,12 +5,17 @@ import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.neoforge.FluidTank;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
+import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
@@ -18,8 +23,11 @@ import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -29,9 +37,23 @@ final class StateAndModelProvider extends BlockStateProvider {
     static final String ITEM_GAS_TANK_BASE = "item/gas_item_tank";
     static final String ITEM_RESERVOIR_BASE = "item/reservoirs";
 
+    private final PackOutput.PathProvider itemInfoPathProvider;
+    private final Map<ResourceLocation, ClientItem> clientItemMap = new HashMap<>();
+
     StateAndModelProvider(DataGenerator gen, ExistingFileHelper exFileHelper) {
         super(gen.getPackOutput(), FluidTankCommon.modId, exFileHelper);
+        this.itemInfoPathProvider = gen.getPackOutput().createPathProvider(PackOutput.Target.RESOURCE_PACK, "items");
     }
+
+    // Model item definition START
+    @Override
+    public CompletableFuture<?> run(CachedOutput cache) {
+        var parent = super.run(cache);
+        return parent.thenCompose(v ->
+            DataProvider.saveAll(cache, ClientItem.CODEC, itemInfoPathProvider, clientItemMap)
+        );
+    }
+    // Model item definition END
 
     private ResourceLocation blockTexture(String name) {
         return modLoc("block/" + name);
@@ -56,7 +78,15 @@ final class StateAndModelProvider extends BlockStateProvider {
     void catBlock() {
         this.directionalBlock(FluidTank.BLOCK_CAT.get(), models().cubeTop(BlockChestAsTank.NAME(),
             blockTexture("cat_side"), blockTexture("cat_front")));
-        this.itemModels().withExistingParent("item/" + BlockChestAsTank.NAME(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/" + BlockChestAsTank.NAME()));
+        var blockModelLocation = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/" + BlockChestAsTank.NAME());
+        this.itemModels().withExistingParent("item/" + BlockChestAsTank.NAME(), blockModelLocation);
+
+        var key = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME());
+        var unbaked = ItemModelUtils.plainModel(blockModelLocation);
+        clientItemMap.put(
+            key,
+            new ClientItem(unbaked, ClientItem.Properties.DEFAULT)
+        );
     }
 
     /*void sourceBlock() {

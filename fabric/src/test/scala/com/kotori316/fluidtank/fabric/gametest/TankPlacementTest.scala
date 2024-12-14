@@ -86,8 +86,8 @@ final class TankPlacementTest extends FabricGameTest {
     tankTile.getConnection.getHandler.fill(fillContent, execute = true)
 
     val state = helper.getBlockState(pos)
-    val stack = state.getBlock.getCloneItemStack(
-      helper.getLevel, helper.absolutePos(pos), state
+    val stack = state.getCloneItemStack(
+      helper.getLevel, helper.absolutePos(pos), false
     )
     val handler = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
     assertAll(

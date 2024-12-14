@@ -131,8 +131,8 @@ abstract class BlockTank(val tier: Tier) extends Block(
     }
   }
 
-  override def getCloneItemStack(level: LevelReader, pos: BlockPos, state: BlockState): ItemStack = {
-    val stack = super.getCloneItemStack(level, pos, state)
+  override def getCloneItemStack(level: LevelReader, pos: BlockPos, state: BlockState, includeData: Boolean): ItemStack = {
+    val stack = super.getCloneItemStack(level, pos, state, includeData)
     saveTankNBT(level.getBlockEntity(pos), stack, level.registryAccess())
     stack
   }

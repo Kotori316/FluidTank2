@@ -7,12 +7,11 @@ import com.kotori316.fluidtank.forge.FluidTank
 import com.kotori316.fluidtank.forge.tank.TankFluidItemHandler
 import com.kotori316.fluidtank.tank.Tier
 import com.kotori316.testutil.GameTestUtil
-import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.{Block, Blocks}
-import net.minecraft.world.phys.{BlockHitResult, Vec3}
 import net.minecraftforge.gametest.GameTestHolder
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals}
 
@@ -87,7 +86,7 @@ final class TankPlacementTest {
     tankTile.getConnection.getHandler.fill(fillContent, execute = true)
 
     val stack = helper.getBlockState(pos).getCloneItemStack(
-      new BlockHitResult(Vec3.atCenterOf(helper.absolutePos(pos)), Direction.UP, helper.absolutePos(pos), true), helper.getLevel, helper.absolutePos(pos), helper.makeMockPlayer(GameType.CREATIVE)
+      helper.getLevel, helper.absolutePos(pos), false
     )
     val handler = new TankFluidItemHandler(tier, stack)
     assertAll(

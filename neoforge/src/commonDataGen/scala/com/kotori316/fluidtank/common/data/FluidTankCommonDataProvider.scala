@@ -20,7 +20,7 @@ import scala.jdk.javaapi.CollectionConverters
 object FluidTankCommonDataProvider {
   @static
   @SubscribeEvent
-  def onEvent(event: GatherDataEvent): Unit = {
+  def onEvent(event: GatherDataEvent.Client): Unit = {
     PlatformConfigAccess.setInstance(() => ConfigData.FOR_TEST)
     FluidTankCommon.LOGGER.info("Start NeoForge common data generation")
 

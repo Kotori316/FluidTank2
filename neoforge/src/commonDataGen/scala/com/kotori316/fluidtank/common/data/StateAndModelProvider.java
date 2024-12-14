@@ -5,6 +5,7 @@ import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.neoforge.FluidTank;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.core.Direction;
@@ -136,7 +137,7 @@ final class StateAndModelProvider extends BlockStateProvider {
                     .texture("particle", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
                     .texture("side", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
                     .texture("top", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"))
-                    .renderType(RenderType.cutout().name)
+                    .renderType(renderTypeName(RenderType.cutout()))
                 )
             });
         itemModels().withExistingParent(tier.getBlockName(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, ITEM_TANK_BASE))
@@ -152,7 +153,7 @@ final class StateAndModelProvider extends BlockStateProvider {
                     .texture("particle", blockTexture("gas_%s1".formatted(tier.name().toLowerCase(Locale.ROOT))))
                     .texture("side", blockTexture("gas_%s1".formatted(tier.name().toLowerCase(Locale.ROOT))))
                     .texture("top", blockTexture("gas_%s2".formatted(tier.name().toLowerCase(Locale.ROOT))))
-                    .renderType(RenderType.cutout().name)
+                    .renderType(renderTypeName(RenderType.cutout()))
                 )
             });
         itemModels().withExistingParent(blockGasTank.registryName().getPath(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, ITEM_GAS_TANK_BASE))
@@ -164,12 +165,12 @@ final class StateAndModelProvider extends BlockStateProvider {
     void pipeBase() {
         // Center Model
         models().getBuilder("block/" + "pipe_center")
-            .renderType(RenderType.cutout().name)
+            .renderType(renderTypeName(RenderType.cutout()))
             .element().from(4.0f, 4.0f, 4.0f).to(12.0f, 12.0f, 12.0f)
             .allFaces((direction, faceBuilder) -> faceBuilder.uvs(4.0f, 4.0f, 12.0f, 12.0f).texture("#texture"));
         // Side Model
         models().getBuilder("block/" + "pipe_side")
-            .renderType(RenderType.cutout().name)
+            .renderType(renderTypeName(RenderType.cutout()))
             .element().from(4.0f, 4.0f, 0.0f).to(12.0f, 12.0f, 4.0f)
             .face(Direction.SOUTH).uvs(4.0f, 4.0f, 12.0f, 12.0f).texture("#texture").cullface(Direction.SOUTH).end()
             .face(Direction.DOWN).uvs(4.0f, 6.0f, 12.0f, 10.0f).texture("#texture").end()
@@ -179,7 +180,7 @@ final class StateAndModelProvider extends BlockStateProvider {
 
         // In-Out Model
         models().getBuilder("block/" + "pipe_in_out")
-            .renderType(RenderType.cutout().name)
+            .renderType(renderTypeName(RenderType.cutout()))
             // Inside
             .element().from(4, 4, 2).to(12, 12, 4)
             .face(Direction.SOUTH).uvs(4.0f, 4.0f, 12.0f, 12.0f).texture("#texture").cullface(Direction.SOUTH).end()
@@ -275,5 +276,15 @@ final class StateAndModelProvider extends BlockStateProvider {
     void reservoir(ItemReservoir reservoirItem) {
         var key = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(reservoirItem));
         itemModels().withExistingParent(key.getPath(), modLoc(ITEM_RESERVOIR_BASE));
+    }
+
+    private static String renderTypeName(RenderStateShard type) {
+        try {
+            var field = RenderStateShard.class.getDeclaredField("name");
+            field.setAccessible(true);
+            return (String) field.get(type);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

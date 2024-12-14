@@ -11,7 +11,7 @@ import scala.annotation.static
 object FluidTankDataProvider {
   @static
   @SubscribeEvent
-  def onEvent(event: GatherDataEvent): Unit = {
+  def onEvent(event: GatherDataEvent.Client): Unit = {
     PlatformConfigAccess.setInstance(() => ConfigData.FOR_TEST)
     FluidTankCommon.LOGGER.info("Start NeoForge data generation")
     event.addProvider(new RecipeNeoForge(event.getGenerator.getPackOutput, event.getLookupProvider))

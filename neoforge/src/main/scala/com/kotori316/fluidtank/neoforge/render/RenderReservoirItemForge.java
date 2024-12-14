@@ -6,11 +6,12 @@ import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.fluids.VanillaFluid;
 import com.kotori316.fluidtank.fluids.VanillaPotion;
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter;
+import com.kotori316.fluidtank.render.RenderItemCodecs;
 import com.kotori316.fluidtank.render.RenderReservoirItem;
+import com.kotori316.fluidtank.render.ReservoirModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
@@ -18,7 +19,10 @@ import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtension
 import java.util.function.Function;
 
 public final class RenderReservoirItemForge extends RenderReservoirItem {
-    public static final RenderReservoirItemForge INSTANCE = new RenderReservoirItemForge();
+
+    public RenderReservoirItemForge(ReservoirModel model) {
+        super(model);
+    }
 
     @Override
     public TextureAtlasSprite getFluidTexture(Tank<FluidLike> tank) {
@@ -28,7 +32,7 @@ public final class RenderReservoirItemForge extends RenderReservoirItem {
         assert Minecraft.getInstance().player != null;
         var location = attributes.getStillTexture(fluid.defaultFluidState(),
             Minecraft.getInstance().level, Minecraft.getInstance().player.getOnPos());
-        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(location);
+        return Minecraft.getInstance().getTextureAtlas(RenderItemCodecs.atlas()).apply(location);
     }
 
     @Override

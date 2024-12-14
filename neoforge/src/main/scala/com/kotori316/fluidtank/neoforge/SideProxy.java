@@ -1,13 +1,9 @@
 package com.kotori316.fluidtank.neoforge;
 
 import com.kotori316.fluidtank.FluidTankCommon;
-import com.kotori316.fluidtank.neoforge.render.RenderItemTank;
-import com.kotori316.fluidtank.neoforge.render.RenderReservoirItemForge;
 import com.kotori316.fluidtank.neoforge.render.RenderTankNeoForge;
 import com.kotori316.fluidtank.render.ReservoirModel;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.core.Holder;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -17,7 +13,6 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -60,24 +55,11 @@ public abstract class SideProxy {
 
         @SubscribeEvent
         public void registerReloadListener(RegisterClientReloadListenersEvent event) {
-            event.registerReloadListener(RenderReservoirItemForge.INSTANCE);
         }
 
-        @SuppressWarnings("unchecked")
         @SubscribeEvent
         public void registerClientItemExtension(RegisterClientExtensionsEvent event) {
-            event.registerItem(new IClientItemExtensions() {
-                @Override
-                public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                    return RenderItemTank.INSTANCE();
-                }
-            }, FluidTank.TANK_ITEM_MAP.values().toArray(Holder[]::new));
-            event.registerItem(new IClientItemExtensions() {
-                @Override
-                public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                    return RenderReservoirItemForge.INSTANCE;
-                }
-            }, FluidTank.RESERVOIR_MAP.values().toArray(Holder[]::new));
+
         }
     }
 

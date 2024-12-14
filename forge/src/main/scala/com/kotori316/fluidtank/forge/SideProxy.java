@@ -1,7 +1,6 @@
 package com.kotori316.fluidtank.forge;
 
 import com.kotori316.fluidtank.FluidTankCommon;
-import com.kotori316.fluidtank.forge.render.RenderReservoirItemForge;
 import com.kotori316.fluidtank.forge.render.RenderTankForge;
 import com.kotori316.fluidtank.render.ReservoirModel;
 import com.kotori316.fluidtank.tank.PlatformTankAccess;
@@ -70,7 +69,6 @@ public abstract class SideProxy {
 
         @SubscribeEvent
         public void registerReloadListener(RegisterClientReloadListenersEvent event) {
-            event.registerReloadListener(RenderReservoirItemForge.INSTANCE);
         }
     }
 

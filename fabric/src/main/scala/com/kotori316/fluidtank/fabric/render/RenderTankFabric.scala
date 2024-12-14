@@ -11,13 +11,13 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 @Environment(EnvType.CLIENT)
 class RenderTankFabric(d: BlockEntityRendererProvider.Context) extends RenderTank(d) {
 
-  override def getFluidTexture(tank: Tank[FluidLike], blockEntity: TileTank): TextureAtlasSprite = RenderResourceHelper.getSprite(tank.content)
+  override def getFluidTexture(tank: Tank[FluidLike], blockEntity: TileTank): TextureAtlasSprite = FluidRenderHelperFabric.getSprite(tank.content)
 
   override def getFluidColor(tank: Tank[FluidLike], blockEntity: TileTank): Int = {
     val level = getTankWorld(blockEntity)
     val pos = getTankPos(blockEntity)
-    RenderResourceHelper.getColorWithPos(tank.content, level, pos)
+    FluidRenderHelperFabric.getColorWithPos(tank.content, level, pos)
   }
 
-  override def getLuminance(tank: Tank[FluidLike]): Int = RenderResourceHelper.getLuminance(tank.content)
+  override def getLuminance(tank: Tank[FluidLike]): Int = FluidRenderHelperFabric.getLuminance(tank.content)
 }

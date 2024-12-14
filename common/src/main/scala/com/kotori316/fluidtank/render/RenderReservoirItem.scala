@@ -17,7 +17,7 @@ import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
 
 import java.util.Locale
 
-abstract class RenderReservoirItem(protected val model: ReservoirModel) extends SpecialModelRenderer[RenderReservoirItem.RenderContext] {
+final class RenderReservoirItem(protected val model: ReservoirModel, renderHelper: FluidRenderHelper) extends SpecialModelRenderer[RenderReservoirItem.RenderContext] {
 
   override def render(patterns: RenderReservoirItem.RenderContext, displayContext: ItemDisplayContext, poseStack: PoseStack, bufferSource: MultiBufferSource, packedLight: Int, packedOverlay: Int, hasFoilType: Boolean): Unit = {
     poseStack.pushPose()
@@ -61,9 +61,9 @@ abstract class RenderReservoirItem(protected val model: ReservoirModel) extends 
     RenderReservoirItem.RenderContext(reservoir.tier, stack.hasFoil, tank)
   }
 
-  def getFluidTexture(tank: Tank[FluidLike]): TextureAtlasSprite
+  def getFluidTexture(tank: Tank[FluidLike]): TextureAtlasSprite = renderHelper.getFluidTexture(tank)
 
-  def getFluidColor(tank: Tank[FluidLike]): Int
+  def getFluidColor(tank: Tank[FluidLike]): Int = renderHelper.getFluidColor(tank)
 }
 
 object RenderReservoirItem {

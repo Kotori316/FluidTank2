@@ -1,13 +1,16 @@
 package com.kotori316.fluidtank.fabric.render;
 
 import com.kotori316.fluidtank.contents.GenericAmount;
+import com.kotori316.fluidtank.contents.Tank;
 import com.kotori316.fluidtank.fabric.fluid.FabricConverter;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.fluids.VanillaFluid;
 import com.kotori316.fluidtank.fluids.VanillaPotion;
+import com.kotori316.fluidtank.render.FluidRenderHelper;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -16,9 +19,10 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.Function;
 
-final class RenderResourceHelper {
+public final class FluidRenderHelperFabric implements FluidRenderHelper {
     static TextureAtlasSprite getSprite(GenericAmount<FluidLike> fluid) {
         return FluidVariantRendering.getSprite(FabricConverter.toVariant(fluid, Fluids.WATER));
     }
@@ -46,5 +50,15 @@ final class RenderResourceHelper {
 
     static int getLuminance(GenericAmount<FluidLike> fluid) {
         return FluidVariantAttributes.getLuminance(FabricConverter.toVariant(fluid, Fluids.EMPTY));
+    }
+
+    @Override
+    public TextureAtlasSprite getFluidTexture(Tank<FluidLike> tank) {
+        return getSprite(tank.content());
+    }
+
+    @Override
+    public int getFluidColor(Tank<FluidLike> tank) {
+        return FluidRenderHelperFabric.getColorWithPos(tank.content(), Minecraft.getInstance().level, Objects.requireNonNull(Minecraft.getInstance().player).getOnPos());
     }
 }

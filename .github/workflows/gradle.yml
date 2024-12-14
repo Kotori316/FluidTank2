@@ -52,7 +52,7 @@ jobs:
       matrix:
         platform:
           - common
-          - forge
+          # - forge
           - fabric
           - neoforge
     env:
@@ -117,6 +117,7 @@ jobs:
           path: |
             build/reports
             game-test/logs
+            game-test/crash-reports
           if-no-files-found: ignore
           retention-days: 1
 

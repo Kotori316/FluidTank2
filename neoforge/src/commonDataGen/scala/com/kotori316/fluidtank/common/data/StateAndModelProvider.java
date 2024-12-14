@@ -3,6 +3,9 @@ package com.kotori316.fluidtank.common.data;
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.neoforge.FluidTank;
+import com.kotori316.fluidtank.neoforge.render.FluidRenderHelperNeoForge;
+import com.kotori316.fluidtank.neoforge.render.FluidRenderHelperNeoForge$;
+import com.kotori316.fluidtank.render.RenderItemCodecs;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
 import net.minecraft.client.data.models.model.ItemModelUtils;
@@ -306,6 +309,11 @@ final class StateAndModelProvider extends BlockStateProvider {
     void reservoir(ItemReservoir reservoirItem) {
         var key = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(reservoirItem));
         itemModels().withExistingParent(key.getPath(), modLoc(ITEM_RESERVOIR_BASE));
+        var unbaked = ItemModelUtils.specialModel(RenderItemCodecs.RESERVOIR_MODEL, FluidRenderHelperNeoForge.reservoirUnbaked());
+        clientItemMap.put(
+            key,
+            new ClientItem(unbaked, ClientItem.Properties.DEFAULT)
+        );
     }
 
     private static String renderTypeName(RenderStateShard type) {

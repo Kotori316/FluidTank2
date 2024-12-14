@@ -1,7 +1,10 @@
 package com.kotori316.fluidtank.neoforge;
 
 import com.kotori316.fluidtank.FluidTankCommon;
+import com.kotori316.fluidtank.neoforge.render.FluidRenderHelperNeoForge;
+import com.kotori316.fluidtank.neoforge.render.FluidRenderHelperNeoForge$;
 import com.kotori316.fluidtank.neoforge.render.RenderTankNeoForge;
+import com.kotori316.fluidtank.render.RenderItemCodecs;
 import com.kotori316.fluidtank.render.ReservoirModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.level.Level;
@@ -13,6 +16,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -59,7 +63,11 @@ public abstract class SideProxy {
 
         @SubscribeEvent
         public void registerClientItemExtension(RegisterClientExtensionsEvent event) {
+        }
 
+        @SubscribeEvent
+        public void registerSpecialModelRenderer(RegisterSpecialModelRendererEvent event) {
+            event.register(RenderItemCodecs.RESERVOIR_MODEL, FluidRenderHelperNeoForge.reservoirUnbaked().type());
         }
     }
 

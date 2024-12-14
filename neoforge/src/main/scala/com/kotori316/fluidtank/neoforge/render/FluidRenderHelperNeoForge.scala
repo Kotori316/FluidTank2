@@ -13,7 +13,9 @@ import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtension
 import java.util.Objects
 import scala.jdk.javaapi.OptionConverters
 
-object FluidRenderHelperNeoForge extends FluidRenderHelper{
+object FluidRenderHelperNeoForge extends FluidRenderHelper {
+
+  final lazy val reservoirUnbaked = RenderItemCodecs.reservoirModelUnbaked(this)
 
   override def getFluidTexture(tank: Tank[FluidLike]): TextureAtlasSprite = {
     val fluid = FluidLike.asFluid(tank.content.content, Fluids.WATER)

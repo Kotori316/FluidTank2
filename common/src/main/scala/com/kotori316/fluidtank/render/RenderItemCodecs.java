@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.render;
 
+import com.kotori316.fluidtank.FluidTankCommon;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
@@ -8,8 +9,12 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 public final class RenderItemCodecs {
+    public static final ResourceLocation RESERVOIR_MODEL = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir");
+    public static SpecialModelRenderer.Unbaked reservoirModelUnbaked(FluidRenderHelper helper) {
+        return new RenderReservoirItemUnbaked(helper);
+    }
 
-    public static class RenderReservoirItemUnbaked implements SpecialModelRenderer.Unbaked {
+    private static class RenderReservoirItemUnbaked implements SpecialModelRenderer.Unbaked {
         private final FluidRenderHelper helper;
         private final MapCodec<RenderReservoirItemUnbaked> codec;
 

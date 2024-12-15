@@ -5,15 +5,14 @@ import com.kotori316.fluidtank.fabric.message.PacketHandler;
 import com.kotori316.fluidtank.fabric.render.FluidRenderHelperFabric;
 import com.kotori316.fluidtank.fabric.render.RenderTankFabric;
 import com.kotori316.fluidtank.render.RenderItemCodecs;
-import com.kotori316.fluidtank.render.ReservoirModel;
-import com.kotori316.fluidtank.render.TankModel;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.SpecialBlockRendererRegistry;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.special.SpecialModelRenderers;
+
+import java.util.Map;
 
 public final class FluidTankClient implements ClientModInitializer {
     @Override
@@ -29,11 +28,9 @@ public final class FluidTankClient implements ClientModInitializer {
         // BuiltinItemRendererRegistry.INSTANCE.register(FluidTank.BLOCK_CREATIVE_TANK, RenderItemTank.INSTANCE());
         // BuiltinItemRendererRegistry.INSTANCE.register(FluidTank.BLOCK_VOID_TANK, RenderItemTank.INSTANCE());
         // var reservoirRenderer = new RenderReservoirItemFabric();
-        EntityModelLayerRegistry.registerModelLayer(ReservoirModel.LOCATION, ReservoirModel::createDefinition);
-        EntityModelLayerRegistry.registerModelLayer(TankModel.LOCATION, TankModel::createDefinition);
+        RenderItemCodecs.registerLayerDefinitions(EntityModelLayerRegistry::registerModelLayer, t -> t::get);
         // FluidTank.RESERVOIR_MAP.values().forEach(b -> BuiltinItemRendererRegistry.INSTANCE.register(b, reservoirRenderer));
-        SpecialModelRenderers.ID_MAPPER.put(RenderItemCodecs.RESERVOIR_MODEL, RenderItemCodecs.reservoirModelUnbaked(new FluidRenderHelperFabric()).type());
-        SpecialModelRenderers.ID_MAPPER.put(RenderItemCodecs.TANK_MODEL, RenderItemCodecs.tankModelUnbaked(new FluidRenderHelperFabric()).type());
+        RenderItemCodecs.registerSpecialModelRenderersCodec(new FluidRenderHelperFabric(), SpecialModelRenderers.ID_MAPPER::put, Map.of());
 
         BlockEntityRenderers.register(FluidTank.TILE_TANK_TYPE, RenderTankFabric::new);
         BlockEntityRenderers.register(FluidTank.TILE_CREATIVE_TANK_TYPE, RenderTankFabric::new);

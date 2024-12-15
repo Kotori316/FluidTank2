@@ -21,7 +21,9 @@ import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 public abstract class SideProxy {
 
@@ -55,8 +57,7 @@ public abstract class SideProxy {
 
         @SubscribeEvent
         public void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-            event.registerLayerDefinition(ReservoirModel.LOCATION, ReservoirModel::createDefinition);
-            event.registerLayerDefinition(TankModel.LOCATION, TankModel::createDefinition);
+            RenderItemCodecs.registerLayerDefinitions(event::registerLayerDefinition, Function.identity());
         }
 
         @SubscribeEvent
@@ -69,8 +70,14 @@ public abstract class SideProxy {
 
         @SubscribeEvent
         public void registerSpecialModelRenderer(RegisterSpecialModelRendererEvent event) {
-            event.register(RenderItemCodecs.RESERVOIR_MODEL, FluidRenderHelperNeoForge.reservoirUnbaked().type());
-            event.register(RenderItemCodecs.TANK_MODEL, FluidRenderHelperNeoForge.tankUnbaked().type());
+            RenderItemCodecs.registerSpecialModelRenderersCodec(
+                FluidRenderHelperNeoForge$.MODULE$,
+                event::register,
+                Map.of(
+                    RenderItemCodecs.RESERVOIR_MODEL, FluidRenderHelperNeoForge.reservoirUnbaked(),
+                    RenderItemCodecs.TANK_MODEL, FluidRenderHelperNeoForge.tankUnbaked()
+                )
+            );
         }
     }
 

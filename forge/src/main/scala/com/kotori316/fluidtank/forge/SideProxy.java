@@ -27,7 +27,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class SideProxy {
@@ -72,7 +74,11 @@ public abstract class SideProxy {
                 field.setAccessible(true);
                 var mapper = (ExtraCodecs.LateBoundIdMapper<ResourceLocation, MapCodec<? extends SpecialModelRenderer.Unbaked>>) field.get(null);
 
-                mapper.put(RenderItemCodecs.RESERVOIR_MODEL, RenderItemCodecs.reservoirModelUnbaked(FluidRenderHelperForge$.MODULE$).type());
+                RenderItemCodecs.registerSpecialModelRenderersCodec(
+                    FluidRenderHelperForge$.MODULE$,
+                    mapper::put,
+                    Map.of()
+                );
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException(e);
             }
@@ -86,8 +92,7 @@ public abstract class SideProxy {
 
         @SubscribeEvent
         public void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-            event.registerLayerDefinition(ReservoirModel.LOCATION, ReservoirModel::createDefinition);
-            event.registerLayerDefinition(TankModel.LOCATION, TankModel::createDefinition);
+            RenderItemCodecs.registerLayerDefinitions(event::registerLayerDefinition, Function.identity());
         }
 
         @SubscribeEvent

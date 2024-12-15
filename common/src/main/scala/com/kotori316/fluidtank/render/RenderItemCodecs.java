@@ -3,10 +3,17 @@ package com.kotori316.fluidtank.render;
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public final class RenderItemCodecs {
     public static final ResourceLocation RESERVOIR_MODEL = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir");
@@ -65,5 +72,27 @@ public final class RenderItemCodecs {
     @SuppressWarnings("deprecation")
     public static ResourceLocation atlas() {
         return TextureAtlas.LOCATION_BLOCKS;
+    }
+
+    public static void registerSpecialModelRenderersCodec(FluidRenderHelper helper, BiConsumer<ResourceLocation, MapCodec<? extends SpecialModelRenderer.Unbaked>> registerFunction, Map<ResourceLocation, SpecialModelRenderer.Unbaked> predefined) {
+        // Reservoir
+        {
+            var unbaked = predefined.getOrDefault(RESERVOIR_MODEL, reservoirModelUnbaked(helper));
+            registerFunction.accept(RESERVOIR_MODEL, unbaked.type());
+        }
+        // Tank
+        {
+            var unbaked = predefined.getOrDefault(TANK_MODEL, tankModelUnbaked(helper));
+            registerFunction.accept(TANK_MODEL, unbaked.type());
+        }
+    }
+
+    public static <T> void registerLayerDefinitions(BiConsumer<ModelLayerLocation, T> registerFunction, Function<Supplier<LayerDefinition>, T> converter) {
+        Map<ModelLayerLocation, Supplier<LayerDefinition>> map = Map.of(
+            ReservoirModel.LOCATION, ReservoirModel::createDefinition,
+            TankModel.LOCATION, TankModel::createDefinition
+        );
+
+        map.forEach((modelLayer, supplier) -> registerFunction.accept(modelLayer, converter.apply(supplier)));
     }
 }

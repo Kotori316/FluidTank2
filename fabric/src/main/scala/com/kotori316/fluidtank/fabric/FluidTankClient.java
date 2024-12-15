@@ -33,6 +33,7 @@ public final class FluidTankClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(TankModel.LOCATION, TankModel::createDefinition);
         // FluidTank.RESERVOIR_MAP.values().forEach(b -> BuiltinItemRendererRegistry.INSTANCE.register(b, reservoirRenderer));
         SpecialModelRenderers.ID_MAPPER.put(RenderItemCodecs.RESERVOIR_MODEL, RenderItemCodecs.reservoirModelUnbaked(new FluidRenderHelperFabric()).type());
+        SpecialModelRenderers.ID_MAPPER.put(RenderItemCodecs.TANK_MODEL, RenderItemCodecs.tankModelUnbaked(new FluidRenderHelperFabric()).type());
 
         BlockEntityRenderers.register(FluidTank.TILE_TANK_TYPE, RenderTankFabric::new);
         BlockEntityRenderers.register(FluidTank.TILE_CREATIVE_TANK_TYPE, RenderTankFabric::new);

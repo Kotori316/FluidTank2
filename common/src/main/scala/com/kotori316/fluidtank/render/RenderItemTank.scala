@@ -1,18 +1,17 @@
 package com.kotori316.fluidtank.render
 
+import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.Tank
 import com.kotori316.fluidtank.fluids.FluidLike
 import com.kotori316.fluidtank.tank.{ItemBlockTank, PlatformTankAccess, Tier, TileTank, VisualTank}
-import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.entity.ItemRenderer
-import net.minecraft.client.renderer.item.ItemStackRenderState
+import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.special.SpecialModelRenderer
-import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
-import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.core.BlockPos
 import net.minecraft.core.component.DataComponents
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
 
@@ -20,10 +19,9 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
   private lazy val tileTank: TileTank = new RenderItemTank.TileTankForRender
 
   override def render(patterns: RenderItemTank.RenderContext, displayContext: ItemDisplayContext, poseStack: PoseStack, bufferSource: MultiBufferSource, packedLight: Int, packedOverlay: Int, hasFoilType: Boolean): Unit = {
-    val state = patterns.item.blockTank.defaultBlockState()
-    val model = Minecraft.getInstance.getBlockRenderer.getBlockModel(state)
-    RenderSystem.enableCull()
-    renderItemModel(displayContext, model, packedLight, packedOverlay, poseStack, bufferSource)
+    Lighting.setupFor3DItems()
+    val buffer = bufferSource.getBuffer(this.model.renderType(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, s"textures/block/fluid_source.png")))
+    this.model.renderToBuffer(poseStack, buffer, packedLight, packedOverlay)
 
     tileTank.tier = patterns.item.blockTank.tier
     for (d <- patterns.data if !d.isEmpty) {
@@ -35,7 +33,6 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
           tileTank, 0, poseStack, bufferSource
         )
       }
-      // RenderHelper.disableStandardItemLighting()
     }
   }
 
@@ -44,12 +41,6 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
       stack.getItem.asInstanceOf[ItemBlockTank],
       Option(stack.get(DataComponents.BLOCK_ENTITY_DATA)),
     )
-  }
-
-  def renderItemModel(displayContext: ItemDisplayContext, model: BakedModel, light: Int, otherLight: Int, matrixStack: PoseStack, renderTypeBuffer: MultiBufferSource): Unit = {
-    matrixStack.pushPose()
-    ItemRenderer.renderItem(displayContext, matrixStack, renderTypeBuffer, light, otherLight, Array(), model, RenderType.cutout(), ItemStackRenderState.FoilType.NONE)
-    matrixStack.popPose()
   }
 }
 

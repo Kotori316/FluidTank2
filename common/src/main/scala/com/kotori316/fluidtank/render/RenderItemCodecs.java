@@ -8,7 +8,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -43,6 +43,7 @@ public final class RenderItemCodecs {
         }
 
         @Override
+        @NotNull
         public MapCodec<? extends SpecialModelRenderer.Unbaked> type() {
             return this.codec;
         }
@@ -58,12 +59,13 @@ public final class RenderItemCodecs {
         }
 
         @Override
-        public @Nullable SpecialModelRenderer<?> bake(EntityModelSet modelSet) {
+        public SpecialModelRenderer<?> bake(EntityModelSet modelSet) {
             var model = new TankModel(modelSet.bakeLayer(TankModel.LOCATION));
             return new RenderItemTank(model, helper);
         }
 
         @Override
+        @NotNull
         public MapCodec<? extends SpecialModelRenderer.Unbaked> type() {
             return codec;
         }

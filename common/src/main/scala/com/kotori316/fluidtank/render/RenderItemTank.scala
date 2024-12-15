@@ -20,10 +20,11 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
   private lazy val tileTank: TileTank = new RenderItemTank.TileTankForRender
 
   override def render(patterns: RenderItemTank.RenderContext, displayContext: ItemDisplayContext, poseStack: PoseStack, bufferSource: MultiBufferSource, packedLight: Int, packedOverlay: Int, hasFoilType: Boolean): Unit = {
-    val buffer = bufferSource.getBuffer(this.model.renderType(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, s"textures/block/${patterns.item.blockTank.tier.toString.toLowerCase(Locale.ROOT)}.png")))
+    val textureLocation = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, s"textures/block/${patterns.tier.toString}.png".toLowerCase(Locale.ROOT))
+    val buffer = bufferSource.getBuffer(this.model.renderType(textureLocation))
     this.model.renderToBuffer(poseStack, buffer, packedLight, packedOverlay)
 
-    tileTank.tier = patterns.item.blockTank.tier
+    tileTank.tier = patterns.tier
     for (d <- patterns.data if !d.isEmpty) {
       val level = Minecraft.getInstance.level
       tileTank.setLevel(level)
@@ -38,14 +39,14 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
 
   override def extractArgument(stack: ItemStack): RenderItemTank.RenderContext = {
     RenderItemTank.RenderContext(
-      stack.getItem.asInstanceOf[ItemBlockTank],
+      stack.getItem.asInstanceOf[ItemBlockTank].blockTank.tier,
       Option(stack.get(DataComponents.BLOCK_ENTITY_DATA)),
     )
   }
 }
 
 object RenderItemTank {
-  case class RenderContext(item: ItemBlockTank, data: Option[CustomData])
+  case class RenderContext(tier: Tier, data: Option[CustomData])
 
   private class TileTankForRender extends TileTank(
     BlockPos.ZERO,
@@ -58,6 +59,10 @@ object RenderItemTank {
       // In client side
       // If level is null, it is the instance in RenderItemTank
       getVisualTank.updateContent(tank.capacity, tank.amount, tank.content.isGaseous)
+    }
+
+    override def getBlockPos: BlockPos = {
+      Minecraft.getInstance().player.blockPosition()
     }
   }
 }

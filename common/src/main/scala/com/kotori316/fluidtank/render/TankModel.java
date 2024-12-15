@@ -27,6 +27,6 @@ public final class TankModel extends Model {
             PartPose.ZERO
         );
 
-        return LayerDefinition.create(meshDefinition, 32, 32);
+        return LayerDefinition.create(meshDefinition, 64, 32);
     }
 }

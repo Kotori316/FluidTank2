@@ -1,22 +1,57 @@
 package com.kotori316.fluidtank.render
 
+import com.kotori316.fluidtank.tank.{ItemBlockTank, PlatformTankAccess, Tier, TileTank, VisualTank}
+import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.entity.ItemRenderer
+import net.minecraft.client.renderer.item.ItemStackRenderState
 import net.minecraft.client.renderer.special.SpecialModelRenderer
+import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
+import net.minecraft.client.resources.model.BakedModel
+import net.minecraft.core.BlockPos
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
 
-class RenderItemTank extends SpecialModelRenderer[RenderItemTank.RenderContext] {
+class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends SpecialModelRenderer[RenderItemTank.RenderContext] {
+  lazy val tileTank: TileTank = new TileTank(BlockPos.ZERO, PlatformTankAccess.getInstance().getTankBlockMap.get(Tier.WOOD).get().defaultBlockState()) {
+    override def getVisualTank: VisualTank = new VisualTank
+  }
 
   override def render(patterns: RenderItemTank.RenderContext, displayContext: ItemDisplayContext, poseStack: PoseStack, bufferSource: MultiBufferSource, packedLight: Int, packedOverlay: Int, hasFoilType: Boolean): Unit = {
+    val state = patterns.item.blockTank.defaultBlockState()
+    val model = Minecraft.getInstance.getBlockRenderer.getBlockModel(state)
+    RenderSystem.enableCull()
+    renderItemModel(displayContext, model, patterns.stack, packedLight, packedOverlay, poseStack, bufferSource)
 
-
+    tileTank.tier = patterns.item.blockTank.tier
+    for (d <- patterns.data if !d.isEmpty) {
+      tileTank.loadAdditional(d.copyTag(), Minecraft.getInstance.level.registryAccess())
+      if (tileTank.getTank.hasContent) {
+        Minecraft.getInstance.getBlockEntityRenderDispatcher.render(
+          tileTank, 0, poseStack, bufferSource
+        )
+      }
+      // RenderHelper.disableStandardItemLighting()
+    }
   }
 
   override def extractArgument(stack: ItemStack): RenderItemTank.RenderContext = {
-    RenderItemTank.RenderContext()
+    RenderItemTank.RenderContext(
+      stack,
+      stack.getItem.asInstanceOf[ItemBlockTank],
+      Option(stack.get(DataComponents.BLOCK_ENTITY_DATA)),
+    )
+  }
+
+  def renderItemModel(displayContext: ItemDisplayContext, model: BakedModel, stack: ItemStack, light: Int, otherLight: Int, matrixStack: PoseStack, renderTypeBuffer: MultiBufferSource): Unit = {
+    matrixStack.pushPose()
+    ItemRenderer.renderItem(displayContext, matrixStack, renderTypeBuffer, light, otherLight, Array(), model, RenderType.cutout(), ItemStackRenderState.FoilType.NONE)
+    matrixStack.popPose()
   }
 }
 
 object RenderItemTank {
-  case class RenderContext()
+  case class RenderContext(stack: ItemStack, item: ItemBlockTank, data: Option[CustomData])
 }

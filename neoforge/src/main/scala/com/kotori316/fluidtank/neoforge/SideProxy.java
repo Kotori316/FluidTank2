@@ -6,6 +6,7 @@ import com.kotori316.fluidtank.neoforge.render.FluidRenderHelperNeoForge$;
 import com.kotori316.fluidtank.neoforge.render.RenderTankNeoForge;
 import com.kotori316.fluidtank.render.RenderItemCodecs;
 import com.kotori316.fluidtank.render.ReservoirModel;
+import com.kotori316.fluidtank.render.TankModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
@@ -55,6 +56,7 @@ public abstract class SideProxy {
         @SubscribeEvent
         public void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(ReservoirModel.LOCATION, ReservoirModel::createDefinition);
+            event.registerLayerDefinition(TankModel.LOCATION, TankModel::createDefinition);
         }
 
         @SubscribeEvent
@@ -68,6 +70,7 @@ public abstract class SideProxy {
         @SubscribeEvent
         public void registerSpecialModelRenderer(RegisterSpecialModelRendererEvent event) {
             event.register(RenderItemCodecs.RESERVOIR_MODEL, FluidRenderHelperNeoForge.reservoirUnbaked().type());
+            event.register(RenderItemCodecs.TANK_MODEL, FluidRenderHelperNeoForge.tankUnbaked().type());
         }
     }
 

@@ -5,6 +5,7 @@ import com.kotori316.fluidtank.forge.render.FluidRenderHelperForge$;
 import com.kotori316.fluidtank.forge.render.RenderTankForge;
 import com.kotori316.fluidtank.render.RenderItemCodecs;
 import com.kotori316.fluidtank.render.ReservoirModel;
+import com.kotori316.fluidtank.render.TankModel;
 import com.kotori316.fluidtank.tank.PlatformTankAccess;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -86,6 +87,7 @@ public abstract class SideProxy {
         @SubscribeEvent
         public void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(ReservoirModel.LOCATION, ReservoirModel::createDefinition);
+            event.registerLayerDefinition(TankModel.LOCATION, TankModel::createDefinition);
         }
 
         @SubscribeEvent

@@ -6,6 +6,7 @@ import com.kotori316.fluidtank.fabric.render.FluidRenderHelperFabric;
 import com.kotori316.fluidtank.fabric.render.RenderTankFabric;
 import com.kotori316.fluidtank.render.RenderItemCodecs;
 import com.kotori316.fluidtank.render.ReservoirModel;
+import com.kotori316.fluidtank.render.TankModel;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
@@ -29,6 +30,7 @@ public final class FluidTankClient implements ClientModInitializer {
         // BuiltinItemRendererRegistry.INSTANCE.register(FluidTank.BLOCK_VOID_TANK, RenderItemTank.INSTANCE());
         // var reservoirRenderer = new RenderReservoirItemFabric();
         EntityModelLayerRegistry.registerModelLayer(ReservoirModel.LOCATION, ReservoirModel::createDefinition);
+        EntityModelLayerRegistry.registerModelLayer(TankModel.LOCATION, TankModel::createDefinition);
         // FluidTank.RESERVOIR_MAP.values().forEach(b -> BuiltinItemRendererRegistry.INSTANCE.register(b, reservoirRenderer));
         SpecialModelRenderers.ID_MAPPER.put(RenderItemCodecs.RESERVOIR_MODEL, RenderItemCodecs.reservoirModelUnbaked(new FluidRenderHelperFabric()).type());
 

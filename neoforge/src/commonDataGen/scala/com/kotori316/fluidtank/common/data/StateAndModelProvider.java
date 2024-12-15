@@ -4,7 +4,6 @@ import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.neoforge.FluidTank;
 import com.kotori316.fluidtank.neoforge.render.FluidRenderHelperNeoForge;
-import com.kotori316.fluidtank.neoforge.render.FluidRenderHelperNeoForge$;
 import com.kotori316.fluidtank.render.RenderItemCodecs;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
@@ -176,6 +175,13 @@ final class StateAndModelProvider extends BlockStateProvider {
         itemModels().withExistingParent(tier.getBlockName(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, ITEM_TANK_BASE))
             .texture("side", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
             .texture("top", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"));
+
+        var key = Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(blockTank));
+        var unbaked = ItemModelUtils.specialModel(RenderItemCodecs.TANK_MODEL, FluidRenderHelperNeoForge.tankUnbaked());
+        clientItemMap.put(
+            key,
+            new ClientItem(unbaked, ClientItem.Properties.DEFAULT)
+        );
     }
 
     /*void gasTank(BlockGasTank blockGasTank) {

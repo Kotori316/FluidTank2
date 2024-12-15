@@ -10,8 +10,14 @@ import org.jetbrains.annotations.Nullable;
 
 public final class RenderItemCodecs {
     public static final ResourceLocation RESERVOIR_MODEL = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir");
+    public static final ResourceLocation TANK_MODEL = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "tank");
+
     public static SpecialModelRenderer.Unbaked reservoirModelUnbaked(FluidRenderHelper helper) {
         return new RenderReservoirItemUnbaked(helper);
+    }
+
+    public static SpecialModelRenderer.Unbaked tankModelUnbaked(FluidRenderHelper helper) {
+        return new RenderTankItemUnbaked(helper);
     }
 
     private static class RenderReservoirItemUnbaked implements SpecialModelRenderer.Unbaked {
@@ -35,16 +41,24 @@ public final class RenderItemCodecs {
         }
     }
 
-    public record RenderTankItemUnbaked() implements SpecialModelRenderer.Unbaked {
+    private static class RenderTankItemUnbaked implements SpecialModelRenderer.Unbaked {
+        private final FluidRenderHelper helper;
+        private final MapCodec<RenderTankItemUnbaked> codec;
+
+        public RenderTankItemUnbaked(FluidRenderHelper helper) {
+            this.helper = helper;
+            this.codec = MapCodec.unit(() -> new RenderTankItemUnbaked(helper));
+        }
 
         @Override
         public @Nullable SpecialModelRenderer<?> bake(EntityModelSet modelSet) {
-            return null;
+            var model = new TankModel(modelSet.bakeLayer(TankModel.LOCATION));
+            return new RenderItemTank(model, helper);
         }
 
         @Override
         public MapCodec<? extends SpecialModelRenderer.Unbaked> type() {
-            return null;
+            return codec;
         }
     }
 

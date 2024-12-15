@@ -16,6 +16,7 @@ import scala.jdk.javaapi.OptionConverters
 object FluidRenderHelperNeoForge extends FluidRenderHelper {
 
   final lazy val reservoirUnbaked = RenderItemCodecs.reservoirModelUnbaked(this)
+  final lazy val tankUnbaked = RenderItemCodecs.tankModelUnbaked(this)
 
   override def getFluidTexture(tank: Tank[FluidLike]): TextureAtlasSprite = {
     val fluid = FluidLike.asFluid(tank.content.content, Fluids.WATER)

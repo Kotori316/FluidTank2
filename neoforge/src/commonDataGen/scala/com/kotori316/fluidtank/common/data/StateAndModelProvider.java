@@ -177,7 +177,7 @@ final class StateAndModelProvider extends BlockStateProvider {
             .texture("top", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"));
 
         var key = Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(blockTank));
-        var unbaked = ItemModelUtils.specialModel(RenderItemCodecs.TANK_MODEL, FluidRenderHelperNeoForge.tankUnbaked());
+        var unbaked = ItemModelUtils.specialModel(key.withPrefix("item/"), FluidRenderHelperNeoForge.tankUnbaked());
         clientItemMap.put(
             key,
             new ClientItem(unbaked, ClientItem.Properties.DEFAULT)
@@ -315,7 +315,7 @@ final class StateAndModelProvider extends BlockStateProvider {
     void reservoir(ItemReservoir reservoirItem) {
         var key = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(reservoirItem));
         itemModels().withExistingParent(key.getPath(), modLoc(ITEM_RESERVOIR_BASE));
-        var unbaked = ItemModelUtils.specialModel(RenderItemCodecs.RESERVOIR_MODEL, FluidRenderHelperNeoForge.reservoirUnbaked());
+        var unbaked = ItemModelUtils.specialModel(key.withPrefix("item/"), FluidRenderHelperNeoForge.reservoirUnbaked());
         clientItemMap.put(
             key,
             new ClientItem(unbaked, ClientItem.Properties.DEFAULT)

@@ -1,7 +1,7 @@
 {
   "model": {
     "type": "minecraft:special",
-    "base": "fluidtank:reservoir",
+    "base": "fluidtank:item/reservoir_wood",
     "model": {
       "type": "fluidtank:reservoir"
     }

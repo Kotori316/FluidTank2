@@ -1,7 +1,7 @@
 {
   "model": {
     "type": "minecraft:special",
-    "base": "fluidtank:tank",
+    "base": "fluidtank:item/tank_stone",
     "model": {
       "type": "fluidtank:tank"
     }

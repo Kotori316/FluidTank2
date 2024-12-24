@@ -26,4 +26,10 @@ dependencies {
         version = project.property("parchment_mapping_version").toString(),
         ext = "zip"
     )
+    // Scala 3
+    implementation(
+        group = "org.scala-lang",
+        name = "scala-library",
+        version = project.property("scala2_version") as String
+    )
 }

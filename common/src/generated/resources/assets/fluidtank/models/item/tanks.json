@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:builtin/entity",
+  "parent": "fluidtank:block/tanks",
   "ambientocclusion": false,
   "display": {
     "firstperson_lefthand": {
@@ -75,80 +75,5 @@
       ]
     }
   },
-  "elements": [
-    {
-      "faces": {
-        "down": {
-          "texture": "#top",
-          "uv": [
-            0.0,
-            0.0,
-            12.0,
-            12.0
-          ]
-        },
-        "east": {
-          "texture": "#side",
-          "uv": [
-            0.0,
-            0.0,
-            12.0,
-            16.0
-          ]
-        },
-        "north": {
-          "texture": "#side",
-          "uv": [
-            0.0,
-            0.0,
-            12.0,
-            16.0
-          ]
-        },
-        "south": {
-          "texture": "#side",
-          "uv": [
-            0.0,
-            0.0,
-            12.0,
-            16.0
-          ]
-        },
-        "up": {
-          "texture": "#top",
-          "uv": [
-            0.0,
-            0.0,
-            12.0,
-            12.0
-          ]
-        },
-        "west": {
-          "texture": "#side",
-          "uv": [
-            0.0,
-            0.0,
-            12.0,
-            16.0
-          ]
-        }
-      },
-      "from": [
-        2,
-        0,
-        2
-      ],
-      "to": [
-        14,
-        16,
-        14
-      ]
-    }
-  ],
-  "gui_light": "side",
-  "textures": {
-    "particle": "#side",
-    "side": "#side",
-    "top": "#top"
-  }
+  "gui_light": "side"
 }

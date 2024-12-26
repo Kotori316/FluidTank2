@@ -1,94 +1,84 @@
 package com.kotori316.fluidtank.common.data;
 
 import com.kotori316.fluidtank.FluidTankCommon;
-import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.neoforge.FluidTank;
 import com.kotori316.fluidtank.neoforge.render.FluidRenderHelperNeoForge;
-import com.kotori316.fluidtank.render.RenderItemCodecs;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
-import net.minecraft.client.data.models.model.ItemModelUtils;
+import com.kotori316.fluidtank.tank.TankPos;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.blockstates.PropertyDispatch;
+import net.minecraft.client.data.models.blockstates.Variant;
+import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.item.ClientItem;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DataProvider;
+import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.client.model.generators.template.ElementBuilder;
+import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplateBuilder;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-final class StateAndModelProvider extends BlockStateProvider {
+final class StateAndModelProvider extends ModelProvider {
 
     static final String ITEM_TANK_BASE = "item/tanks";
     static final String ITEM_GAS_TANK_BASE = "item/gas_item_tank";
     static final String ITEM_RESERVOIR_BASE = "item/reservoirs";
 
-    private final PackOutput.PathProvider itemInfoPathProvider;
-    private final Map<ResourceLocation, ClientItem> clientItemMap = new HashMap<>();
-
-    StateAndModelProvider(DataGenerator gen, ExistingFileHelper exFileHelper) {
-        super(gen.getPackOutput(), FluidTankCommon.modId, exFileHelper);
-        this.itemInfoPathProvider = gen.getPackOutput().createPathProvider(PackOutput.Target.RESOURCE_PACK, "items");
+    StateAndModelProvider(PackOutput output) {
+        super(output, FluidTankCommon.modId);
     }
 
-    // Model item definition START
     @Override
-    public CompletableFuture<?> run(CachedOutput cache) {
-        var parent = super.run(cache);
-        return parent.thenCompose(v ->
-            DataProvider.saveAll(cache, ClientItem.CODEC, itemInfoPathProvider, clientItemMap)
-        );
+    protected Stream<? extends Holder<Block>> getKnownBlocks() {
+        return Stream.of();
     }
-    // Model item definition END
+
+    @Override
+    protected Stream<? extends Holder<Item>> getKnownItems() {
+        return Stream.of();
+    }
 
     private ResourceLocation blockTexture(String name) {
-        return modLoc("block/" + name);
+        return modLocation("block/" + name);
     }
 
     @Override
-    protected void registerStatesAndModels() {
+    protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
         FluidTankCommon.LOGGER.info("Generating state and model");
-        catBlock();
+        catBlock(blockModels);
         // sourceBlock();
-        tankBase();
-        FluidTank.TANK_MAP.values().stream().map(Supplier::get).forEach(this::tank);
-        Stream.of(FluidTank.BLOCK_CREATIVE_TANK, FluidTank.BLOCK_VOID_TANK).map(Supplier::get).forEach(this::tank);
+        var tankTemplates = tankBase(blockModels, itemModels);
+        FluidTank.TANK_MAP.values().stream().map(Supplier::get).forEach(b -> tank(blockModels, itemModels, b, tankTemplates));
+        Stream.of(FluidTank.BLOCK_CREATIVE_TANK, FluidTank.BLOCK_VOID_TANK).map(Supplier::get).forEach(b -> tank(blockModels, itemModels, b, tankTemplates));
         // StreamConverters.asJavaSeqStream(ModObjects.gasTanks()).forEach(this::gasTank);
         // pipeBase();
         // pipe(ModObjects.blockFluidPipe(), "fluid_pipe");
         // pipe(ModObjects.blockItemPipe(), "item_pipe");
-        reservoirBase();
-        FluidTank.RESERVOIR_MAP.values().stream().map(Supplier::get).forEach(this::reservoir);
+        reservoirBase(itemModels);
+        FluidTank.RESERVOIR_MAP.values().stream().map(Supplier::get).forEach(i -> reservoir(itemModels, i));
     }
 
-    void catBlock() {
-        this.directionalBlock(FluidTank.BLOCK_CAT.get(), models().cubeTop(BlockChestAsTank.NAME(),
-            blockTexture("cat_side"), blockTexture("cat_front")));
-        var blockModelLocation = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/" + BlockChestAsTank.NAME());
-        this.itemModels().withExistingParent("item/" + BlockChestAsTank.NAME(), blockModelLocation);
-
-        var key = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME());
-        var unbaked = ItemModelUtils.plainModel(blockModelLocation);
-        clientItemMap.put(
-            key,
-            new ClientItem(unbaked, ClientItem.Properties.DEFAULT)
+    void catBlock(BlockModelGenerators blockModels) {
+        var location = TexturedModel.CUBE_TOP.updateTexture(t -> t.put(TextureSlot.SIDE, blockTexture("cat_side")).put(TextureSlot.TOP, blockTexture("cat_front")))
+            .create(FluidTank.BLOCK_CAT.get(), blockModels.modelOutput);
+        blockModels.blockStateOutput.accept(
+            BlockModelGenerators.createSimpleBlock(FluidTank.BLOCK_CAT.get(), location)
+                .with(blockModels.createColumnWithFacing())
         );
+        blockModels.registerSimpleItemModel(FluidTank.BLOCK_CAT.get(), location);
     }
 
     /*void sourceBlock() {
@@ -109,79 +99,80 @@ final class StateAndModelProvider extends BlockStateProvider {
             .end();
     }*/
 
-    void tankBase() {
-        models().withExistingParent("block/tanks", mcLoc("block"))
-            .element()
+    TankModelTemplates tankBase(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
+        Consumer<ElementBuilder> elementBuilderConsumer = b -> b
             .from(2.0f, 0.0f, 2.0f)
             .to(14.0f, 16.0f, 14.0f)
             .allFaces((direction, faceBuilder) -> {
                 if (direction.getAxis() == Direction.Axis.Y) {
-                    faceBuilder.texture("#top").uvs(0.0f, 0.0f, 12.0f, 12.0f);
+                    faceBuilder.texture(TextureSlot.TOP).uvs(0.0f, 0.0f, 12.0f, 12.0f);
                 } else {
-                    faceBuilder.texture("#side").uvs(0.0f, 0.0f, 12.0f, 16.0f);
+                    faceBuilder.texture(TextureSlot.SIDE).uvs(0.0f, 0.0f, 12.0f, 16.0f);
                 }
             });
-        itemModels().getBuilder(ITEM_TANK_BASE)
-            .parent(new ModelFile.UncheckedModelFile("builtin/entity"))
-            .guiLight(BlockModel.GuiLight.SIDE)
-            .transforms()
-            .transform(ItemDisplayContext.GUI).scale(0.625f).translation(0, 0, 0).rotation(30, 225, 0).end()
-            .transform(ItemDisplayContext.GROUND).scale(0.25f).translation(0, 3, 0).rotation(0, 0, 0).end()
-            .transform(ItemDisplayContext.FIXED).scale(0.5f).translation(0, 0, 0).rotation(0, 0, 0).end()
-            .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND).scale(0.375f).translation(0, 2.5f, 0).rotation(75, 45, 0).end()
-            .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND).scale(0.4f).translation(0, 0, 0).rotation(0, 45, 0).end()
-            .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND).scale(0.4f).translation(0, 0, 0).rotation(0, 225, 0).end()
-            .end()
-            .ao(false)
-            .texture("particle", "#side")
-            .texture("side", "#side")
-            .texture("top", "#top")
-            .element()
-            .from(2.0f, 0.0f, 2.0f).to(14.0f, 16.0f, 14.0f)
-            .allFaces((direction, faceBuilder) -> {
-                if (direction.getAxis() == Direction.Axis.Y) {
-                    faceBuilder.texture("#top").uvs(0.0f, 0.0f, 12.0f, 12.0f);
-                } else {
-                    faceBuilder.texture("#side").uvs(0.0f, 0.0f, 12.0f, 16.0f);
-                }
-            });
-        itemModels().withExistingParent(ITEM_GAS_TANK_BASE, mcLoc("block/block"))
-            .ao(false)
-            .texture("particle", "#side")
-            .texture("side", "#side")
-            .texture("top", "#top")
-            .element()
-            .from(2.0f, 0.0f, 2.0f).to(14.0f, 16.0f, 14.0f)
-            .allFaces((direction, faceBuilder) -> {
-                if (direction.getAxis() == Direction.Axis.Y) {
-                    faceBuilder.texture("#top").uvs(0.0f, 0.0f, 12.0f, 12.0f);
-                } else {
-                    faceBuilder.texture("#side").uvs(0.0f, 0.0f, 12.0f, 16.0f);
-                }
-            });
+        var tankBlockTemplate = ExtendedModelTemplateBuilder.builder()
+            .parent(mcLocation("block/block"))
+            .element(elementBuilderConsumer)
+            .build();
+        var blockModelLocation = tankBlockTemplate.create(modLocation("block/tanks"), new TextureMapping(), blockModels.modelOutput);
+
+        var itemTemplate = ExtendedModelTemplateBuilder.builder()
+            .parent(blockModelLocation)
+            .guiLight(UnbakedModel.GuiLight.SIDE)
+            .transform(ItemDisplayContext.GUI, b -> b.scale(0.625f).translation(0, 0, 0).rotation(30, 225, 0))
+            .transform(ItemDisplayContext.GROUND, b -> b.scale(0.25f).translation(0, 3, 0).rotation(0, 0, 0))
+            .transform(ItemDisplayContext.FIXED, b -> b.scale(0.5f).translation(0, 0, 0).rotation(0, 0, 0))
+            .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, b -> b.scale(0.375f).translation(0, 2.5f, 0).rotation(75, 45, 0))
+            .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, b -> b.scale(0.4f).translation(0, 0, 0).rotation(0, 45, 0))
+            .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND, b -> b.scale(0.4f).translation(0, 0, 0).rotation(0, 225, 0))
+            .ambientOcclusion(false)
+            .build();
+        var itemModelLocation = itemTemplate.create(modLocation(ITEM_TANK_BASE), new TextureMapping(), itemModels.modelOutput);
+
+        var gasTankBlockTemplate = ExtendedModelTemplateBuilder.builder()
+            .parent(mcLocation("block/block"))
+            .ambientOcclusion(false)
+            .element(elementBuilderConsumer)
+            .build();
+
+        var gasBlockModelLocation = gasTankBlockTemplate.create(modLocation(ITEM_GAS_TANK_BASE), new TextureMapping(), itemModels.modelOutput);
+
+        return new TankModelTemplates(blockModelLocation, itemModelLocation, gasBlockModelLocation);
     }
 
-    void tank(BlockTank blockTank) {
+    void tank(BlockModelGenerators blockModels, ItemModelGenerators itemModels, BlockTank blockTank, TankModelTemplates templates) {
         var tier = blockTank.tier();
-        getVariantBuilder(blockTank)
-            .forAllStates(blockState -> new ConfiguredModel[]{
-                new ConfiguredModel(models().withExistingParent(tier.getBlockName(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/tanks"))
-                    .texture("particle", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
-                    .texture("side", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
-                    .texture("top", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"))
-                    .renderType(renderTypeName(RenderType.cutout()))
-                )
-            });
-        itemModels().withExistingParent(tier.getBlockName(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, ITEM_TANK_BASE))
-            .texture("side", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
-            .texture("top", blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"));
+        var tankPosProperty = PropertyDispatch.property(TankPos.TANK_POS_PROPERTY)
+            .generate(tankPos -> Variant.variant());
+        var blockModel = ExtendedModelTemplateBuilder.builder()
+            .parent(templates.tankBlock())
+            .renderType(renderTypeName(RenderType.cutout()))
+            .build();
 
-        var key = Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(blockTank));
-        var unbaked = ItemModelUtils.specialModel(key.withPrefix("item/"), FluidRenderHelperNeoForge.tankUnbaked());
-        clientItemMap.put(
-            key,
-            new ClientItem(unbaked, ClientItem.Properties.DEFAULT)
+        var blockModelLocation = blockModel.create(ModelLocationUtils.getModelLocation(blockTank),
+            new TextureMapping()
+                .putForced(TextureSlot.PARTICLE, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
+                .putForced(TextureSlot.SIDE, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
+                .putForced(TextureSlot.TOP, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"))
+            ,
+            blockModels.modelOutput
         );
+        blockModels.blockStateOutput.accept(
+            BlockModelGenerators.createSimpleBlock(blockTank, blockModelLocation)
+                .with(tankPosProperty)
+        );
+
+        var itemModel = ExtendedModelTemplateBuilder.builder()
+            .parent(templates.tankItem())
+            .build();
+        var itemModelLocation = itemModel.create(ModelLocationUtils.getModelLocation(blockTank.asItem()),
+            new TextureMapping()
+                .putForced(TextureSlot.SIDE, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
+                .putForced(TextureSlot.TOP, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"))
+            ,
+            itemModels.modelOutput
+        );
+        itemModels.itemModelOutput.accept(blockTank.asItem(), ItemModelUtils.specialModel(itemModelLocation, FluidRenderHelperNeoForge.tankUnbaked()));
     }
 
     /*void gasTank(BlockGasTank blockGasTank) {
@@ -200,7 +191,7 @@ final class StateAndModelProvider extends BlockStateProvider {
             .texture("2", blockTexture("gas_%s2".formatted(tier.name().toLowerCase(Locale.ROOT))));
     }*/
 
-    @SuppressWarnings("SpellCheckingInspection")
+    /*@SuppressWarnings("SpellCheckingInspection")
     void pipeBase() {
         // Center Model
         models().getBuilder("block/" + "pipe_center")
@@ -249,7 +240,7 @@ final class StateAndModelProvider extends BlockStateProvider {
             .allFaces((direction, faceBuilder) ->
                 faceBuilder.uvs(4, 4, 12, 12).texture("#texture")
             );
-    }
+    }*/
 
     /*void pipe(PipeBlock pipeBlock, String modelBaseName) {
         String prefix = pipeBlock.registryName.getPath().replace("pipe", "");
@@ -297,29 +288,28 @@ final class StateAndModelProvider extends BlockStateProvider {
             .texture("texture", frameTexture);
     }*/
 
-    void reservoirBase() {
-        itemModels().getBuilder(ITEM_RESERVOIR_BASE)
-            .parent(new ModelFile.UncheckedModelFile("builtin/entity"))
+    void reservoirBase(ItemModelGenerators itemModels) {
+        var template = ExtendedModelTemplateBuilder.builder()
+            .parent(mcLocation("builtin/entity"))
             .guiLight(BlockModel.GuiLight.FRONT)
-            .transforms()
-            .transform(ItemDisplayContext.FIXED).scale(1f).translation(0, 0, 0).rotation(0, 180, 0).end()
-            .transform(ItemDisplayContext.GROUND).scale(0.5f).translation(0, 0, 0).rotation(0, 180, 0).end()
-            .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND).scale(0.85f).translation(0f, 4.0f, 0.5f).rotation(0, 0, 0).end()
-            .transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND).scale(0.85f).translation(0f, 4.0f, 0.5f).rotation(0, 0, 0).end()
-            .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND).scale(0.68f).translation(1.13f, 3.2f, -1.13f).rotation(0, -90, 0).end()
-            .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND).scale(0.68f).translation(1.13f, 3.2f, -1.13f).rotation(0, 90, 0).end()
-            .end()
-        ;
+            .transform(ItemDisplayContext.FIXED, b -> b.scale(1f).translation(0, 0, 0).rotation(0, 180, 0))
+            .transform(ItemDisplayContext.GROUND, b -> b.scale(0.5f).translation(0, 0, 0).rotation(0, 180, 0))
+            .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, b -> b.scale(0.85f).translation(0f, 4.0f, 0.5f).rotation(0, 0, 0))
+            .transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND, b -> b.scale(0.85f).translation(0f, 4.0f, 0.5f).rotation(0, 0, 0))
+            .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, b -> b.scale(0.68f).translation(1.13f, 3.2f, -1.13f).rotation(0, -90, 0))
+            .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND, b -> b.scale(0.68f).translation(1.13f, 3.2f, -1.13f).rotation(0, 90, 0))
+            .build();
+        template.create(modLocation(ITEM_RESERVOIR_BASE), new TextureMapping(), itemModels.modelOutput);
     }
 
-    void reservoir(ItemReservoir reservoirItem) {
-        var key = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(reservoirItem));
-        itemModels().withExistingParent(key.getPath(), modLoc(ITEM_RESERVOIR_BASE));
-        var unbaked = ItemModelUtils.specialModel(key.withPrefix("item/"), FluidRenderHelperNeoForge.reservoirUnbaked());
-        clientItemMap.put(
-            key,
-            new ClientItem(unbaked, ClientItem.Properties.DEFAULT)
-        );
+    void reservoir(ItemModelGenerators itemModels, ItemReservoir reservoirItem) {
+        var key = ModelLocationUtils.getModelLocation(reservoirItem);
+        var template = ExtendedModelTemplateBuilder.builder()
+            .parent(modLocation(ITEM_RESERVOIR_BASE))
+            .build();
+        template.create(key, new TextureMapping(), itemModels.modelOutput);
+        var unbaked = ItemModelUtils.specialModel(key, FluidRenderHelperNeoForge.reservoirUnbaked());
+        itemModels.itemModelOutput.accept(reservoirItem, unbaked);
     }
 
     private static String renderTypeName(RenderStateShard type) {
@@ -330,5 +320,8 @@ final class StateAndModelProvider extends BlockStateProvider {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    record TankModelTemplates(ResourceLocation tankBlock, ResourceLocation tankItem, ResourceLocation gasTankBlock) {
     }
 }

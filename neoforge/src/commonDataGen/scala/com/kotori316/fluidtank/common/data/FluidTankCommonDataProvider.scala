@@ -28,7 +28,7 @@ object FluidTankCommonDataProvider {
       CollectionConverters.asJava(Seq(new LootTableProvider.SubProviderEntry(r => new LootSubProvider(r), LootContextParamSets.BLOCK))),
       event.getLookupProvider
     ))
-    event.addProvider(StateAndModelProvider(event.getGenerator, event.getExistingFileHelper))
+    event.addProvider(StateAndModelProvider(event.getGenerator.getPackOutput))
     event.addProvider(PackMetadataGenerator(event.getGenerator.getPackOutput)
       .add(PackMetadataSection.TYPE, PackMetadataSection(Component.literal("FluidTank Resources"), DetectedVersion.BUILT_IN.getPackVersion(PackType.CLIENT_RESOURCES)))
     )

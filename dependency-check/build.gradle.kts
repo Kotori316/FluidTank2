@@ -29,7 +29,7 @@ dependencies {
     // Scala 3
     implementation(
         group = "org.scala-lang",
-        name = "scala-library",
-        version = project.property("scala2_version") as String
+        name = "scala3-library_3",
+        version = project.property("scala3_version") as String
     )
 }

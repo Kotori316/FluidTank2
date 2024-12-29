@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 public final class PacketHandler {
     public static class Server {
         public static void initServer() {
+            // Register message class in BOTH SIDE
+            PayloadTypeRegistry.playS2C().register(FluidTankContentMessageFabric.TYPE, FluidTankContentMessageFabric.STREAM_CODEC);
             // Use ServerPlayNetworking.registerGlobalReceiver
         }
 
@@ -23,8 +25,6 @@ public final class PacketHandler {
     @Environment(EnvType.CLIENT)
     public static class Client {
         public static void initClient() {
-            PayloadTypeRegistry.playS2C().register(FluidTankContentMessageFabric.TYPE, FluidTankContentMessageFabric.STREAM_CODEC);
-
             ClientPlayNetworking.registerGlobalReceiver(FluidTankContentMessageFabric.TYPE, FluidTankContentMessageFabric.HandlerHolder.HANDLER);
         }
     }

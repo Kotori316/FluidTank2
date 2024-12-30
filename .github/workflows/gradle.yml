@@ -2,9 +2,9 @@ name: Java CI
 
 on:
   push:
-    branches: [ "1.21.3" ]
+    branches: [ "1.21.2" ]
   pull_request:
-    branches: [ "1.21.3" ]
+    branches: [ "1.21.2" ]
 
 permissions:
   contents: read

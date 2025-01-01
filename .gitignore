@@ -25,3 +25,4 @@ classes/
 .cache
 .DS_Store
 .architectury-transformer
+.kotlin

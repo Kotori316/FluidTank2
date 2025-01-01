@@ -6,6 +6,22 @@ plugins {
     alias(libs.plugins.fabric.loom)
 }
 
+sourceSets {
+    create("clientTest") {
+        val s = this
+        project.configurations {
+            named(s.compileClasspathConfigurationName) {
+                extendsFrom(project.configurations.compileClasspath.get())
+                extendsFrom(project.configurations.testCompileClasspath.get())
+            }
+            named(s.runtimeClasspathConfigurationName) {
+                extendsFrom(project.configurations.runtimeClasspath.get())
+                extendsFrom(project.configurations.testRuntimeClasspath.get())
+            }
+        }
+    }
+}
+
 fabricApi {
 }
 
@@ -44,6 +60,14 @@ loom {
 
             isIdeConfigGenerated = true
             source(sourceSets["dataGen"])
+        }
+
+        create("gameTestClient") {
+            client()
+            name("Fabric Client GameTest")
+            property("fabric.client.gametest")
+            runDir = "run-client"
+            source(sourceSets["clientTest"])
         }
     }
     knownIndyBsms.add("scala/runtime/LambdaDeserialize")
@@ -110,6 +134,8 @@ dependencies {
 
     testImplementation("net.fabricmc:fabric-loader-junit:${project.property("fabric_loader_version")}")
     testImplementation(project(":gameTest:commonTest"))
+
+    "clientTestImplementation"(project.sourceSets.main.get().output)
 }
 
 tasks {

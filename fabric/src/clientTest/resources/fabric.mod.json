@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "fluidtank_client_test",
+  "version": "1.0.0",
+  "name": "Fluid Tank Client Test",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "com.kotori316.fluidtank.fabric.client.test.DemoTest"
+    ]
+  }
+}

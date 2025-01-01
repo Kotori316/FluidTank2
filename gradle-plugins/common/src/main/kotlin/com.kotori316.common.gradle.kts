@@ -44,18 +44,6 @@ repositories {
         }
     }
     maven {
-        name = "Kotori316BackUp"
-        url = uri("https://storage.googleapis.com/kotori316-maven-storage/maven/")
-        val catsVersion = project.property("cats_version") as String
-        content {
-            includeVersion("org.typelevel", "cats-core_3", catsVersion)
-            includeVersion("org.typelevel", "cats-kernel_3", catsVersion)
-            includeVersion("org.typelevel", "cats-core_2.13", catsVersion)
-            includeVersion("org.typelevel", "cats-kernel_2.13", catsVersion)
-            includeGroup("com.kotori316")
-        }
-    }
-    maven {
         name = "Curse"
         url = uri("https://www.cursemaven.com")
         content {

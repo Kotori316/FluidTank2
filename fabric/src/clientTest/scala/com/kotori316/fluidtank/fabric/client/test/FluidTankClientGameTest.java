@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 public interface FluidTankClientGameTest extends FabricClientGameTest {
     @Override
     default void runTest(ClientGameTestContext context) {
+        context.runOnClient(i -> i.options.hideGui = true);
         try (var singlePlayerContext = context.worldBuilder().adjustSettings(FluidTankClientGameTest::setWorldNameByTime).create()) {
             runTest(context, singlePlayerContext);
         }

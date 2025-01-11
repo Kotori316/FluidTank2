@@ -1,3 +1,6 @@
 {
-  "parent": "fluidtank:item/reservoirs"
+  "parent": "fluidtank:item/reservoirs",
+  "textures": {
+    "particle": "fluidtank:block/iron1"
+  }
 }

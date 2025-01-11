@@ -291,7 +291,6 @@ final class StateAndModelProvider extends ModelProvider {
 
     void reservoirBase(ItemModelGenerators itemModels) {
         var template = ExtendedModelTemplateBuilder.builder()
-            .parent(mcLocation("builtin/entity"))
             .guiLight(BlockModel.GuiLight.FRONT)
             .transform(ItemDisplayContext.FIXED, b -> b.scale(1f).translation(0, 0, 0).rotation(0, 180, 0))
             .transform(ItemDisplayContext.GROUND, b -> b.scale(0.5f).translation(0, 0, 0).rotation(0, 180, 0))
@@ -308,7 +307,10 @@ final class StateAndModelProvider extends ModelProvider {
         var template = ExtendedModelTemplateBuilder.builder()
             .parent(modLocation(ITEM_RESERVOIR_BASE))
             .build();
-        template.create(key, new TextureMapping(), itemModels.modelOutput);
+        template.create(key,
+            new TextureMapping()
+                .putForced(TextureSlot.PARTICLE, blockTexture(reservoirItem.tier().name().toLowerCase(Locale.ROOT) + "1")),
+            itemModels.modelOutput);
         var unbaked = ItemModelUtils.specialModel(key, FluidRenderHelperNeoForge.reservoirUnbaked());
         itemModels.itemModelOutput.accept(reservoirItem, unbaked);
     }

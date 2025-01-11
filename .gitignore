@@ -3,6 +3,7 @@ build/
 run/
 runs/
 run-server/
+run-client/
 *.iws
 out/
 *.iml

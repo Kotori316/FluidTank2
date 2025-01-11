@@ -156,6 +156,32 @@ jobs:
       - name: Check diff
         run: git diff --exit-code -- ./common/src/generated
 
+  fabric-client-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DISABLE_FORGE: true
+      DISABLE_FABRIC: false
+      DISABLE_NEOFORGE: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - run: chmod +x ./gradlew
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+          add-job-summary: 'on-failure'
+      - name: Run client test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: ./gradlew runGameTestClient
+      - run: ls fabric/run-client/screenshots
+
   merge-checker:
     if: always()
     needs:

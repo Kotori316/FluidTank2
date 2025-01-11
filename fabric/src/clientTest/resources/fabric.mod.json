@@ -5,7 +5,8 @@
   "name": "Fluid Tank Client Test",
   "entrypoints": {
     "fabric-client-gametest": [
-      "com.kotori316.fluidtank.fabric.client.test.DemoTest"
+      "com.kotori316.fluidtank.fabric.client.test.DemoTest",
+      "com.kotori316.fluidtank.fabric.client.test.WaterTankTest"
     ]
   }
 }

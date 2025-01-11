@@ -1,6 +1,7 @@
 {
   "parent": "fluidtank:item/tanks",
   "textures": {
+    "particle": "fluidtank:block/void1",
     "side": "fluidtank:block/void1",
     "top": "fluidtank:block/void2"
   }

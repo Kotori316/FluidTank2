@@ -167,6 +167,7 @@ final class StateAndModelProvider extends ModelProvider {
             .build();
         var itemModelLocation = itemModel.create(ModelLocationUtils.getModelLocation(blockTank.asItem()),
             new TextureMapping()
+                .putForced(TextureSlot.PARTICLE, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
                 .putForced(TextureSlot.SIDE, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
                 .putForced(TextureSlot.TOP, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"))
             ,

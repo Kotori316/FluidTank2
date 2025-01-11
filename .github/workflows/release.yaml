@@ -35,7 +35,7 @@ jobs:
             (sleep 5 && ./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer --no-daemon) || \
             (sleep 5 && ./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer --no-daemon) || true
       - name: GameTest
-        run: ./gradlew runGameTest
+        run: ./gradlew runGameTestServer
         env:
           RUN_GAME_TEST: true
           DISABLE_FORGE: true

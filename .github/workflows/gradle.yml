@@ -174,10 +174,13 @@ jobs:
       - run: chmod +x ./gradlew
       - uses: gradle/actions/setup-gradle@v4
         with:
-          cache-read-only: ${{ github.event_name != 'push' }}
+          cache-read-only: true
           add-job-summary: 'on-failure'
       - name: Run client test
-        run: ./gradlew runGameTestClient
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: ./gradlew runGameTestClient
+      - run: ls fabric/run-client/screenshots
 
   merge-checker:
     if: always()

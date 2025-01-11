@@ -1,0 +1,14 @@
+{
+  "volta": {
+    "node": "22.13.0",
+    "npm": "10.9.2"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "reg-suit": "^0.14.4",
+    "reg-keygen-git-hash-plugin": "^0.14.3",
+    "reg-notify-github-plugin": "^0.14.4",
+    "reg-publish-gcs-plugin": "^0.14.4"
+  }
+}

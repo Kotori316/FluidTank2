@@ -57,8 +57,16 @@ public interface FluidTankClientGameTest extends FabricClientGameTest {
         return new ServerDataContext(level, player, direction, pos);
     }
 
-    static void takeScreenshot(ClientGameTestContext context, String fileName) {
-        var destinationDir = Optional.ofNullable(System.getenv("SCREENSHOT_DIR")).map(Path::of);
+    default void takeScreenshot(ClientGameTestContext context, String fileName) {
+        takeScreenshot(context, getScreenshotSubDirectory(), fileName);
+    }
+
+    default String getScreenshotSubDirectory() {
+        return getClass().getSimpleName();
+    }
+
+    static void takeScreenshot(ClientGameTestContext context, String directory, String fileName) {
+        var destinationDir = Optional.ofNullable(System.getenv("SCREENSHOT_DIR")).map(Path::of).map(p -> p.resolve(directory));
         var option = TestScreenshotOptions.of(fileName)
             .disableCounterPrefix();
         // the option is builder-like instance

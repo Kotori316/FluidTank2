@@ -1,0 +1,15 @@
+{
+  "volta": {
+    "node": "22.13.0",
+    "npm": "10.9.2"
+  },
+  "scripts": {
+    "run": "npx reg-suit run"
+  },
+  "devDependencies": {
+    "reg-notify-github-plugin": "^0.14.4",
+    "reg-publish-s3-plugin": "^0.14.4",
+    "reg-simple-keygen-plugin": "^0.14.2",
+    "reg-suit": "^0.14.4"
+  }
+}

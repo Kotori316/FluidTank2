@@ -197,9 +197,11 @@ jobs:
       - name: Login to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-session-name: UploadContentSession
+          role-session-name: VrtUpload
           aws-region: 'us-east-1'
           role-to-assume: ${{ secrets.AWS_VRT_UPLOADER_ROLE_ARN }}
+          mask-aws-account-id: true
+          retry-max-attempts: 3
       - name: Add profile credentials to ~/.aws/credentials
         env:
           PROFILE: 'aws_kotori316'

@@ -159,6 +159,9 @@ jobs:
   fabric-client-test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      id-token: write
+      contents: read
     env:
       DISABLE_FORGE: true
       DISABLE_FABRIC: false
@@ -179,8 +182,19 @@ jobs:
       - name: Run client test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: ./gradlew runGameTestClient
-      - run: ls fabric/run-client/screenshots
+          run: SCREENSHOT_DIR=vrt/screenshots ./gradlew runGameTestClient
+      - run: ls vrt/screenshots
+      - run: npm ci
+        working-directory: vrt
+      - name: Login to AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-session-name: UploadContentSession
+          aws-region: 'us-east-1'
+          role-to-assume: ${{ secrets.AWS_VRT_UPLOADER_ROLE_ARN }}
+      - name: VRT
+        run: npm run run
+        working-directory: vrt
 
   merge-checker:
     if: always()

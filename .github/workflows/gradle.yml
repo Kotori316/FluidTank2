@@ -186,12 +186,12 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: ./gradlew runGameTestClient
-      - run: ls "${SCREENSHOT_DIR}"
+      - run: ls -R "${SCREENSHOT_DIR}"
       - run: mkdir -p vrt/screenshots
       - run: |
           set -x
           mv ${SCREENSHOT_DIR}/* vrt/screenshots
-          ls vrt/screenshots
+          ls -R vrt/screenshots
       - run: npm ci
         working-directory: vrt
       - name: Login to AWS

@@ -166,8 +166,11 @@ jobs:
       DISABLE_FORGE: true
       DISABLE_FABRIC: false
       DISABLE_NEOFORGE: true
+      SCREENSHOT_DIR: /tmp/vrt/screenshots
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
       - uses: gradle/actions/wrapper-validation@v4
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -183,9 +186,12 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: ./gradlew runGameTestClient
-        env:
-          SCREENSHOT_DIR: vrt/screenshots
-      - run: ls vrt/screenshots
+      - run: ls "${SCREENSHOT_DIR}"
+      - run: mkdir -p vrt/screenshots
+      - run: |
+          set -x
+          mv ${SCREENSHOT_DIR}/* vrt/screenshots
+          ls vrt/screenshots
       - run: npm ci
         working-directory: vrt
       - name: Login to AWS
@@ -194,6 +200,16 @@ jobs:
           role-session-name: UploadContentSession
           aws-region: 'us-east-1'
           role-to-assume: ${{ secrets.AWS_VRT_UPLOADER_ROLE_ARN }}
+      - name: Add profile credentials to ~/.aws/credentials
+        env:
+          PROFILE: 'aws_kotori316'
+        run: |
+          aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID" --profile "$PROFILE"
+          aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY" --profile "$PROFILE"
+          aws configure set aws_session_token "$AWS_SESSION_TOKEN" --profile "$PROFILE"
+      - run: |
+          echo "EXPECTED_KEY=$(git rev-parse origin/${{ github.base_ref || github.ref_name }})" >> "$GITHUB_ENV"
+          echo "ACTUAL_KEY=${{ github.sha }}" >> "$GITHUB_ENV"
       - name: VRT
         run: npm run run
         working-directory: vrt

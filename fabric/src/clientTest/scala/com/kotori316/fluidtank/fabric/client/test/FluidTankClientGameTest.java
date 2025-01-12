@@ -14,6 +14,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -22,6 +24,8 @@ import java.util.Optional;
 
 @SuppressWarnings("UnstableApiUsage")
 public interface FluidTankClientGameTest extends FabricClientGameTest {
+    Logger LOGGER = LoggerFactory.getLogger(FluidTankClientGameTest.class);
+
     @Override
     default void runTest(ClientGameTestContext context) {
         context.runOnClient(i -> i.options.hideGui = true);
@@ -59,7 +63,8 @@ public interface FluidTankClientGameTest extends FabricClientGameTest {
             .disableCounterPrefix();
         // the option is builder-like instance
         destinationDir.ifPresent(option::withDestinationDir);
-        context.takeScreenshot(option);
+        var screenshotPath = context.takeScreenshot(option);
+        LOGGER.info("Screenshot path: {}", screenshotPath);
     }
 
     record ServerDataContext(ServerLevel level, ServerPlayer player, Direction playerDirection, BlockPos playerOnPos) {

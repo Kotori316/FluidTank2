@@ -6,12 +6,10 @@
   "scripts": {
     "run": "npx reg-suit run"
   },
-  "dependencies": {
-  },
   "devDependencies": {
-    "reg-suit": "^0.14.4",
-    "reg-keygen-git-hash-plugin": "^0.14.3",
     "reg-notify-github-plugin": "^0.14.4",
-    "reg-publish-s3-plugin": "^0.14.4"
+    "reg-publish-s3-plugin": "^0.14.4",
+    "reg-simple-keygen-plugin": "^0.14.2",
+    "reg-suit": "^0.14.4"
   }
 }

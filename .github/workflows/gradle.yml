@@ -182,7 +182,9 @@ jobs:
       - name: Run client test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: SCREENSHOT_DIR=vrt/screenshots ./gradlew runGameTestClient
+          run: ./gradlew runGameTestClient
+        env:
+          SCREENSHOT_DIR: vrt/screenshots
       - run: ls vrt/screenshots
       - run: npm ci
         working-directory: vrt

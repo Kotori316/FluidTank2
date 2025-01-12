@@ -24,7 +24,11 @@ public final class WaterTankTest implements FluidTankClientGameTest {
 
         singlePlayerContext.getServer().runOnServer(server -> {
             var c = FluidTankClientGameTest.getServerDataContext(server);
-            var tankTile = (TileTank) c.level().getBlockEntity(c.getPos(3));
+            var pos = c.getPos(3);
+            var tankTile = (TileTank) c.level().getBlockEntity(pos);
+            if (tankTile == null) {
+                throw new IllegalStateException("No tank tile at %s (Player: %s)".formatted(pos.toShortString(), c.playerOnPos().toShortString()));
+            }
             tankTile.getConnection().getHandler().fill(FluidAmountUtil.BUCKET_WATER().setAmount(GenericUnit.fromForge(6000)), true);
         });
         context.waitTicks(10); // wait until packet is sent

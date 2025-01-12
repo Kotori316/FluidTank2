@@ -209,9 +209,12 @@ jobs:
           aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID" --profile "$PROFILE"
           aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY" --profile "$PROFILE"
           aws configure set aws_session_token "$AWS_SESSION_TOKEN" --profile "$PROFILE"
-      - run: |
-          echo "EXPECTED_KEY=$(git rev-parse origin/${{ github.base_ref || github.ref_name }})" >> "$GITHUB_ENV"
-          echo "ACTUAL_KEY=${{ github.sha }}" >> "$GITHUB_ENV"
+      - name: workaround for detached HEAD
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          git switch "${REF_NAME}" || git switch -c "${REF_NAME}" && git pull
+        env:
+          REF_NAME: ${{ github.head_ref }}
       - name: VRT
         run: npm run run
         working-directory: vrt

@@ -8,10 +8,7 @@
     }
   },
   "plugins": {
-    "reg-simple-keygen-plugin": {
-      "expectedKey": "${EXPECTED_KEY}",
-      "actualKey": "${ACTUAL_KEY}"
-    },
+    "reg-keygen-git-hash-plugin": true,
     "reg-notify-github-plugin": {
       "prComment": true,
       "prCommentBehavior": "default",

@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.fabric.client.test;
 
 import net.fabricmc.fabric.api.client.gametest.v1.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
+import net.fabricmc.fabric.api.client.gametest.v1.TestScreenshotOptions;
 import net.fabricmc.fabric.api.client.gametest.v1.TestSingleplayerContext;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.core.BlockPos;
@@ -14,8 +15,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 @SuppressWarnings("UnstableApiUsage")
 public interface FluidTankClientGameTest extends FabricClientGameTest {
@@ -48,6 +51,15 @@ public interface FluidTankClientGameTest extends FabricClientGameTest {
         var direction = player.getDirection();
         var pos = player.getOnPos().above();
         return new ServerDataContext(level, player, direction, pos);
+    }
+
+    static void takeScreenshot(ClientGameTestContext context, String fileName) {
+        var destinationDir = Optional.ofNullable(System.getenv("SCREENSHOT_DIR")).map(Path::of);
+        var option = TestScreenshotOptions.of(fileName)
+            .disableCounterPrefix();
+        // the option is builder-like instance
+        destinationDir.ifPresent(option::withDestinationDir);
+        context.takeScreenshot(option);
     }
 
     record ServerDataContext(ServerLevel level, ServerPlayer player, Direction playerDirection, BlockPos playerOnPos) {

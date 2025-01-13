@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "com.kotori316.fluidtank.fabric.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "mixins": [
+    "MixinTextureAtlasSprite"
+  ]
+}

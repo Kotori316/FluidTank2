@@ -5,7 +5,8 @@
   },
   "scripts": {
     "run:ci": "npx reg-suit run",
-    "run:local": "AWS_PROFILE=aws_kotori316 npx reg-suit run"
+    "run:local": "AWS_PROFILE=aws_kotori316 npx reg-suit run",
+    "run:compare": "AWS_PROFILE=aws_kotori316 reg-suit sync-expected && reg-suit compare"
   },
   "devDependencies": {
     "reg-notify-github-plugin": "^0.14.4",

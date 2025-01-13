@@ -4,14 +4,16 @@
     "npm": "10.9.2"
   },
   "scripts": {
-    "run:ci": "npx reg-suit run",
+    "run:ci-pr": "npx reg-suit run --config regconfig.json",
+    "run:ci-push": "npx reg-suit run --config regconfig-push.json",
     "run:local": "AWS_PROFILE=aws_kotori316 npx reg-suit run",
     "run:compare": "AWS_PROFILE=aws_kotori316 reg-suit sync-expected && reg-suit compare"
   },
   "devDependencies": {
+    "reg-keygen-git-hash-plugin": "^0.14.2",
     "reg-notify-github-plugin": "^0.14.4",
     "reg-publish-s3-plugin": "^0.14.4",
-    "reg-keygen-git-hash-plugin": "^0.14.2",
+    "reg-simple-keygen-plugin": "^0.14.2",
     "reg-suit": "^0.14.4"
   }
 }

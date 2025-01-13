@@ -9,5 +9,11 @@
       "com.kotori316.fluidtank.fabric.client.test.WaterTankTest",
       "com.kotori316.fluidtank.fabric.client.test.LavaTankTest"
     ]
-  }
+  },
+  "mixins": [
+    {
+      "environment": "client",
+      "config": "fluidtank_client_test.mixin.json"
+    }
+  ]
 }

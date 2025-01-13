@@ -188,10 +188,11 @@ jobs:
           run: ./gradlew runGameTestClient
       - run: ls -R "${SCREENSHOT_DIR}"
       - run: mkdir -p vrt/screenshots
-      - run: |
+      - name: Check screenshots
+        run: |
           set -x
           mv ${SCREENSHOT_DIR}/* vrt/screenshots
-          ls -R vrt/screenshots
+          ls -alR vrt/screenshots
       - run: npm ci
         working-directory: vrt
       - name: Login to AWS
@@ -202,13 +203,6 @@ jobs:
           role-to-assume: ${{ secrets.AWS_VRT_UPLOADER_ROLE_ARN }}
           mask-aws-account-id: true
           retry-max-attempts: 3
-      - name: Add profile credentials to ~/.aws/credentials
-        env:
-          PROFILE: 'aws_kotori316'
-        run: |
-          aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID" --profile "$PROFILE"
-          aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY" --profile "$PROFILE"
-          aws configure set aws_session_token "$AWS_SESSION_TOKEN" --profile "$PROFILE"
       - name: workaround for detached HEAD
         if: ${{ github.event_name == 'pull_request' }}
         run: |
@@ -216,7 +210,7 @@ jobs:
         env:
           REF_NAME: ${{ github.head_ref }}
       - name: VRT
-        run: npm run run
+        run: npm run run:ci
         working-directory: vrt
 
   merge-checker:

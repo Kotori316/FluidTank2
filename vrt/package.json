@@ -4,7 +4,8 @@
     "npm": "10.9.2"
   },
   "scripts": {
-    "run": "npx reg-suit run"
+    "run:ci": "npx reg-suit run",
+    "run:local": "AWS_PROFILE=aws_kotori316 npx reg-suit run"
   },
   "devDependencies": {
     "reg-notify-github-plugin": "^0.14.4",

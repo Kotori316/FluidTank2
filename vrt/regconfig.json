@@ -19,7 +19,6 @@
       "enableACL": false,
       "customDomain": "vrt-fluidtank.kotori316.com",
       "sdkOptions": {
-        "profile": "aws_kotori316"
       }
     }
   }

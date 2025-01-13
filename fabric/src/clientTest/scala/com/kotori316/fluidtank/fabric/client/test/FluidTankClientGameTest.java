@@ -4,22 +4,30 @@ import net.fabricmc.fabric.api.client.gametest.v1.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.TestScreenshotOptions;
 import net.fabricmc.fabric.api.client.gametest.v1.TestSingleplayerContext;
+import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -29,7 +37,10 @@ public interface FluidTankClientGameTest extends FabricClientGameTest {
     @Override
     default void runTest(ClientGameTestContext context) {
         context.runOnClient(i -> i.options.hideGui = true);
-        try (var singlePlayerContext = context.worldBuilder().adjustSettings(FluidTankClientGameTest::setWorldNameByTime).create()) {
+        try (var singlePlayerContext = context.worldBuilder()
+            .adjustSettings(FluidTankClientGameTest::setWorldNameByTime)
+            .adjustSettings(FluidTankClientGameTest::setFlatWorldSetting)
+            .create()) {
             runTest(context, singlePlayerContext);
         }
     }
@@ -39,6 +50,19 @@ public interface FluidTankClientGameTest extends FabricClientGameTest {
     static void setWorldNameByTime(WorldCreationUiState state) {
         var name = createWorldNameByDate(ZonedDateTime.now());
         setWorldName(state, name);
+    }
+
+    static void setFlatWorldSetting(WorldCreationUiState state) {
+        var settings = new FlatLevelGeneratorSettings(
+            Optional.of(HolderSet.direct()),
+            state.getSettings().worldgenLoadContext().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS),
+            List.of()
+        );
+        settings.getLayersInfo().add(new FlatLayerInfo(1, Blocks.BARRIER));
+        settings.updateLayers();
+
+        var updater = PresetEditor.flatWorldConfigurator(settings);
+        state.updateDimensions(updater);
     }
 
     static void setWorldName(WorldCreationUiState state, String name) {
@@ -57,8 +81,16 @@ public interface FluidTankClientGameTest extends FabricClientGameTest {
         return new ServerDataContext(level, player, direction, pos);
     }
 
-    static void takeScreenshot(ClientGameTestContext context, String fileName) {
-        var destinationDir = Optional.ofNullable(System.getenv("SCREENSHOT_DIR")).map(Path::of);
+    default void takeScreenshot(ClientGameTestContext context, String fileName) {
+        takeScreenshot(context, getScreenshotSubDirectory(), fileName);
+    }
+
+    default String getScreenshotSubDirectory() {
+        return getClass().getSimpleName();
+    }
+
+    static void takeScreenshot(ClientGameTestContext context, String directory, String fileName) {
+        var destinationDir = Optional.ofNullable(System.getenv("SCREENSHOT_DIR")).map(Path::of).map(p -> p.resolve(directory));
         var option = TestScreenshotOptions.of(fileName)
             .disableCounterPrefix();
         // the option is builder-like instance

@@ -1,7 +1,9 @@
 package com.kotori316.fluidtank.fabric.client.test;
 
+import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
+import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.tank.PlatformTankAccess;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
@@ -13,6 +15,13 @@ import net.minecraft.core.Vec3i;
 public final class WaterTankTest implements FluidTankClientGameTest {
     @Override
     public void runTest(ClientGameTestContext context, TestSingleplayerContext singlePlayerContext) {
+        String testName = "water";
+        var fluid = FluidAmountUtil.BUCKET_WATER();
+
+        testFluid(this, context, singlePlayerContext, testName, fluid);
+    }
+
+    static void testFluid(FluidTankClientGameTest testInstance, ClientGameTestContext context, TestSingleplayerContext singlePlayerContext, String testName, GenericAmount<FluidLike> fluid) {
         singlePlayerContext.getServer().runOnServer(server -> {
             var c = FluidTankClientGameTest.getServerDataContext(server);
 
@@ -20,15 +29,19 @@ public final class WaterTankTest implements FluidTankClientGameTest {
             c.placeBlockRelativeOffset(3, Vec3i.ZERO.above(), PlatformTankAccess.getInstance().getTankBlockMap().get(Tier.WOOD).get().defaultBlockState());
         });
         singlePlayerContext.getClientWorld().waitForChunksRender();
-        FluidTankClientGameTest.takeScreenshot(context, "water_before");
+        testInstance.takeScreenshot(context, testName + "_before");
 
         singlePlayerContext.getServer().runOnServer(server -> {
             var c = FluidTankClientGameTest.getServerDataContext(server);
-            var tankTile = (TileTank) c.level().getBlockEntity(c.getPos(3));
-            tankTile.getConnection().getHandler().fill(FluidAmountUtil.BUCKET_WATER().setAmount(GenericUnit.fromForge(6000)), true);
+            var pos = c.getPos(3);
+            var tankTile = (TileTank) c.level().getBlockEntity(pos);
+            if (tankTile == null) {
+                throw new IllegalStateException("No tank tile at %s (Player: %s)".formatted(pos.toShortString(), c.playerOnPos().toShortString()));
+            }
+            tankTile.getConnection().getHandler().fill(fluid.setAmount(GenericUnit.fromForge(6000)), true);
         });
         context.waitTicks(10); // wait until packet is sent
         singlePlayerContext.getClientWorld().waitForChunksRender();
-        FluidTankClientGameTest.takeScreenshot(context, "water_after");
+        testInstance.takeScreenshot(context, testName + "_after");
     }
 }

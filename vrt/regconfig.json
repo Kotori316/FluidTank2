@@ -18,7 +18,7 @@
     "reg-publish-s3-plugin": {
       "bucketName": "kotori316-vrt-fluid-tank",
       "enableACL": false,
-      "customDomain": "vrt-fluidtank.kotori316.com",
+      "customDomain": "fluidtank.vrt.kotori316.com",
       "sdkOptions": {
       }
     }

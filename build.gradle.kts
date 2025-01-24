@@ -7,7 +7,7 @@ version = project.findProperty("mod_version") as String
 val releaseDebug = (System.getenv("RELEASE_DEBUG") ?: "true").toBoolean()
 
 tasks.named("wrapper", Wrapper::class) {
-    gradleVersion = "8.12"
+    gradleVersion = "8.12.1"
     distributionType = Wrapper.DistributionType.BIN
 }
 

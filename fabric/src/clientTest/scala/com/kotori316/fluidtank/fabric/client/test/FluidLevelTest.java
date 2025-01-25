@@ -48,7 +48,7 @@ public final class FluidLevelTest implements FluidTankClientGameTest {
 
             context.waitTicks(10); // Wait for packet transmission
             singlePlayerContext.getClientWorld().waitForChunksRender();
-            testInstance.takeScreenshot(context, "%s_level_%d".formatted(fluidName, amount));
+            testInstance.takeScreenshot(context, s -> s.concat("/").concat(fluidName), "%s_level_%d".formatted(fluidName, amount));
         }
     }
 } 

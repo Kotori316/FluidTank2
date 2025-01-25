@@ -16,7 +16,7 @@ publishMods {
     github {
         repository = "Kotori316/FluidTank2"
         accessToken = project.findProperty("githubToken") as? String ?: System.getenv("REPO_TOKEN") ?: ""
-        commitish = "1.21"
+        commitish = project.property("github_branch") as? String
         tagName = "v${project.findProperty("mod_version")}"
         displayName = "v${project.findProperty("mod_version")} for ${project.findProperty("minecraft_version")}"
         changelog = createChangelog()

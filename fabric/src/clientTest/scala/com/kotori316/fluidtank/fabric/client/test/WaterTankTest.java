@@ -40,7 +40,7 @@ public final class WaterTankTest implements FluidTankClientGameTest {
             }
             tankTile.getConnection().getHandler().fill(fluid.setAmount(GenericUnit.fromForge(6000)), true);
         });
-        context.waitTicks(10); // wait until packet is sent
+        context.waitTicks(PACKET_WAIT_TICKS); // wait until packet is sent
         singlePlayerContext.getClientWorld().waitForChunksRender();
         testInstance.takeScreenshot(context, testName + "_after");
     }

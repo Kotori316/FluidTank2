@@ -46,7 +46,7 @@ public final class FluidLevelTest implements FluidTankClientGameTest {
                 tankTile.getConnection().getHandler().set(fluid.setAmount(GenericUnit.fromForge(amount)));
             });
 
-            context.waitTicks(10); // Wait for packet transmission
+            context.waitTicks(PACKET_WAIT_TICKS); // Wait for packet transmission
             singlePlayerContext.getClientWorld().waitForChunksRender();
             testInstance.takeScreenshot(context, s -> s.concat("/").concat(fluidName), "%s_level_%d".formatted(fluidName, amount));
         }

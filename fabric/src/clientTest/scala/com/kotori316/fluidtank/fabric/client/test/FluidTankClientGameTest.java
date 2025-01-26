@@ -34,6 +34,7 @@ import java.util.function.UnaryOperator;
 @SuppressWarnings("UnstableApiUsage")
 public interface FluidTankClientGameTest extends FabricClientGameTest {
     Logger LOGGER = LoggerFactory.getLogger(FluidTankClientGameTest.class);
+    int PACKET_WAIT_TICKS = 3;
 
     @Override
     default void runTest(ClientGameTestContext context) {

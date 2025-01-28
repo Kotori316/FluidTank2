@@ -29,10 +29,12 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 @SuppressWarnings("UnstableApiUsage")
 public interface FluidTankClientGameTest extends FabricClientGameTest {
     Logger LOGGER = LoggerFactory.getLogger(FluidTankClientGameTest.class);
+    int PACKET_WAIT_TICKS = 3;
 
     @Override
     default void runTest(ClientGameTestContext context) {
@@ -81,8 +83,13 @@ public interface FluidTankClientGameTest extends FabricClientGameTest {
         return new ServerDataContext(level, player, direction, pos);
     }
 
+    default void takeScreenshot(ClientGameTestContext context, UnaryOperator<String> directoryOperator, String fileName) {
+        var directory = directoryOperator.apply(getScreenshotSubDirectory());
+        takeScreenshot(context, directory, fileName);
+    }
+
     default void takeScreenshot(ClientGameTestContext context, String fileName) {
-        takeScreenshot(context, getScreenshotSubDirectory(), fileName);
+        takeScreenshot(context, UnaryOperator.identity(), fileName);
     }
 
     default String getScreenshotSubDirectory() {
@@ -91,10 +98,11 @@ public interface FluidTankClientGameTest extends FabricClientGameTest {
 
     static void takeScreenshot(ClientGameTestContext context, String directory, String fileName) {
         var destinationDir = Optional.ofNullable(System.getenv("SCREENSHOT_DIR")).map(Path::of).map(p -> p.resolve(directory));
-        var option = TestScreenshotOptions.of(fileName)
+        var filePath = Path.of(fileName);
+        var option = TestScreenshotOptions.of(filePath.getFileName().toString())
             .disableCounterPrefix();
         // the option is builder-like instance
-        destinationDir.ifPresent(option::withDestinationDir);
+        destinationDir.map(p -> p.resolve(filePath)).map(Path::getParent).ifPresent(option::withDestinationDir);
         var screenshotPath = context.takeScreenshot(option);
         LOGGER.info("Screenshot path: {}", screenshotPath);
     }

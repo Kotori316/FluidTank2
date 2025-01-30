@@ -7,8 +7,8 @@ import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.tank.PlatformTankAccess;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
-import net.fabricmc.fabric.api.client.gametest.v1.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.TestSingleplayerContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 

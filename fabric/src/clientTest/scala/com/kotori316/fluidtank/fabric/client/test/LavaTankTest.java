@@ -1,8 +1,8 @@
 package com.kotori316.fluidtank.fabric.client.test;
 
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
-import net.fabricmc.fabric.api.client.gametest.v1.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.TestSingleplayerContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 
 import static com.kotori316.fluidtank.fabric.client.test.WaterTankTest.testFluid;
 

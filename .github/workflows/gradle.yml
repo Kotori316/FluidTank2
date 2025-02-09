@@ -206,11 +206,9 @@ jobs:
       - name: workaround for detached HEAD
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          set -eu
+          set -eux
           git branch -vv
           git fetch
-          git branch --unset-upstream
-          git branch -u "origin/${REF_NAME}"
           git switch "${REF_NAME}"
           git pull
         env:

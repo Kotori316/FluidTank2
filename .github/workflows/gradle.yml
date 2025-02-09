@@ -206,7 +206,11 @@ jobs:
       - name: workaround for detached HEAD
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          git switch "${REF_NAME}" || git switch -c "${REF_NAME}" && git pull
+          set -eux
+          git branch -vv
+          git fetch
+          git switch "${REF_NAME}"
+          git pull
         env:
           REF_NAME: ${{ github.head_ref }}
       - name: VRT PR

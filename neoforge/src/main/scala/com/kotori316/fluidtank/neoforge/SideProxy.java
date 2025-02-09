@@ -5,8 +5,6 @@ import com.kotori316.fluidtank.neoforge.render.FluidRenderHelperNeoForge;
 import com.kotori316.fluidtank.neoforge.render.FluidRenderHelperNeoForge$;
 import com.kotori316.fluidtank.neoforge.render.RenderTankNeoForge;
 import com.kotori316.fluidtank.render.RenderItemCodecs;
-import com.kotori316.fluidtank.render.ReservoirModel;
-import com.kotori316.fluidtank.render.TankModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
@@ -15,8 +13,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -61,7 +59,7 @@ public abstract class SideProxy {
         }
 
         @SubscribeEvent
-        public void registerReloadListener(RegisterClientReloadListenersEvent event) {
+        public void registerReloadListener(AddClientReloadListenersEvent event) {
         }
 
         @SubscribeEvent

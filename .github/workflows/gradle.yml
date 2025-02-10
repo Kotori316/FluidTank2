@@ -195,14 +195,18 @@ jobs:
           ls -alR vrt/screenshots
       - run: npm ci
         working-directory: vrt
-      - name: Login to AWS
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: google-github-actions/auth@v2
         with:
-          role-session-name: VrtUpload
-          aws-region: 'us-east-1'
-          role-to-assume: ${{ secrets.AWS_VRT_UPLOADER_ROLE_ARN }}
-          mask-aws-account-id: true
-          retry-max-attempts: 3
+          workload_identity_provider: ${{secrets.GCP_IDENTITY_PROVIDER}}
+          service_account: ${{secrets.GCP_SERVICE_ACCOUNT}}
+      - name: Get credentials
+        id: get-secrets
+        uses: google-github-actions/get-secretmanager-secrets@v2
+        with:
+          secrets: |-
+            cloudflare_s3_endpoint:kotori316-mods-resources/cloudflare_s3_endpoint
+            cloudflare_access_key:kotori316-mods-resources/cloudflare_access_key
+            cloudflare_secret_key:kotori316-mods-resources/cloudflare_secret_key
       - name: workaround for detached HEAD
         if: ${{ github.event_name == 'pull_request' }}
         run: |
@@ -217,6 +221,10 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: npm run run:ci-pr
         working-directory: vrt
+        env:
+          AWS_ACCESS_KEY_ID: ${{ steps.get-secrets.outputs.cloudflare_access_key }}
+          AWS_SECRET_ACCESS_KEY: ${{ steps.get-secrets.outputs.cloudflare_secret_key }}
+          AWS_ENDPOINT_URL: ${{ steps.get-secrets.outputs.cloudflare_s3_endpoint }}
       - name: VRT Push
         if: ${{ github.event_name == 'push' }}
         run: npm run run:ci-push
@@ -224,6 +232,9 @@ jobs:
         env:
           EXPECTED_KEY: ${{ github.event.before }}
           ACTUAL_KEY: ${{ github.sha }}
+          AWS_ACCESS_KEY_ID: ${{ steps.get-secrets.outputs.cloudflare_access_key }}
+          AWS_SECRET_ACCESS_KEY: ${{ steps.get-secrets.outputs.cloudflare_secret_key }}
+          AWS_ENDPOINT_URL: ${{ steps.get-secrets.outputs.cloudflare_s3_endpoint }}
 
   merge-checker:
     if: always()

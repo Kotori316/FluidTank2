@@ -20,6 +20,8 @@
       "enableACL": false,
       "customDomain": "fluidtank.vrt.kotori316.com",
       "sdkOptions": {
+        "requestChecksumCalculation": "WHEN_REQUIRED",
+        "responseChecksumValidation": "WHEN_REQUIRED"
       }
     }
   }

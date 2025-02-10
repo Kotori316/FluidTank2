@@ -225,6 +225,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ steps.get-secrets.outputs.cloudflare_access_key }}
           AWS_SECRET_ACCESS_KEY: ${{ steps.get-secrets.outputs.cloudflare_secret_key }}
           AWS_ENDPOINT_URL: ${{ steps.get-secrets.outputs.cloudflare_s3_endpoint }}
+          AWS_REGION: auto
       - name: VRT Push
         if: ${{ github.event_name == 'push' }}
         run: npm run run:ci-push
@@ -235,6 +236,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ steps.get-secrets.outputs.cloudflare_access_key }}
           AWS_SECRET_ACCESS_KEY: ${{ steps.get-secrets.outputs.cloudflare_secret_key }}
           AWS_ENDPOINT_URL: ${{ steps.get-secrets.outputs.cloudflare_s3_endpoint }}
+          AWS_REGION: auto
 
   merge-checker:
     if: always()

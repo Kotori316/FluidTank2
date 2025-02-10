@@ -210,7 +210,7 @@ jobs:
           git branch -vv
           git fetch
           git switch "${REF_NAME}"
-          git pull
+          git pull || true
         env:
           REF_NAME: ${{ github.head_ref }}
       - name: VRT PR

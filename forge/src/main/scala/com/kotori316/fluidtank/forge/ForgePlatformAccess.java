@@ -86,7 +86,7 @@ final class ForgePlatformAccess implements PlatformAccess {
 
     @Override
     public boolean isFluidContainer(ItemStack stack) {
-        return FluidUtil.getFluidHandler(stack).isPresent() ||
+        return ForgeConverter.fluidHandlerFromItem(stack).isPresent() ||
             PotionFluidHandler.apply(stack).isValidHandler() ||
             stack.getItem() instanceof BucketItem;
     }
@@ -108,7 +108,7 @@ final class ForgePlatformAccess implements PlatformAccess {
             var potionHandler = PotionFluidHandler.apply(fluidContainer);
             return potionHandler.fill(toFill, vanillaPotion);
         }
-        return FluidUtil.getFluidHandler(ItemHandlerHelper.copyStackWithSize(fluidContainer, 1))
+        return ForgeConverter.fluidHandlerFromItem(ItemHandlerHelper.copyStackWithSize(fluidContainer, 1))
             .map(h -> {
                 int filledAmount = h.fill(ForgeConverter.toStack(toFill), IFluidHandler.FluidAction.EXECUTE);
                 return new TransferStack(toFill.setAmount(GenericUnit.fromForge(filledAmount)), h.getContainer());
@@ -130,7 +130,7 @@ final class ForgePlatformAccess implements PlatformAccess {
             var potionHandler = PotionFluidHandler.apply(fluidContainer);
             return potionHandler.drain(toDrain, v);
         }
-        return FluidUtil.getFluidHandler(ItemHandlerHelper.copyStackWithSize(fluidContainer, 1))
+        return ForgeConverter.fluidHandlerFromItem(ItemHandlerHelper.copyStackWithSize(fluidContainer, 1))
             .map(h -> {
                 var drained = h.drain(ForgeConverter.toStack(toDrain), IFluidHandler.FluidAction.EXECUTE);
                 return new TransferStack(ForgeConverter.toAmount(drained), h.getContainer());

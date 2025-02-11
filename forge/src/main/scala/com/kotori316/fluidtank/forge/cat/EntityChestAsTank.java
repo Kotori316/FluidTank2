@@ -16,7 +16,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -94,9 +93,9 @@ public class EntityChestAsTank extends BlockEntity {
             this.inventory = inventory;
         }
 
-        LazyOptional<IFluidHandlerItem> getHandler(int slot) {
+        Optional<IFluidHandlerItem> getHandler(int slot) {
             var stack = this.inventory.getStackInSlot(slot);
-            return FluidUtil.getFluidHandler(stack);
+            return ForgeConverter.fluidHandlerFromItem(stack);
         }
 
         @Override
@@ -127,8 +126,8 @@ public class EntityChestAsTank extends BlockEntity {
             for (int i = 0; i < getTanks(); i++) {
                 var stack = this.inventory.getStackInSlot(i);
                 if (stack.isEmpty() || stack.getCount() > 1) continue; // Don't fill to stacked item
-                var handlerO = FluidUtil.getFluidHandler(stack);
-                if (!handlerO.isPresent()) continue; // Not a fluid container
+                var handlerO = ForgeConverter.fluidHandlerFromItem(stack);
+                if (handlerO.isEmpty()) continue; // Not a fluid container
 
                 var handler = handlerO.orElseThrow(AssertionError::new);
                 var filled = handler.fill(rest, fluidAction);
@@ -151,8 +150,8 @@ public class EntityChestAsTank extends BlockEntity {
             for (int i = 0; i < getTanks(); i++) {
                 var stack = this.inventory.getStackInSlot(i);
                 if (stack.isEmpty() || stack.getCount() > 1) continue; // Don't drain from stacked item
-                var handlerO = FluidUtil.getFluidHandler(stack);
-                if (!handlerO.isPresent()) continue; // Not a fluid container
+                var handlerO = ForgeConverter.fluidHandlerFromItem(stack);
+                if (handlerO.isEmpty()) continue; // Not a fluid container
 
                 var handler = handlerO.orElseThrow(AssertionError::new);
                 var drained = handler.drain(rest, fluidAction);

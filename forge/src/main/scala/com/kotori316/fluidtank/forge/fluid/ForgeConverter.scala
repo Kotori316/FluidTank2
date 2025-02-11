@@ -5,8 +5,11 @@ import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, VanillaFluid, VanillaPotion}
 import net.minecraft.core.component.{DataComponentPatch, DataComponents}
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
+import net.minecraftforge.common.capabilities.ForgeCapabilities
 import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fluids.capability.IFluidHandlerItem
 
 import scala.jdk.OptionConverters.RichOptional
 
@@ -49,5 +52,10 @@ object ForgeConverter {
       dd <- d.toScala
     } yield dd.copyTag()
     data.orNull
+  }
+
+  def fluidHandlerFromItem(stack: ItemStack): java.util.Optional[IFluidHandlerItem] = {
+    val handler = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM)
+    handler.resolve()
   }
 }

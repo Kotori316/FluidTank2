@@ -36,6 +36,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraftforge.common.SoundActions;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -218,6 +219,8 @@ final class ForgePlatformAccess implements PlatformAccess {
     @Override
     public List<GenericAmount<FluidLike>> getCATFluids(Level level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof EntityChestAsTank cat) {
+            // Trigger loading fluid in inventory
+            cat.getCapability(ForgeCapabilities.FLUID_HANDLER, null);
             return cat.getFluids().orElse(List.of());
         } else {
             return List.of();

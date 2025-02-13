@@ -4,7 +4,6 @@ plugins {
     id("com.kotori316.subprojects")
     id("com.kotori316.dg")
     alias(libs.plugins.forge.gradle)
-    alias(libs.plugins.forge.parchment)
 }
 val minecraftVersion = project.property("minecraft_version").toString()
 
@@ -72,12 +71,10 @@ sourceSets {
 }
 
 minecraft {
-    val parchmentMc = project.property("parchment_mapping_mc")
-    val mapping = project.property("parchment_mapping_version")
     mappings(
         mapOf(
-            "channel" to "parchment",
-            "version" to "$parchmentMc-$mapping-$minecraftVersion"
+            "channel" to "official",
+            "version" to minecraftVersion,
         )
     )
 

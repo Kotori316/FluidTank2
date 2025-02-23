@@ -144,6 +144,7 @@ dependencies {
 
     testImplementation(platform("org.junit:junit-bom:${project.property("jupiterVersion")}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.platform:junit-platform-launcher")
 }
 
 java {

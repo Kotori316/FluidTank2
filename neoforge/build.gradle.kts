@@ -190,3 +190,9 @@ tasks.compileDataGenScala {
 tasks.named("compileGameTestScala", ScalaCompile::class) {
     source(project(":gameTest:commonTest").layout.projectDirectory.file("src/main/scala"))
 }
+
+afterEvaluate {
+    tasks.named("testJunit") {
+        outputs.upToDateWhen { false }
+    }
+}

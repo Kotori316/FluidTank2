@@ -20,6 +20,6 @@ logoFile = "assets/fluidtank/textures/icon.png"
 [[dependencies.fluidtank]]
 modId = "neoforge"
 type = "required"
-versionRange = "[20.5.0-beta, )"
+versionRange = "[21.4.112-beta, )"
 ordering = "NONE"
 side = "BOTH"

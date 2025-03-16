@@ -20,6 +20,15 @@
         "^appeng:appliedenergistics2-*"
       ],
       "automerge": true
+    },
+    {
+      "matchManagers": [
+        "gradle"
+      ],
+      "matchPackagePatterns": [
+        "^net.neoforged.gradle.userdev"
+      ],
+      "enabled": false
     }
   ]
 }

@@ -176,10 +176,15 @@ dependencies {
     )
     implementation("com.kotori316:debug-utility-neoforge:${project.property("debug_util_version")}") {
         exclude(group = "org.mockito")
+        exclude(group = "org.junit")
+        exclude(group = "org.junit.jupiter")
+        exclude(group = "org.junit.platform")
     }
 
     "gameTestImplementation"(sourceSets.main.get().output)
     "gameTestCompileOnly"(project(":gameTest:commonTest"))
+    "gameTestImplementation"(platform("org.junit:junit-bom:${project.property("jupiterVersion")}"))
+    "gameTestImplementation"("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

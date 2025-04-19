@@ -78,8 +78,6 @@ configurations {
     create("junit")
 }
 
-val enableScala2 = false
-
 dependencies {
 
     compileOnly(
@@ -92,41 +90,26 @@ dependencies {
         name = "scala-library",
         version = project.property("scala2_version") as String
     )
-    if (enableScala2 && System.getProperty("idea.sync.active", "false").toBoolean() ||
-        System.getenv("FORCE_SCALA2").toBoolean()
-    ) {
-        compileOnly(
-            group = "org.typelevel",
-            name = "cats-core_2.13",
-            version = project.property("cats_version") as String
-        ) { exclude("org.scala-lang") }
-        testImplementation(
-            group = "org.typelevel",
-            name = "cats-core_2.13",
-            version = project.property("cats_version") as String
-        ) { exclude("org.scala-lang") }
-    } else {
-        compileOnly(
-            group = "org.scala-lang",
-            name = "scala3-library_3",
-            version = project.property("scala3_version") as String
-        )
-        compileOnly(
-            group = "org.typelevel",
-            name = "cats-core_3",
-            version = project.property("cats_version") as String
-        ) { exclude("org.scala-lang") }
-        testImplementation(
-            group = "org.scala-lang",
-            name = "scala3-library_3",
-            version = project.property("scala3_version") as String
-        )
-        testImplementation(
-            group = "org.typelevel",
-            name = "cats-core_3",
-            version = project.property("cats_version") as String
-        ) { exclude("org.scala-lang") }
-    }
+    compileOnly(
+        group = "org.scala-lang",
+        name = "scala3-library_3",
+        version = project.property("scala3_version") as String
+    )
+    compileOnly(
+        group = "org.typelevel",
+        name = "cats-core_3",
+        version = project.property("cats_version") as String
+    ) { exclude("org.scala-lang") }
+    testImplementation(
+        group = "org.scala-lang",
+        name = "scala3-library_3",
+        version = project.property("scala3_version") as String
+    )
+    testImplementation(
+        group = "org.typelevel",
+        name = "cats-core_3",
+        version = project.property("cats_version") as String
+    ) { exclude("org.scala-lang") }
 
     testImplementation(platform("org.junit:junit-bom:${project.property("jupiterVersion")}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -153,11 +136,6 @@ tasks {
     }
 
     withType(ScalaCompile::class) {
-        if (enableScala2 && System.getProperty("idea.sync.active", "false").toBoolean() ||
-            System.getenv("FORCE_SCALA2").toBoolean()
-        ) {
-            scalaCompileOptions.additionalParameters = listOf("-X" + "source:3")
-        }
         //scalaCompileOptions.additionalParameters.add("-no-indent")
         scalaCompileOptions.additionalParameters.add("-old-syntax")
         scalaCompileOptions.additionalParameters.add("-source:3.4-migration")

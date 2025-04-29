@@ -1,9 +1,11 @@
 package com.kotori316.fluidtank.gametest;
 
 import com.google.common.base.CaseFormat;
+import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.gametest.cat.CatGameTest;
 import com.kotori316.fluidtank.gametest.reservoir.ReservoirTest;
 import com.kotori316.fluidtank.gametest.tank.TankTest;
+import com.kotori316.testutil.common.TestFunction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -55,7 +57,7 @@ public final class GameTestFunctions {
             .filter(m -> m.getParameterTypes()[0] == GameTestHelper.class)
             .filter(m -> m.getReturnType() == void.class)
             .map(m ->
-                new TestFunction(batchName, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "%s_%s".formatted(m.getDeclaringClass().getSimpleName(), m.getName())), structureName, maxTicks, 0, true, g -> {
+                TestFunction.createWithStructure(FluidTankCommon.modId, batchName, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "%s_%s".formatted(m.getDeclaringClass().getSimpleName(), m.getName())), structureName, g -> {
                     try {
                         m.setAccessible(true);
                         m.invoke(null, g);
@@ -81,7 +83,7 @@ public final class GameTestFunctions {
 
     public static @NotNull TestFunction create(String batchName, String structureName, String name, Consumer<GameTestHelper> test) {
         var formatted = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
-        return new TestFunction(batchName, formatted, structureName, 100, 0, true, wrapper(test));
+        return TestFunction.createWithStructure(FluidTankCommon.modId, batchName, formatted, structureName, test);
     }
 
     public static void assertEqualStack(ItemStack expected, ItemStack actual) {

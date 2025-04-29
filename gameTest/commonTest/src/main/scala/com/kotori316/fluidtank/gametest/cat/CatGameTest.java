@@ -1,13 +1,12 @@
 package com.kotori316.fluidtank.gametest.cat;
 
-import com.google.common.base.CaseFormat;
 import com.kotori316.fluidtank.cat.PlatformChestAsTankAccess;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.gametest.GameTestFunctions;
+import com.kotori316.testutil.common.TestFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
@@ -15,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,15 +38,12 @@ public final class CatGameTest {
 
     private static Stream<TestFunction> placeTest(String batchName, String structureName) {
         return Stream.of(Direction.values())
-            .map(d -> {
-                var name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "CatGameTestPlaceTest_%s".formatted(d.getName()));
-                return new TestFunction(batchName, name, structureName, 100, 0, true, GameTestFunctions.wrapper(g -> placeTest(g, d)));
-            });
+            .map(d -> GameTestFunctions.create(batchName, structureName, "CatGameTestPlaceTest_%s".formatted(d.getName()), g -> placeTest(g, d)));
     }
 
     private static void setBlocks(GameTestHelper helper, BlockPos basePos, Direction direction, @Nullable Item chestItem) {
         helper.setBlock(basePos, Blocks.CHEST);
-        Container container = helper.getBlockEntity(basePos);
+        Container container = helper.getBlockEntity(basePos, ChestBlockEntity.class);
         if (chestItem != null) {
             container.setItem(0, chestItem.getDefaultInstance());
         }

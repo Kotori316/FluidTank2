@@ -6,8 +6,10 @@ import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, PotionType,
 import com.kotori316.fluidtank.gametest.GameTestFunctions
 import com.kotori316.fluidtank.gametest.GameTestFunctions.{assertEqualStack, create}
 import com.kotori316.fluidtank.tank.{PlatformTankAccess, Tier, TileTank}
+import com.kotori316.testutil.common.TestFunction
 import net.minecraft.core.BlockPos
-import net.minecraft.gametest.framework.{GameTestAssertPosException, GameTestHelper, TestFunction}
+import net.minecraft.gametest.framework.{GameTestAssertPosException, GameTestHelper}
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.level.GameType
@@ -32,11 +34,11 @@ class ReservoirTest {
   private def placeTank(helper: GameTestHelper, pos: BlockPos, tier: Tier): TileTank = {
     val block = PlatformTankAccess.getInstance().getTankBlockMap.get(tier)
     helper.setBlock(pos, block.get)
-    helper.getBlockEntity[BlockEntity](pos) match {
+    helper.getBlockEntity(pos, classOf[BlockEntity]) match {
       case tileTank: TileTank =>
         tileTank.onBlockPlacedBy()
         tileTank
-      case _ => throw new GameTestAssertPosException("Expect tank tile", helper.absolutePos(pos), pos, helper.getTick)
+      case _ => throw new GameTestAssertPosException(Component.literal("Expect tank tile"), helper.absolutePos(pos), pos, helper.getTick.toInt)
     }
   }
 

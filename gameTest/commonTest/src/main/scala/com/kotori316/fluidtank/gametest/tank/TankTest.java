@@ -6,12 +6,11 @@ import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.fluids.PotionType;
 import com.kotori316.fluidtank.gametest.GameTestFunctions;
 import com.kotori316.fluidtank.tank.*;
+import com.kotori316.testutil.common.TestFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.gametest.framework.GameTestAssertPosException;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -48,13 +47,9 @@ public final class TankTest {
     static TileTank placeTank(GameTestHelper helper, BlockPos pos, Tier tier) {
         var block = getBlock(tier);
         helper.setBlock(pos, block.get());
-        var tile = helper.getBlockEntity(pos);
-        if (tile instanceof TileTank tileTank) {
-            tileTank.onBlockPlacedBy();
-            return tileTank;
-        } else {
-            throw new GameTestAssertPosException("Expect tank tile", helper.absolutePos(pos), pos, helper.getTick());
-        }
+        var tile = helper.getBlockEntity(pos, TileTank.class);
+        tile.onBlockPlacedBy();
+        return tile;
     }
 
     static void place(GameTestHelper helper) {

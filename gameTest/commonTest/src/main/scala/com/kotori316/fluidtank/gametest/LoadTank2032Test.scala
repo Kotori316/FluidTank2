@@ -1,12 +1,12 @@
 package com.kotori316.fluidtank.gametest
 
-import com.google.common.base.CaseFormat
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.FluidAmountUtil
 import com.kotori316.fluidtank.tank.{BlockTank, PlatformTankAccess, Tier, TileTank}
+import com.kotori316.testutil.common.TestFunction
 import net.minecraft.core.BlockPos
-import net.minecraft.gametest.framework.{GameTestHelper, TestFunction}
-import org.junit.jupiter.api.Assertions.{assertEquals, assertFalse, assertInstanceOf, assertTrue, fail}
+import net.minecraft.gametest.framework.GameTestHelper
+import org.junit.jupiter.api.Assertions.{assertEquals, assertFalse, assertTrue, fail}
 
 import scala.jdk.StreamConverters.*
 
@@ -25,16 +25,17 @@ class LoadTank2032Test {
         helper.assertBlockPresent(getTankByTier(expectedTier), pos)
       })
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(pos))
+        val tile = helper.getBlockEntity(pos, classOf[TankType])
         assertEquals(expectedTier, tile.tier)
         assertFalse(tile.getConnection.isDummy)
       }).thenSucceed()
   }
 
   def woodTypeContents(helper: GameTestHelper): Unit = {
+    val pos = new BlockPos(0, 1, 0)
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(0, 1, 0)))
+        val tile = helper.getBlockEntity(pos, classOf[TankType])
         val content = tile.getConnection.getContent.getOrElse(fail("Content is empty!"))
         assertFalse(content.isEmpty)
         assertEquals(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(3000)), content)
@@ -50,16 +51,17 @@ class LoadTank2032Test {
         helper.assertBlockPresent(getTankByTier(expectedTier), pos)
       })
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(pos))
+        val tile = helper.getBlockEntity(pos, classOf[TankType])
         assertEquals(expectedTier, tile.tier)
         assertFalse(tile.getConnection.isDummy)
       }).thenSucceed()
   }
 
   def stoneTypeContents(helper: GameTestHelper): Unit = {
+    val pos = new BlockPos(0, 1, 1)
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(0, 1, 1)))
+        val tile = helper.getBlockEntity(pos, classOf[TankType])
         val content = tile.getConnection.getContent.getOrElse(fail("Content is empty!"))
         assertFalse(content.isEmpty)
         assertEquals(FluidAmountUtil.BUCKET_LAVA.setAmount(GenericUnit.fromForge(24000)), content)
@@ -78,16 +80,17 @@ class LoadTank2032Test {
         helper.assertBlockPresent(getTankByTier(expectedTier), pos)
       })
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(pos))
+        val tile = helper.getBlockEntity(pos, classOf[TankType])
         assertEquals(expectedTier, tile.tier)
         assertFalse(tile.getConnection.isDummy)
       }).thenSucceed()
   }
 
   def copperTypeContents(helper: GameTestHelper): Unit = {
+    val pos = new BlockPos(1, 1, 2)
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(1, 1, 2)))
+        val tile = helper.getBlockEntity(pos, classOf[TankType])
         val content = tile.getConnection.getContent.getOrElse(fail("Content is empty!"))
         assertFalse(content.isEmpty)
         assertEquals(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(30000)), content)
@@ -105,16 +108,17 @@ class LoadTank2032Test {
         helper.assertBlockPresent(getTankByTier(expectedTier), pos)
       })
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(pos))
+        val tile = helper.getBlockEntity(pos, classOf[TankType])
         assertEquals(expectedTier, tile.tier)
         assertFalse(tile.getConnection.isDummy)
       }).thenSucceed()
   }
 
   def starTypeContents(helper: GameTestHelper): Unit = {
+    val pos = new BlockPos(1, 1, 1)
     helper.startSequence()
       .thenExecuteAfter(2, () => {
-        val tile = assertInstanceOf(classOf[TankType], helper.getBlockEntity(new BlockPos(1, 1, 1)))
+        val tile = helper.getBlockEntity(pos, classOf[TankType])
         val content = tile.getConnection.getContent.getOrElse(fail("Content is empty!"))
         assertFalse(content.isEmpty)
         assertTrue(content.contentEqual(FluidAmountUtil.BUCKET_LAVA))
@@ -133,8 +137,7 @@ object LoadTank2032Test {
       .filter(m => m.getParameterTypes sameElements Array(classOf[GameTestHelper]))
       .filter(m => m.getReturnType == Void.TYPE)
       .map { m =>
-        val name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, f"LoadTank2032Test_${m.getName}")
-        new TestFunction(batch, name, structure, 100, 0, true, g => m.invoke(instance, g))
+        GameTestFunctions.create(batch, structure, f"LoadTank2032Test_${m.getName}", g => m.invoke(instance, g))
       }
       .asJavaSeqStream
   }

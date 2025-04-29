@@ -5,7 +5,6 @@ import com.kotori316.fluidtank.gametest.cat.CatGameTest;
 import com.kotori316.fluidtank.gametest.reservoir.ReservoirTest;
 import com.kotori316.fluidtank.gametest.tank.TankTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;

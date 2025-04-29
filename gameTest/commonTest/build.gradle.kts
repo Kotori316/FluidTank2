@@ -13,6 +13,9 @@ dependencies {
         parchment("org.parchmentmc.data:parchment-$parchmentMC:$parchmentDate@zip")
     })
 
+    compileOnly("com.kotori316:debug-utility-common:${project.property("debug_util_version")}") {
+        isTransitive = false
+    }
     implementation(project(":common"))
     implementation(platform("org.junit:junit-bom:${project.property("jupiterVersion")}"))
     implementation("org.junit.jupiter:junit-jupiter")

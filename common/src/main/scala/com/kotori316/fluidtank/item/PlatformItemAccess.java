@@ -9,7 +9,6 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -37,7 +36,7 @@ public interface PlatformItemAccess {
         if (tileTag == null || tileTag.isEmpty()) {
             stack.remove(DataComponents.BLOCK_ENTITY_DATA);
         } else {
-            if (!tileTag.contains("id", Tag.TAG_STRING)) {
+            if (!tileTag.contains("id")) {
                 if (tileTypeId != null) {
                     tileTag.putString("id", tileTypeId);
                 } else {

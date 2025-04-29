@@ -5,7 +5,6 @@ import com.kotori316.fluidtank.contents.Tank
 import com.kotori316.fluidtank.fluids.FluidLike
 import com.kotori316.fluidtank.reservoir.ItemReservoir
 import com.kotori316.fluidtank.tank.Tier
-import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.special.SpecialModelRenderer
@@ -27,7 +26,7 @@ final class RenderReservoirItem(protected val model: ReservoirModel, renderHelpe
     val vertexConsumer = ItemRenderer.getFoilBuffer(bufferSource,
       this.model.renderType(RenderReservoirItem.textureNameMap(patterns.tier)),
       true, patterns.hasFoil)
-    RenderSystem.enableCull()
+    // RenderSystem.enableCull()
     this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, ARGB.color(255, -1))
 
     val tank = patterns.tank

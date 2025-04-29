@@ -44,10 +44,10 @@ object TooltipContent {
   final def getTooltipTextJava(tankData: CompoundTag, tank: TileTank, isShort: Boolean, isCompact: Boolean, locale: Locale): java.util.List[Component] = {
     getTooltipText(
       tier = tank.tier,
-      fluid = FluidAmountUtil.fromTag(tankData.getCompound(KEY_FLUID)),
-      capacity = tankData.getLong(KEY_CAPACITY),
-      comparator = tankData.getInt(KEY_COMPARATOR),
-      hasCreative = tankData.getBoolean(KEY_CREATIVE),
+      fluid = FluidAmountUtil.fromTag(tankData.getCompoundOrEmpty(KEY_FLUID)),
+      capacity = tankData.getLongOr(KEY_CAPACITY, 0),
+      comparator = tankData.getIntOr(KEY_COMPARATOR, 0),
+      hasCreative = tankData.getBooleanOr(KEY_CREATIVE, false),
       isShort = isShort,
       isCompact = isCompact,
       locale = locale

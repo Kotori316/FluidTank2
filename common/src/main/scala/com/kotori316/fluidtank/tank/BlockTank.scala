@@ -24,8 +24,6 @@ import net.minecraft.world.phys.shapes.{CollisionContext, VoxelShape}
 import net.minecraft.world.{InteractionHand, InteractionResult}
 import org.jetbrains.annotations.Nullable
 
-import scala.annotation.nowarn
-
 abstract class BlockTank(val tier: Tier) extends Block(
   BlockBehaviour.Properties.of().strength(1f).dynamicShape().pushReaction(PushReaction.BLOCK).forceSolidOn()
     .setId(ResourceKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, tier.getBlockName)))
@@ -107,18 +105,6 @@ abstract class BlockTank(val tier: Tier) extends Block(
     level.getBlockEntity(pos) match {
       case tileTank: TileTank => tileTank.getComparatorLevel
       case tile => FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {} in {}", pos.show, tile, getCallerMethod); 0
-    }
-  }
-
-  //noinspection ScalaDeprecation,deprecation
-  override final def onRemove(state: BlockState, level: Level, pos: BlockPos, newState: BlockState, moved: Boolean): Unit = {
-    if (!state.is(newState.getBlock)) {
-      level.getBlockEntity(pos) match {
-        case tank: TileTank => tank.onDestroy()
-        case tile => FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {} in {}", pos.show, tile, getCallerMethod)
-      }
-      //noinspection ScalaDeprecation,deprecation
-      super.onRemove(state, level, pos, newState, moved): @nowarn
     }
   }
 

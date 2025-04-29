@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState
 import org.jetbrains.annotations.{NotNull, Nullable}
 
 import java.util.Locale
+import scala.jdk.OptionConverters.RichOptional
 
 abstract class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: BlockPos, s: BlockState)
   extends BlockEntity(t, p, s) with Nameable {
@@ -49,11 +50,9 @@ abstract class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: Bl
   // Override of BlockEntity
   override def loadAdditional(tag: CompoundTag, provider: HolderLookup.Provider): Unit = {
     super.loadAdditional(tag, provider)
-    this.setTank(TankUtil.load(tag.getCompound(KEY_TANK)))
-    this.tier = Tier.valueOf(tag.getString(KEY_TIER))
-    this.customName = Option.when(tag.contains(KEY_STACK_NAME))(
-      Component.Serializer.fromJson(tag.getString(KEY_STACK_NAME), provider)
-    )
+    this.setTank(TankUtil.load(tag.getCompoundOrEmpty(KEY_TANK)))
+    this.tier = tag.stringConvert(KEY_TIER, Tier.valueOf, Tier.INVALID)
+    this.customName = tag.getString(KEY_STACK_NAME).toScala.map(s => Component.Serializer.fromJson(s, provider))
   }
 
   override def saveAdditional(tag: CompoundTag, provider: HolderLookup.Provider): Unit = {
@@ -82,7 +81,8 @@ abstract class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: Bl
 
   def getComparatorLevel: Int = this.connection.getComparatorLevel
 
-  def onDestroy(): Unit = {
+  override def preRemoveSideEffects(blockPos: BlockPos, blockState: BlockState): Unit = {
+    super.preRemoveSideEffects(blockPos, blockState)
     this.connection.remove(this)
   }
 

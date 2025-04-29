@@ -11,4 +11,11 @@ object MCImplicits {
   implicit final val hashCompoundTag: Hash[CompoundTag] = Hash.fromUniversalHashCode
   implicit final val hashFluid: Hash[Fluid] = Hash.fromUniversalHashCode
   implicit final val hashDataComponentPatch: Hash[DataComponentPatch] = Hash.fromUniversalHashCode
+
+  extension (tag: CompoundTag) {
+    def stringConvert[T](key: String, func: String => T, defaultValue: T): T = {
+      val string = tag.getString(key)
+      string.map[T](s => func(s)).orElse(defaultValue)
+    }
+  }
 }

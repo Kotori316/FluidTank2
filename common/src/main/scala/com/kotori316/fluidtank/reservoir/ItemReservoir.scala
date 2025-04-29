@@ -13,14 +13,15 @@ import net.minecraft.resources.{ResourceKey, ResourceLocation}
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item.TooltipContext
+import net.minecraft.world.item.component.TooltipDisplay
 import net.minecraft.world.item.{Item, ItemStack, ItemUseAnimation, ItemUtils, TooltipFlag}
 import net.minecraft.world.level.block.BucketPickup
 import net.minecraft.world.level.{ClipContext, Level}
 import net.minecraft.world.phys.{BlockHitResult, HitResult}
 import net.minecraft.world.{InteractionHand, InteractionResult}
 
-import java.util
 import java.util.Locale
+import java.util.function.Consumer
 import scala.jdk.OptionConverters.RichOptional
 
 class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(1)
@@ -67,7 +68,7 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
           patch <- content.componentPatch.iterator
           content <- Option(patch.get(DataComponents.POTION_CONTENTS)).flatMap(_.toScala).iterator
         } {
-          content.applyToLivingEntity(livingEntity)
+          content.applyToLivingEntity(livingEntity, 1)
         }
         val newTank = tank.copy(content = content.setAmount(content.amount |-| GenericUnit.ONE_BOTTLE))
         this.saveTank(stack, newTank)
@@ -76,15 +77,16 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
     }
   }
 
-  override def appendHoverText(stack: ItemStack, context: TooltipContext, tooltip: util.List[Component], isAdvanced: TooltipFlag): Unit = {
-    super.appendHoverText(stack, context, tooltip, isAdvanced)
+  //noinspection ScalaDeprecation,deprecation
+  override def appendHoverText(stack: ItemStack, context: TooltipContext, tooltipDisplay: TooltipDisplay, tooltip: Consumer[Component], isAdvanced: TooltipFlag): Unit = {
+    super.appendHoverText(stack, context, tooltipDisplay, tooltip, isAdvanced)
     val tank = getTank(stack)
     if (tank.isEmpty) {
-      tooltip.add(Component.translatable("fluidtank.waila.capacity", GenericUnit.asForgeFromBigInt(tier.getCapacity)))
+      tooltip.accept(Component.translatable("fluidtank.waila.capacity", GenericUnit.asForgeFromBigInt(tier.getCapacity)))
     } else {
       val fluid = tank.content
       val capacity = tank.capacity
-      tooltip.add(Component.translatable("fluidtank.waila.short",
+      tooltip.accept(Component.translatable("fluidtank.waila.short",
         PlatformFluidAccess.getInstance().getDisplayName(fluid), fluid.amount.asDisplay, capacity.asDisplay))
     }
   }

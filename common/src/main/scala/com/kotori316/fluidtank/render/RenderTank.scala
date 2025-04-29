@@ -11,9 +11,10 @@ import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
 import net.minecraft.core.BlockPos
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 
 abstract class RenderTank(context: BlockEntityRendererProvider.Context) extends BlockEntityRenderer[TileTank] {
-  override final def render(blockEntity: TileTank, partialTick: Float, matrix: PoseStack, buffer: MultiBufferSource, packedLight: Int, packedOverlay: Int): Unit = {
+  override final def render(blockEntity: TileTank, partialTick: Float, matrix: PoseStack, buffer: MultiBufferSource, packedLight: Int, packedOverlay: Int, vec3: Vec3): Unit = {
     val profiler = Profiler.get()
     profiler.push("RenderTank")
     if (!blockEntity.getTank.isEmpty) {

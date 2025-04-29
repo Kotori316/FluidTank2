@@ -24,7 +24,7 @@ class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c
       blockEntityData <- Option(componentPatch.get(DataComponents.BLOCK_ENTITY_DATA)).flatMap(_.toScala)
       if blockEntityData.contains(TileTank.KEY_TANK)
       customTag = blockEntityData.copyTag()
-      tankTag <- Option(customTag.getCompound(TileTank.KEY_TANK))
+      tankTag <- customTag.getCompound(TileTank.KEY_TANK).toScala
     } yield TankUtil.load(tankTag)
     maybeTank.getOrElse(Tank(FluidAmountUtil.EMPTY, GenericUnit(getTier.getCapacity)))
   }

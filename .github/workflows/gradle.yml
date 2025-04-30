@@ -52,7 +52,6 @@ jobs:
       matrix:
         platform:
           - common
-          - forge
           - fabric
           - neoforge
     env:

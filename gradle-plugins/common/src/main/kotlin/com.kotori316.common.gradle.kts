@@ -79,33 +79,7 @@ configurations {
 }
 
 dependencies {
-
-    compileOnly(
-        group = "org.scala-lang",
-        name = "scala-library",
-        version = project.property("scala2_version") as String
-    )
-    testImplementation(
-        group = "org.scala-lang",
-        name = "scala-library",
-        version = project.property("scala2_version") as String
-    )
-    compileOnly(
-        group = "org.scala-lang",
-        name = "scala3-library_3",
-        version = project.property("scala3_version") as String
-    )
-    compileOnly(
-        group = "org.typelevel",
-        name = "cats-core_3",
-        version = project.property("cats_version") as String
-    ) { exclude("org.scala-lang") }
-    testImplementation(
-        group = "org.scala-lang",
-        name = "scala3-library_3",
-        version = project.property("scala3_version") as String
-    )
-    testImplementation(
+    implementation(
         group = "org.typelevel",
         name = "cats-core_3",
         version = project.property("cats_version") as String
@@ -124,6 +98,10 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+scala {
+    scalaVersion = project.property("scala3_version").toString()
 }
 
 tasks {

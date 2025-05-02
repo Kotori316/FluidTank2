@@ -1,15 +1,15 @@
 package com.kotori316.fluidtank.fabric.gametest
 
-import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fabric.FluidTank
 import com.kotori316.fluidtank.fabric.recipe.ModifiableSingleItemStorage
 import com.kotori316.fluidtank.fabric.tank.FabricTankItemStorage
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
+import com.kotori316.fluidtank.gametest.GameTestFunctions
 import com.kotori316.fluidtank.tank.{PlatformTankAccess, Tier}
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest
+import com.kotori316.testutil.common.TestFunction
 import net.minecraft.core.{BlockPos, Direction}
-import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
+import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
@@ -20,17 +20,20 @@ import org.junit.jupiter.api.Assertions.{assertAll, assertEquals}
 import java.util.Locale
 import scala.jdk.javaapi.CollectionConverters
 
-final class TankPlacementTest extends FabricGameTest {
+final class TankPlacementTest {
   private final val BATCH_NAME = "tank_place_test"
 
-  @GameTestGenerator
-  def notRemovedByFluid(): java.util.List[TestFunction] = {
-    CollectionConverters.asJava(for {
+  def tests(): java.util.List[TestFunction] = {
+    val tests = notRemovedByFluid() ++ tankDrop() ++ placeTankAboveTank()
+    CollectionConverters.asJava(tests)
+  }
+
+  def notRemovedByFluid(): Seq[TestFunction] = {
+    for {
       t <- Tier.values().filterNot(_ == Tier.INVALID).toSeq
       f <- Seq(Blocks.LAVA, Blocks.WATER)
       name = s"${BATCH_NAME}_${t}_${f.getName.getString}".toLowerCase(Locale.ROOT)
-    } yield GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-      name, "check_water", g => notRemovedByFluid(g, t, f)))
+    } yield GameTestFunctions.create(BATCH_NAME, "check_water", name, g => notRemovedByFluid(g, t, f))
   }
 
   private def notRemovedByFluid(helper: GameTestHelper, tier: Tier, fluid: Block): Unit = {
@@ -44,8 +47,7 @@ final class TankPlacementTest extends FabricGameTest {
       .thenSucceed()
   }
 
-  @GameTestGenerator
-  def tankDrop(): java.util.List[TestFunction] = {
+  def tankDrop(): Seq[TestFunction] = {
     val tests = for {
       t <- Seq(Tier.WOOD, Tier.STONE, Tier.STAR)
       f <- Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
@@ -54,12 +56,12 @@ final class TankPlacementTest extends FabricGameTest {
       cloneName = s"tank_clone_${t}_${f.content.getKey.getPath}_${amount.asForge}".toLowerCase(Locale.ROOT)
 
       test <- Seq(
-        GameTestUtil.create(FluidTankCommon.modId, BATCH_NAME, dropName, g => testGetTankDrop(g, t, f.setAmount(amount))),
-        GameTestUtil.create(FluidTankCommon.modId, BATCH_NAME, cloneName, g => testGetTankClone(g, t, f.setAmount(amount))),
+        GameTestFunctions.create(BATCH_NAME, TestFunction.NO_PLACE_STRUCTURE, dropName, g => testGetTankDrop(g, t, f.setAmount(amount))),
+        GameTestFunctions.create(BATCH_NAME, TestFunction.NO_PLACE_STRUCTURE, cloneName, g => testGetTankClone(g, t, f.setAmount(amount))),
       )
     } yield test
 
-    CollectionConverters.asJava(tests)
+    tests
   }
 
   private def testGetTankDrop(helper: GameTestHelper, tier: Tier, fillContent: FluidAmount): Unit = {
@@ -98,15 +100,14 @@ final class TankPlacementTest extends FabricGameTest {
     helper.succeed()
   }
 
-  @GameTestGenerator
-  def placeTankAboveTank(): java.util.List[TestFunction] = {
+  def placeTankAboveTank(): Seq[TestFunction] = {
     val tests = for {
       t <- Seq(Tier.WOOD, Tier.STONE, Tier.STAR)
       f <- Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
       testName = s"tank_place_tank_above_tank_${t}_${f.content.getKey.getPath}".toLowerCase(Locale.ROOT)
-    } yield GameTestUtil.create(FluidTankCommon.modId, BATCH_NAME, testName, g => testPlaceTankAboveTank(g, t, f))
+    } yield GameTestFunctions.create(BATCH_NAME, TestFunction.EMPTY_STRUCTURE, testName, g => testPlaceTankAboveTank(g, t, f))
 
-    CollectionConverters.asJava(tests)
+    tests
   }
 
   private def testPlaceTankAboveTank(helper: GameTestHelper, tier: Tier, tankContent: FluidAmount): Unit = {

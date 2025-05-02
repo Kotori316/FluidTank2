@@ -8,11 +8,10 @@ import com.kotori316.fluidtank.neoforge.tank.TankFluidItemHandler
 import com.kotori316.fluidtank.tank.Tier
 import com.kotori316.testutil.GameTestUtil
 import net.minecraft.core.BlockPos
-import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
+import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.{Block, Blocks}
-import net.neoforged.neoforge.gametest.GameTestHolder
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals}
 
 import java.util.Locale
@@ -22,7 +21,6 @@ import scala.jdk.javaapi.CollectionConverters
 final class TankPlacementTest {
   private final val BATCH_NAME = "tank_place_test"
 
-  @GameTestGenerator
   def notRemovedByFluid(): java.util.List[TestFunction] = {
     CollectionConverters.asJava(for {
       t <- Tier.values().filterNot(_ == Tier.INVALID).toSeq
@@ -43,7 +41,6 @@ final class TankPlacementTest {
       .thenSucceed()
   }
 
-  @GameTestGenerator
   def tankDrop(): java.util.List[TestFunction] = {
     val tests = for {
       t <- Seq(Tier.WOOD, Tier.STONE, Tier.STAR)

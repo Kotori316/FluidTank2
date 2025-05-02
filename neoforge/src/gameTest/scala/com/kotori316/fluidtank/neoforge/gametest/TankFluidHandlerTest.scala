@@ -10,19 +10,17 @@ import com.kotori316.fluidtank.neoforge.gametest.GetGameTestMethods.assertEqualH
 import com.kotori316.fluidtank.neoforge.tank.TileTankNeoForge
 import com.kotori316.fluidtank.tank.Tier
 import net.minecraft.core.BlockPos
-import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
+import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.world.item.alchemy.Potions
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction
-import net.neoforged.neoforge.gametest.GameTestHolder
 import org.junit.jupiter.api.Assertions.{assertDoesNotThrow, assertEquals, assertNotNull, assertTrue}
 
 @GameTestHolder(FluidTankCommon.modId)
 class TankFluidHandlerTest {
   private final val BATCH = "defaultBatch"
 
-  @GameTestGenerator
   def generator(): java.util.List[TestFunction] = {
     GetGameTestMethods.getTests(getClass, this, BATCH)
   }

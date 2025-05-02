@@ -78,7 +78,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
       val tag = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag()
       assertNotNull(tag)
       val expected = Tank.apply(FluidAmountUtil.BUCKET_LAVA, GenericUnit(tier.getCapacity))
-      val actual = TankUtil.load(tag.getCompound(TileTank.KEY_TANK))
+      val actual = TankUtil.load(tag.getCompoundOrEmpty(TileTank.KEY_TANK))
       assertAll(
         () => assertEquals(expected, actual),
         () => assertEquals(tier.name, tag.getString(TileTank.KEY_TIER))
@@ -110,7 +110,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
       val tag = handler.getStack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag()
       assertNotNull(tag)
       val expected = Tank.apply(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(3000)), GenericUnit(tier.getCapacity))
-      val actual = TankUtil.load(tag.getCompound(TileTank.KEY_TANK))
+      val actual = TankUtil.load(tag.getCompoundOrEmpty(TileTank.KEY_TANK))
       assertAll(() => assertEquals(expected, actual), () => assertEquals(tier.name, tag.getString(TileTank.KEY_TIER)))
     }
 
@@ -133,7 +133,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
       assertNotEquals(before, tag)
       assertNotNull(tag)
       val expected = Tank.apply(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(4000)), GenericUnit(tier.getCapacity))
-      val actual = TankUtil.load(tag.getCompound(TileTank.KEY_TANK))
+      val actual = TankUtil.load(tag.getCompoundOrEmpty(TileTank.KEY_TANK))
       assertAll(() => assertEquals(expected, actual), () => assertEquals(tier.name, tag.getString(TileTank.KEY_TIER)))
     }
 

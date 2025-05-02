@@ -1,17 +1,17 @@
 package com.kotori316.fluidtank.fabric.gametest
 
-import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fabric.FluidTank
 import com.kotori316.fluidtank.fabric.tank.ConnectionStorage
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, PotionType}
+import com.kotori316.fluidtank.gametest.GameTestFunctions
 import com.kotori316.fluidtank.tank.Tier
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest
+import com.kotori316.testutil.common.TestFunction
 import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidConstants, FluidStorage, FluidVariant}
 import net.fabricmc.fabric.api.transfer.v1.storage.{Storage, StorageUtil}
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.core.BlockPos
-import net.minecraft.gametest.framework.{GameTest, GameTestGenerator, GameTestHelper, TestFunction}
+import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.level.material.Fluids
 import org.junit.jupiter.api.Assertions.*
@@ -22,20 +22,16 @@ import scala.jdk.javaapi.CollectionConverters
 import scala.util.Using
 
 //noinspection UnstableApiUsage
-final class ConnectionStorageTest extends FabricGameTest {
-  @GameTestGenerator
+final class ConnectionStorageTest {
   def generator: java.util.List[TestFunction] = {
     val batch = "connection_storage_test"
     val withHelper = getClass.getDeclaredMethods.toSeq
       .filter(m => m.getReturnType == Void.TYPE)
-      .filter(m => !m.isAnnotationPresent(classOf[GameTest]))
       .filter(m => (m.getModifiers & Modifier.PRIVATE) == 0)
       .filter(m => m.getParameterTypes.toSeq == Seq(classOf[GameTestHelper]))
       .map { m =>
         val test: java.util.function.Consumer[GameTestHelper] = g => ReflectionSupport.invokeMethod(m, this, g)
-        GameTestUtil.create(FluidTankCommon.modId, batch, getClass.getSimpleName + "_" + m.getName,
-          test
-        )
+        GameTestFunctions.create(batch, TestFunction.EMPTY_STRUCTURE, getClass.getSimpleName + "_" + m.getName, test)
       }
 
     CollectionConverters.asJava(withHelper)

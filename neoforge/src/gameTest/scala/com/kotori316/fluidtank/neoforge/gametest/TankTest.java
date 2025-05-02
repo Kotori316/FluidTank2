@@ -8,7 +8,6 @@ import com.kotori316.fluidtank.tank.TileTank;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestAssertPosException;
-import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -26,7 +25,6 @@ final class TankTest {
 
     private static final String BATCH = "defaultBatch";
 
-    @GameTestGenerator
     List<TestFunction> fillTest() {
         return GetGameTestMethods.getTests(getClass(), this, BATCH);
     }

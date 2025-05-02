@@ -9,19 +9,18 @@ import com.kotori316.fluidtank.fabric.FluidTank;
 import com.kotori316.fluidtank.fabric.recipe.RecipeInventoryUtil;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
+import com.kotori316.fluidtank.gametest.GameTestFunctions;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.Tier;
+import com.kotori316.testutil.common.TestFunction;
 import com.mojang.serialization.JsonOps;
 import io.netty.buffer.ByteBufAllocator;
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.fabricmc.fabric.impl.resource.conditions.ResourceConditionsImpl;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
@@ -52,28 +51,30 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("unused")
-public final class RecipeTest implements FabricGameTest {
+public final class RecipeTest {
     final Path recipeParent = Path.of("../src/generated/resources", "data/fluidtank/recipe");
 
     public RecipeTest() {
         FluidTankCommon.LOGGER.info("Search recipe path: {}", recipeParent.toAbsolutePath());
     }
 
-    @GameTestGenerator
     public List<TestFunction> generator() {
         // no args
         var noArgs = Stream.of(getClass().getDeclaredMethods())
             .filter(m -> m.getReturnType() == Void.TYPE)
             .filter(m -> m.getParameterCount() == 0)
             .filter(m -> (m.getModifiers() & (Modifier.PUBLIC | Modifier.PRIVATE | Modifier.STATIC)) == 0)
-            .map(m -> GameTestUtil.create(FluidTankCommon.modId, "recipe_test",
+            .map(m -> GameTestFunctions.create("recipe_test", TestFunction.NO_PLACE_STRUCTURE,
                 getClass().getSimpleName() + "_" + m.getName(),
-                () -> ReflectionSupport.invokeMethod(m, this)));
+                (g) -> {
+                    ReflectionSupport.invokeMethod(m, this);
+                    g.succeed();
+                }));
         var withHelper = Stream.of(getClass().getDeclaredMethods())
             .filter(m -> m.getReturnType() == Void.TYPE)
             .filter(m -> Arrays.equals(m.getParameterTypes(), new Class<?>[]{GameTestHelper.class}))
             .filter(m -> (m.getModifiers() & (Modifier.PUBLIC | Modifier.PRIVATE | Modifier.STATIC)) == 0)
-            .map(m -> GameTestUtil.create(FluidTankCommon.modId, "recipe_test",
+            .map(m -> GameTestFunctions.create("recipe_test", TestFunction.NO_PLACE_STRUCTURE,
                 getClass().getSimpleName() + "_" + m.getName(),
                 g -> ReflectionSupport.invokeMethod(m, this, g)));
         return Stream.concat(noArgs, withHelper).toList();
@@ -140,7 +141,6 @@ public final class RecipeTest implements FabricGameTest {
         ))), null));
     }
 
-    @GameTestGenerator
     public List<TestFunction> combineFluids() {
         var fluids = IntStream.of(500, 1000, 2000, 3000, 4000)
             .mapToObj(GenericUnit::fromForge)
@@ -150,8 +150,14 @@ public final class RecipeTest implements FabricGameTest {
         return fluids.flatMap(f -> {
             var name = "%s_%s".formatted(FluidAmountUtil.access().getKey(f.content()).getPath(), GenericUnit.asForgeFromBigInt(f.amount()));
             return Stream.of(
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_combine1_" + name, () -> combine1(f)),
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_combine2_" + name, () -> combine2(f))
+                GameTestFunctions.create("recipe_test", TestFunction.EMPTY_STRUCTURE, getClass().getSimpleName() + "_combine1_" + name, (g) -> {
+                    combine1(f);
+                    g.succeed();
+                }),
+                GameTestFunctions.create("recipe_test", TestFunction.EMPTY_STRUCTURE, getClass().getSimpleName() + "_combine2_" + name, (g) -> {
+                    combine2(f);
+                    g.succeed();
+                })
             );
         }).toList();
     }
@@ -190,13 +196,12 @@ public final class RecipeTest implements FabricGameTest {
         assertEquals(Tier.STONE.getCapacity(), RecipeInventoryUtil.getFluidHandler(result).getTank().capacity());
     }
 
-    @GameTestGenerator
     public List<TestFunction> serialize() {
         return Stream.of(Tier.values()).filter(Tier::isNormalTankTier)
             .filter(Predicate.isEqual(Tier.WOOD).negate())
             .flatMap(t -> Stream.of(
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_json_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializeJson(g, t)),
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_packet_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializePacket(g, t))
+                GameTestFunctions.create("recipe_test", TestFunction.EMPTY_STRUCTURE, getClass().getSimpleName() + "_json_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializeJson(g, t)),
+                GameTestFunctions.create("recipe_test", TestFunction.EMPTY_STRUCTURE, getClass().getSimpleName() + "_packet_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializePacket(g, t))
             ))
             .toList();
     }
@@ -264,11 +269,10 @@ public final class RecipeTest implements FabricGameTest {
         helper.succeed();
     }
 
-    @GameTestGenerator
     @SuppressWarnings("ConstantConditions")
     public List<TestFunction> loadJsonInData() throws IOException {
         try (var files = Files.find(recipeParent, 1, (path, a) -> path.getFileName().toString().endsWith(".json"))) {
-            return files.map(p -> GameTestUtil.create(FluidTankCommon.modId, "recipe_test", "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),
+            return files.map(p -> GameTestFunctions.create("recipe_test", TestFunction.EMPTY_STRUCTURE, "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),
                 (g) -> loadFromFile(g, p))).toList();
         }
     }

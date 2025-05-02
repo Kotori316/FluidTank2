@@ -7,13 +7,12 @@ import com.kotori316.fluidtank.neoforge.cat.EntityChestAsTank
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.{FluidAmount2FluidStack, FluidStack2FluidAmount}
 import com.kotori316.testutil.GameTestUtil
 import net.minecraft.core.BlockPos
-import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
+import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.world.item.{Item, Items}
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.block.entity.HopperBlockEntity
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
-import net.neoforged.neoforge.gametest.GameTestHolder
 import org.junit.jupiter.api.Assertions.{assertDoesNotThrow, assertEquals, assertInstanceOf, assertNotNull, assertTrue}
 
 import java.util.Locale
@@ -25,7 +24,6 @@ import scala.jdk.OptionConverters.RichOptional
 class CatTest {
   private final val BATCH = "defaultBatch"
 
-  @GameTestGenerator
   def generator(): java.util.List[TestFunction] = {
     GetGameTestMethods.getTests(getClass, this, BATCH, "cat_test")
   }
@@ -80,7 +78,6 @@ class CatTest {
     helper.succeed()
   }
 
-  @GameTestGenerator
   def fillMore(): java.util.List[TestFunction] = {
     val t = for {
       rot <- Rotation.values().toSeq
@@ -118,7 +115,6 @@ class CatTest {
     }
   }
 
-  @GameTestGenerator
   def fillFail(): java.util.List[TestFunction] = {
     val t = for {
       kind <- Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
@@ -151,7 +147,6 @@ class CatTest {
     helper.succeed()
   }
 
-  @GameTestGenerator
   def drainWater(): java.util.List[TestFunction] = {
     val t = for {
       a <- 1000 to 3000 by 500

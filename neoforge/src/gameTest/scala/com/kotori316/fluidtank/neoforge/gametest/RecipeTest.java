@@ -14,7 +14,6 @@ import com.mojang.serialization.JsonOps;
 import io.netty.buffer.ByteBufAllocator;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -55,7 +54,6 @@ final class RecipeTest {
         FluidTankCommon.LOGGER.info("Search recipe path: {}", recipeParent.toAbsolutePath());
     }
 
-    @GameTestGenerator
     List<TestFunction> generator() {
         return GetGameTestMethods.getTests(getClass(), this, "recipe_test");
     }
@@ -121,7 +119,6 @@ final class RecipeTest {
         ))), null));
     }
 
-    @GameTestGenerator
     List<TestFunction> combineFluids() {
         var fluids = IntStream.of(500, 1000, 2000, 3000, 4000)
             .mapToObj(GenericUnit::fromForge)
@@ -171,7 +168,6 @@ final class RecipeTest {
         assertEquals(Tier.STONE.getCapacity(), RecipeInventoryUtil.getFluidHandler(result).getTank().capacity());
     }
 
-    @GameTestGenerator
     List<TestFunction> serialize() {
         return Stream.of(Tier.values()).filter(Tier::isNormalTankTier)
             .filter(Predicate.isEqual(Tier.WOOD).negate())
@@ -246,7 +242,6 @@ final class RecipeTest {
         helper.succeed();
     }
 
-    @GameTestGenerator
     @SuppressWarnings("ConstantConditions")
     List<TestFunction> loadJsonInData() throws IOException {
         try (var files = Files.find(recipeParent, 1, (path, a) -> path.getFileName().toString().endsWith(".json"))) {

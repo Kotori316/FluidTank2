@@ -1,15 +1,15 @@
 package com.kotori316.fluidtank.fabric.gametest
 
-import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fabric.cat.ChestAsTankStorage
 import com.kotori316.fluidtank.fabric.fluid.FabricConverter
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest
+import com.kotori316.fluidtank.gametest.GameTestFunctions
+import com.kotori316.testutil.common.TestFunction
 import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidConstants, FluidStorage, FluidVariant}
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.core.BlockPos
-import net.minecraft.gametest.framework.{GameTest, GameTestGenerator, GameTestHelper, TestFunction}
+import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.world.item.{Item, Items}
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.block.entity.HopperBlockEntity
@@ -18,30 +18,29 @@ import org.junit.jupiter.api.Assertions.{assertEquals, assertInstanceOf, assertN
 import org.junit.platform.commons.support.ReflectionSupport
 
 import java.lang.reflect.Modifier
-import java.util.Locale
 import scala.jdk.javaapi.CollectionConverters
 import scala.util.Using
 
 //noinspection UnstableApiUsage
-final class CatTest extends FabricGameTest {
+final class CatTest {
   private final val BATCH = "defaultBatch"
 
-  @GameTestGenerator
-  def generator: java.util.List[TestFunction] = {
+  def tests: java.util.List[TestFunction] = {
+    val testFunctions = generator ++ fillMore() ++ fillFail() ++ drainWater()
+    CollectionConverters.asJava(testFunctions)
+  }
+
+  def generator: Seq[TestFunction] = {
     val withHelper = getClass.getDeclaredMethods.toSeq
       .filter(m => m.getReturnType == Void.TYPE)
-      .filter(m => !m.isAnnotationPresent(classOf[GameTest]))
       .filter(m => (m.getModifiers & Modifier.PRIVATE) == 0)
       .filter(m => m.getParameterTypes.toSeq == Seq(classOf[GameTestHelper]))
       .map { m =>
         val test: java.util.function.Consumer[GameTestHelper] = g => ReflectionSupport.invokeMethod(m, this, g)
-        GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH, getClass.getSimpleName + "_" + m.getName,
-          "cat_test",
-          test
-        )
+        GameTestFunctions.create(BATCH, "cat_test", getClass.getSimpleName + "_" + m.getName, test)
       }
 
-    CollectionConverters.asJava(withHelper)
+    withHelper
   }
 
   private def getStorage(helper: GameTestHelper) = {
@@ -96,8 +95,7 @@ final class CatTest extends FabricGameTest {
     helper.succeed()
   }
 
-  @GameTestGenerator
-  def fillMore(): java.util.List[TestFunction] = {
+  def fillMore(): Seq[TestFunction] = {
     val t = for {
       rot <- Rotation.values().toSeq
       kind <- Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
@@ -106,11 +104,9 @@ final class CatTest extends FabricGameTest {
       bucket = if (kind.contentEqual(FluidAmountUtil.BUCKET_WATER)) Items.WATER_BUCKET else Items.LAVA_BUCKET
       count = if (kind.contentEqual(FluidAmountUtil.BUCKET_WATER)) 4 else 5
     } yield {
-      new TestFunction(BATCH, s"cat_test_${kind.content.getKey.getPath}_${amount}_${rot.name()}".toLowerCase(Locale.ROOT),
-        "cat_test", rot, 100, 0, true,
-        g => fillMore(g, fluid, count, bucket))
+      GameTestFunctions.create(BATCH, "cat_test", s"cat_test_${kind.content.getKey.getPath}_${amount}_${rot.name()}", g => fillMore(g, fluid, count, bucket))
     }
-    CollectionConverters.asJava(t)
+    t
   }
 
   private def fillMore(helper: GameTestHelper, fluid: FluidAmount, expectItemCount: Int, expectItem: Item): Unit = {
@@ -136,17 +132,13 @@ final class CatTest extends FabricGameTest {
     }
   }
 
-  @GameTestGenerator
-  def fillFail(): java.util.List[TestFunction] = {
-    CollectionConverters.asJava(for {
+  def fillFail(): Seq[TestFunction] = {
+    for {
       kind <- Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
       a <- Seq(0, 500, 999)
       amount = GenericUnit.fromForge(a)
       fluid = kind.setAmount(amount)
-    } yield GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH,
-      s"cat_test_fill_fail_${fluid.content.getKey.getPath}_$a".toLowerCase(Locale.ROOT),
-      "cat_test", g => fillFail(g, fluid)
-    ))
+    } yield GameTestFunctions.create(BATCH, "cat_test", s"cat_test_fill_fail_${fluid.content.getKey.getPath}_$a", g => fillFail(g, fluid))
   }
 
   private def fillFail(helper: GameTestHelper, amount: FluidAmount): Unit = {
@@ -175,18 +167,16 @@ final class CatTest extends FabricGameTest {
     helper.succeed()
   }
 
-  @GameTestGenerator
-  def drainWater(): java.util.List[TestFunction] = {
-   CollectionConverters.asJava(for {
-     a <- 1000 to 3000 by 500
-   } yield {
-     val waterBucket = math.max(2 - a / 1000, 0)
-     val emptyBucket = 4 - waterBucket
-     val drained = math.min(1000 * (a / 1000), 2000)
-     val toDrain = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(a))
-     GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH, s"cat_test_drain_${toDrain.content.getKey.getPath}_$a",
-       "cat_test", g => drainWater(g, toDrain, waterBucket, emptyBucket, drained))
-   })
+  def drainWater(): Seq[TestFunction] = {
+    for {
+      a <- 1000 to 3000 by 500
+    } yield {
+      val waterBucket = math.max(2 - a / 1000, 0)
+      val emptyBucket = 4 - waterBucket
+      val drained = math.min(1000 * (a / 1000), 2000)
+      val toDrain = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(a))
+      GameTestFunctions.create(BATCH, "cat_test", s"cat_test_drain_${toDrain.content.getKey.getPath}_$a", g => drainWater(g, toDrain, waterBucket, emptyBucket, drained))
+    }
   }
 
   private def drainWater(helper: GameTestHelper, toDrain: FluidAmount, filledBucket: Int, emptyBucket: Int, drainedAmount: Int): Unit = {

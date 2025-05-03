@@ -4,7 +4,6 @@ import java.time.format.DateTimeFormatter
 plugins {
     id("java")
     id("scala")
-    id("idea")
 }
 
 val minecraftVersion = project.property("minecraft_version") as String
@@ -76,12 +75,5 @@ afterEvaluate {
     }
     tasks.processResources {
         commonProject?.let { from(it.sourceSets.main.get().resources) }
-    }
-}
-
-idea {
-    module {
-        isDownloadSources = true
-        isDownloadJavadoc = true
     }
 }

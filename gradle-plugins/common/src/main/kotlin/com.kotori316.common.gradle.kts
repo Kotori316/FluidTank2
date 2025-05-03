@@ -3,6 +3,7 @@ import org.gradle.jvm.tasks.Jar
 plugins {
     id("java")
     id("scala")
+    id("idea")
 }
 
 val minecraftVersion = project.property("minecraft_version") as String
@@ -132,5 +133,13 @@ tasks {
     }
     named("sourcesJar", Jar::class) {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}
+
+idea {
+    module {
+        isDownloadSources = true
+        isDownloadJavadoc = true
+        excludeDirs = excludeDirs + file("run") + file("runs") + file("run-server")
     }
 }

@@ -44,6 +44,7 @@ import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -56,6 +57,15 @@ public final class RecipeTest {
 
     public RecipeTest() {
         FluidTankCommon.LOGGER.info("Search recipe path: {}", recipeParent.toAbsolutePath());
+    }
+
+    public Stream<TestFunction> tests() {
+        return Stream.of(
+            generator().stream(),
+            combineFluids().stream(),
+            serialize().stream(),
+            loadJsonInData().stream()
+        ).flatMap(Function.identity());
     }
 
     public List<TestFunction> generator() {
@@ -270,10 +280,12 @@ public final class RecipeTest {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public List<TestFunction> loadJsonInData() throws IOException {
+    public List<TestFunction> loadJsonInData() {
         try (var files = Files.find(recipeParent, 1, (path, a) -> path.getFileName().toString().endsWith(".json"))) {
             return files.map(p -> GameTestFunctions.create("recipe_test", TestFunction.EMPTY_STRUCTURE, "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),
                 (g) -> loadFromFile(g, p))).toList();
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
         }
     }
 

@@ -83,7 +83,14 @@ public final class GameTestFunctions {
 
     public static @NotNull TestFunction create(String batchName, String structureName, String name, Consumer<GameTestHelper> test) {
         var formatted = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
-        return TestFunction.createWithStructure(FluidTankCommon.modId, batchName, formatted, structureName, test);
+        String namespacedStructureName;
+        if (structureName.equals(TestFunction.EMPTY_STRUCTURE)) {
+            namespacedStructureName = "minecraft:empty";
+        } else {
+            namespacedStructureName = "%s:%s".formatted(FluidTankCommon.modId, structureName);
+        }
+        String namespacedBatchName = "%s:%s".formatted(FluidTankCommon.modId, ResourceLocation.parse(batchName).getPath());
+        return TestFunction.createWithStructure(FluidTankCommon.modId, namespacedBatchName, formatted, namespacedStructureName, test);
     }
 
     public static void assertEqualStack(ItemStack expected, ItemStack actual) {

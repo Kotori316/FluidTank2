@@ -23,7 +23,7 @@ import scala.util.Using
 
 //noinspection UnstableApiUsage
 final class CatTest {
-  private final val BATCH = "defaultBatch"
+  private final val BATCH = "cat_test"
 
   def tests: java.util.List[TestFunction] = {
     val testFunctions = generator ++ fillMore() ++ fillFail() ++ drainWater()

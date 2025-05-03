@@ -16,6 +16,6 @@ public final class FromCommon {
     }
 
     public List<TestFunction> load2032Tank() {
-        return LoadTank2032Test.tests("loadTank2032", "load_20_3_tanks").toList();
+        return LoadTank2032Test.tests("load_tank2032", "load_20_3_tanks").toList();
     }
 }

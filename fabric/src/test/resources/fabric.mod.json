@@ -4,13 +4,8 @@
   "version": "1.0.0",
   "name": "Fluid Tank Test",
   "entrypoints": {
-    "fabric-gametest": [
-      "com.kotori316.fluidtank.fabric.gametest.ConnectionStorageTest",
-      "com.kotori316.fluidtank.fabric.gametest.TankPlacementTest",
-      "com.kotori316.fluidtank.fabric.gametest.PlatformAccessTest",
-      "com.kotori316.fluidtank.fabric.gametest.CatTest",
-      "com.kotori316.fluidtank.fabric.gametest.RecipeTest",
-      "com.kotori316.fluidtank.fabric.gametest.FromCommon"
+    "main": [
+      "com.kotori316.fluidtank.fabric.gametest.FluidTankFabricGameTest"
     ]
   }
 }

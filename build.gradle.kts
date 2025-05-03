@@ -34,7 +34,6 @@ fun createChangelog(): String {
         | Dependency | Version |
         | -- | -- |
         | Minecraft | ${project.property("minecraft_version")} |
-        | Forge | ${project.property("forge_version")} |
         | Fabric | ${project.property("fabric_api_version")} |
         | NeoForge | ${project.property("neoforge_version")} |
         

@@ -138,7 +138,7 @@ final class PlatformAccessTest {
     potions().map { case (potionType, potion) =>
       GameTestFunctions.create(BATCH_NAME,
         TestFunction.NO_PLACE_STRUCTURE,
-        "fill_potion_%s_%s".formatted(potionType.name(), potion.value().name().toLowerCase(Locale.ROOT)),
+        "fill_potion_%s_%s".formatted(potionType.name(), potion.value().name()).toLowerCase(Locale.ROOT),
         g => fillPotion(g, potionType, potion)
       )
     }

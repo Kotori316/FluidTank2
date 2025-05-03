@@ -1,7 +1,6 @@
 package com.kotori316.fluidtank.neoforge.gametest
 
 import cats.implicits.catsSyntaxSemigroup
-import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, PotionType}
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter
@@ -9,6 +8,7 @@ import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.FluidAmount2Flui
 import com.kotori316.fluidtank.neoforge.gametest.GetGameTestMethods.assertEqualHelper
 import com.kotori316.fluidtank.neoforge.tank.TileTankNeoForge
 import com.kotori316.fluidtank.tank.Tier
+import com.kotori316.testutil.common.TestFunction
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.world.item.alchemy.Potions
@@ -17,9 +17,8 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction
 import org.junit.jupiter.api.Assertions.{assertDoesNotThrow, assertEquals, assertNotNull, assertTrue}
 
-@GameTestHolder(FluidTankCommon.modId)
 class TankFluidHandlerTest {
-  private final val BATCH = "defaultBatch"
+  private final val BATCH = GetGameTestMethods.DEFAULT_BATCH
 
   def generator(): java.util.List[TestFunction] = {
     GetGameTestMethods.getTests(getClass, this, BATCH)

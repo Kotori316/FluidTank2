@@ -1,11 +1,12 @@
 package com.kotori316.fluidtank.neoforge.gametest
 
+import com.kotori316.fluidtank.PlatformAccess
 import com.kotori316.fluidtank.config.PlatformConfigAccess
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, PlatformFluidAccess, PotionType}
+import com.kotori316.fluidtank.gametest.GameTestFunctions
 import com.kotori316.fluidtank.tank.Tier
-import com.kotori316.fluidtank.{FluidTankCommon, PlatformAccess}
-import com.kotori316.testutil.GameTestUtil
+import com.kotori316.testutil.common.TestFunction
 import com.mojang.serialization.JsonOps
 import net.minecraft.core.Holder
 import net.minecraft.gametest.framework.GameTestHelper
@@ -13,15 +14,20 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.alchemy.{Potion, PotionContents, Potions}
 import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.GameType
+import org.junit.jupiter.api.Assertions.{assertDoesNotThrow, assertEquals, assertFalse, assertNotNull, assertTrue}
 
 import java.util.Locale
-import scala.jdk.javaapi.CollectionConverters
+import scala.jdk.CollectionConverters.{ListHasAsScala, SeqHasAsJava}
 
 //noinspection ScalaUnusedSymbol
-@GameTestHolder(FluidTankCommon.modId)
 class PlatformAccessTest {
   private final val ACCESS: PlatformAccess = PlatformFluidAccess.getInstance().asInstanceOf[PlatformAccess]
   private final val BATCH_NAME = "platform_test"
+
+  def tests(): java.util.List[TestFunction] = {
+    val all = generator().asScala ++ fillPotion() ++ fillFailPotionWithAmount() ++ drainPotion() ++ drainFailPotionWithAmount()
+    all.asJava
+  }
 
   def generator(): java.util.List[TestFunction] = {
     GetGameTestMethods.getTests(getClass, this, BATCH_NAME)
@@ -123,41 +129,45 @@ class PlatformAccessTest {
     } yield (t, p)
   }
 
-  def fillPotion(): java.util.List[TestFunction] = CollectionConverters.asJava(
+  def fillPotion(): Seq[TestFunction] =
     potions().map { case (potionType, potion) =>
-      GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "fill_potion_%s_%s".formatted(potionType.name(), potion.getRegisteredName).toLowerCase(Locale.ROOT),
+      GameTestFunctions.create(
+        BATCH_NAME,
         TestFunction.NO_PLACE_STRUCTURE,
-        g => fillPotion(g, potionType, potion))
+        "fill_potion_%s_%s".formatted(potionType.name(), potion.value().name()).toLowerCase(Locale.ROOT),
+        g => fillPotion(g, potionType, potion),
+      )
     }
-  )
 
-  def fillFailPotionWithAmount(): java.util.List[TestFunction] = CollectionConverters.asJava(
+  def fillFailPotionWithAmount(): Seq[TestFunction] =
     potions().map { case (potionType, potion) =>
-      GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "fill_fail1_potion_%s_%s".formatted(potionType.name(), potion.getRegisteredName).toLowerCase(Locale.ROOT),
+      GameTestFunctions.create(
+        BATCH_NAME,
         TestFunction.NO_PLACE_STRUCTURE,
-        g => fillFailPotionWithAmount(g, potionType, potion))
+        "fill_fail1_potion_%s_%s".formatted(potionType.name(), potion.value().name()).toLowerCase(Locale.ROOT),
+        g => fillFailPotionWithAmount(g, potionType, potion),
+      )
     }
-  )
 
-  def drainPotion(): java.util.List[TestFunction] = CollectionConverters.asJava(
+  def drainPotion(): Seq[TestFunction] =
     potions().map { case (potionType, potion) =>
-      GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "drain_potion_%s_%s".formatted(potionType.name(), potion.getRegisteredName).toLowerCase(Locale.ROOT),
+      GameTestFunctions.create(
+        BATCH_NAME,
         TestFunction.NO_PLACE_STRUCTURE,
-        g => drainPotion(g, potionType, potion))
+        "drain_potion_%s_%s".formatted(potionType.name(), potion.value().name()).toLowerCase(Locale.ROOT),
+        g => drainPotion(g, potionType, potion),
+      )
     }
-  )
 
-  def drainFailPotionWithAmount(): java.util.List[TestFunction] = CollectionConverters.asJava(
+  def drainFailPotionWithAmount(): Seq[TestFunction] =
     potions().map { case (potionType, potion) =>
-      GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-        "drain_fail1_potion_%s_%s".formatted(potionType.name(), potion.getRegisteredName).toLowerCase(Locale.ROOT),
+      GameTestFunctions.create(
+        BATCH_NAME,
         TestFunction.NO_PLACE_STRUCTURE,
-        g => drainFailPotionWithAmount(g, potionType, potion))
+        "drain_fail1_potion_%s_%s".formatted(potionType.name(), potion.value().name()).toLowerCase(Locale.ROOT),
+        g => drainFailPotionWithAmount(g, potionType, potion),
+      )
     }
-  )
 
   private def fillPotion(helper: GameTestHelper, potionType: PotionType, potion: Holder[Potion]): Unit = {
     val player = helper.makeMockPlayer(GameType.SURVIVAL)

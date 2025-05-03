@@ -93,6 +93,13 @@ public final class GameTestFunctions {
         return TestFunction.createWithStructure(FluidTankCommon.modId, namespacedBatchName, formatted, namespacedStructureName, test);
     }
 
+    public static @NotNull TestFunction create(String batchName, String structureName, String name, Runnable test) {
+        return create(batchName, structureName, name, g -> {
+            test.run();
+            g.succeed();
+        });
+    }
+
     public static void assertEqualStack(ItemStack expected, ItemStack actual) {
         Assertions.assertTrue(ItemStack.matches(expected, actual),
             "Expected: %s(%s), Actual: %s(%s)".formatted(expected, expected.getComponentsPatch(), actual, actual.getComponentsPatch()));

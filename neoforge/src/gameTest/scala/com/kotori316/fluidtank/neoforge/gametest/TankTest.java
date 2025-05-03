@@ -1,17 +1,14 @@
 package com.kotori316.fluidtank.neoforge.gametest;
 
-import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.neoforge.FluidTank;
 import com.kotori316.fluidtank.tank.BlockTank;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
+import com.kotori316.testutil.common.TestFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTestAssertPosException;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestFunction;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.gametest.GameTestHolder;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -20,10 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SuppressWarnings("unused")
-@GameTestHolder(FluidTankCommon.modId)
 final class TankTest {
 
-    private static final String BATCH = "defaultBatch";
+    private static final String BATCH = GetGameTestMethods.DEFAULT_BATCH;
 
     List<TestFunction> fillTest() {
         return GetGameTestMethods.getTests(getClass(), this, BATCH);
@@ -40,13 +36,9 @@ final class TankTest {
     static TileTank placeTank(GameTestHelper helper, BlockPos pos, Tier tier) {
         var block = getBlock(tier);
         helper.setBlock(pos, block.get());
-        var tile = helper.getBlockEntity(pos);
-        if (tile instanceof TileTank tileTank) {
-            tileTank.onBlockPlacedBy();
-            return tileTank;
-        } else {
-            throw new GameTestAssertPosException("Expect tank tile", helper.absolutePos(pos), pos, helper.getTick());
-        }
+        var tileTank = helper.getBlockEntity(pos, TileTank.class);
+        tileTank.onBlockPlacedBy();
+        return tileTank;
     }
 
     void capability1(GameTestHelper helper) {

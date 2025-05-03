@@ -76,10 +76,7 @@ public final class RecipeTest {
             .filter(m -> (m.getModifiers() & (Modifier.PUBLIC | Modifier.PRIVATE | Modifier.STATIC)) == 0)
             .map(m -> GameTestFunctions.create("recipe_test", TestFunction.NO_PLACE_STRUCTURE,
                 getClass().getSimpleName() + "_" + m.getName(),
-                (g) -> {
-                    ReflectionSupport.invokeMethod(m, this);
-                    g.succeed();
-                }));
+                () -> ReflectionSupport.invokeMethod(m, this)));
         var withHelper = Stream.of(getClass().getDeclaredMethods())
             .filter(m -> m.getReturnType() == Void.TYPE)
             .filter(m -> Arrays.equals(m.getParameterTypes(), new Class<?>[]{GameTestHelper.class}))

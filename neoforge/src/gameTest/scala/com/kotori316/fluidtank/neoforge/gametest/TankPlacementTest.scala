@@ -1,12 +1,12 @@
 package com.kotori316.fluidtank.neoforge.gametest
 
-import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
+import com.kotori316.fluidtank.gametest.GameTestFunctions
 import com.kotori316.fluidtank.neoforge.FluidTank
 import com.kotori316.fluidtank.neoforge.tank.TankFluidItemHandler
 import com.kotori316.fluidtank.tank.Tier
-import com.kotori316.testutil.GameTestUtil
+import com.kotori316.testutil.common.TestFunction
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.world.item.ItemStack
@@ -17,17 +17,20 @@ import org.junit.jupiter.api.Assertions.{assertAll, assertEquals}
 import java.util.Locale
 import scala.jdk.javaapi.CollectionConverters
 
-@GameTestHolder(FluidTankCommon.modId)
 final class TankPlacementTest {
   private final val BATCH_NAME = "tank_place_test"
 
-  def notRemovedByFluid(): java.util.List[TestFunction] = {
-    CollectionConverters.asJava(for {
+  def tests(): java.util.List[TestFunction] = {
+    CollectionConverters.asJava(notRemovedByFluid() ++ tankDrop())
+  }
+
+  def notRemovedByFluid(): Seq[TestFunction] = {
+    for {
       t <- Tier.values().filterNot(_ == Tier.INVALID).toSeq
       f <- Seq(Blocks.LAVA, Blocks.WATER)
       name = s"${BATCH_NAME}_${t}_${f.getName.getString}".toLowerCase(Locale.ROOT)
-    } yield GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH_NAME,
-      name, "check_water", g => notRemovedByFluid(g, t, f)))
+    } yield GameTestFunctions.create(BATCH_NAME, "check_water",
+      name, g => notRemovedByFluid(g, t, f))
   }
 
   private def notRemovedByFluid(helper: GameTestHelper, tier: Tier, fluid: Block): Unit = {
@@ -41,8 +44,8 @@ final class TankPlacementTest {
       .thenSucceed()
   }
 
-  def tankDrop(): java.util.List[TestFunction] = {
-    val tests = for {
+  def tankDrop(): Seq[TestFunction] = {
+    for {
       t <- Seq(Tier.WOOD, Tier.STONE, Tier.STAR)
       f <- Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
       amount <- Seq(GenericUnit.ONE_BUCKET, GenericUnit.ONE_BOTTLE, GenericUnit.fromForge(2000))
@@ -50,12 +53,10 @@ final class TankPlacementTest {
       cloneName = s"tank_clone_${t}_${f.content.getKey.getPath}_${amount.asForge}".toLowerCase(Locale.ROOT)
 
       test <- Seq(
-        GameTestUtil.create(FluidTankCommon.modId, BATCH_NAME, dropName, g => testGetTankDrop(g, t, f.setAmount(amount))),
-        GameTestUtil.create(FluidTankCommon.modId, BATCH_NAME, cloneName, g => testGetTankClone(g, t, f.setAmount(amount))),
+        GameTestFunctions.create(BATCH_NAME, TestFunction.EMPTY_STRUCTURE, dropName, g => testGetTankDrop(g, t, f.setAmount(amount))),
+        GameTestFunctions.create(BATCH_NAME, TestFunction.EMPTY_STRUCTURE, cloneName, g => testGetTankClone(g, t, f.setAmount(amount))),
       )
     } yield test
-
-    CollectionConverters.asJava(tests)
   }
 
   private def testGetTankDrop(helper: GameTestHelper, tier: Tier, fillContent: FluidAmount): Unit = {

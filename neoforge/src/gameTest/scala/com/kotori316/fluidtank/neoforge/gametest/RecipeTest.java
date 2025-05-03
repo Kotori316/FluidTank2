@@ -6,16 +6,16 @@ import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
+import com.kotori316.fluidtank.gametest.GameTestFunctions;
 import com.kotori316.fluidtank.neoforge.FluidTank;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.Tier;
-import com.kotori316.testutil.GameTestUtil;
+import com.kotori316.testutil.common.TestFunction;
 import com.mojang.serialization.JsonOps;
 import io.netty.buffer.ByteBufAllocator;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
@@ -25,7 +25,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.neoforged.neoforge.common.conditions.WithConditions;
-import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
@@ -35,10 +34,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -46,12 +42,21 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("unused")
-@GameTestHolder(FluidTankCommon.modId)
 final class RecipeTest {
     final Path recipeParent = Path.of("../src/generated/resources", "data/fluidtank/recipe");
 
     public RecipeTest() {
         FluidTankCommon.LOGGER.info("Search recipe path: {}", recipeParent.toAbsolutePath());
+    }
+
+    List<TestFunction> tests() {
+        return Stream.of(
+                generator(),
+                combineFluids(),
+                serialize(),
+                loadJsonInData()
+            ).flatMap(Collection::stream)
+            .toList();
     }
 
     List<TestFunction> generator() {
@@ -128,8 +133,8 @@ final class RecipeTest {
         return fluids.flatMap(f -> {
             var name = "%s_%s".formatted(FluidAmountUtil.access().getKey(f.content()).getPath(), GenericUnit.asForgeFromBigInt(f.amount()));
             return Stream.of(
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_combine1_" + name, () -> combine1(f)),
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_combine2_" + name, () -> combine2(f))
+                GameTestFunctions.create("recipe_test", TestFunction.NO_PLACE_STRUCTURE, getClass().getSimpleName() + "_combine1_" + name, () -> combine1(f)),
+                GameTestFunctions.create("recipe_test", TestFunction.NO_PLACE_STRUCTURE, getClass().getSimpleName() + "_combine2_" + name, () -> combine2(f))
             );
         }).toList();
     }
@@ -172,8 +177,8 @@ final class RecipeTest {
         return Stream.of(Tier.values()).filter(Tier::isNormalTankTier)
             .filter(Predicate.isEqual(Tier.WOOD).negate())
             .flatMap(t -> Stream.of(
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_json_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializeJson(g, t)),
-                GameTestUtil.create(FluidTankCommon.modId, "recipe_test", getClass().getSimpleName() + "_packet_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializePacket(g, t))
+                GameTestFunctions.create("recipe_test", TestFunction.NO_PLACE_STRUCTURE, getClass().getSimpleName() + "_json_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializeJson(g, t)),
+                GameTestFunctions.create("recipe_test", TestFunction.NO_PLACE_STRUCTURE, getClass().getSimpleName() + "_packet_" + t.name().toLowerCase(Locale.ROOT), (g) -> serializePacket(g, t))
             ))
             .toList();
     }
@@ -243,13 +248,15 @@ final class RecipeTest {
     }
 
     @SuppressWarnings("ConstantConditions")
-    List<TestFunction> loadJsonInData() throws IOException {
+    List<TestFunction> loadJsonInData() {
         try (var files = Files.find(recipeParent, 1, (path, a) -> path.getFileName().toString().endsWith(".json"))) {
-            return files.map(p -> GameTestUtil.create(FluidTankCommon.modId, "recipe_test", "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),
+            return files.map(p -> GameTestFunctions.create("recipe_test", TestFunction.NO_PLACE_STRUCTURE, "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),
                 (g) -> {
                     loadFromFile(g, p);
                     g.succeed();
                 })).toList();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 

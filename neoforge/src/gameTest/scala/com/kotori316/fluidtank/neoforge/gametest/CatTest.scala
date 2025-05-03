@@ -1,11 +1,11 @@
 package com.kotori316.fluidtank.neoforge.gametest
 
-import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
+import com.kotori316.fluidtank.gametest.GameTestFunctions
 import com.kotori316.fluidtank.neoforge.cat.EntityChestAsTank
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.{FluidAmount2FluidStack, FluidStack2FluidAmount}
-import com.kotori316.testutil.GameTestUtil
+import com.kotori316.testutil.common.TestFunction
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.world.item.{Item, Items}
@@ -13,16 +13,20 @@ import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.block.entity.HopperBlockEntity
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
-import org.junit.jupiter.api.Assertions.{assertDoesNotThrow, assertEquals, assertInstanceOf, assertNotNull, assertTrue}
+import org.junit.jupiter.api.Assertions.{assertDoesNotThrow, assertEquals, assertNotNull, assertTrue}
 
 import java.util.Locale
 import scala.jdk.CollectionConverters.{ListHasAsScala, SeqHasAsJava}
 import scala.jdk.OptionConverters.RichOptional
 
 //noinspection ScalaUnusedSymbol,DuplicatedCode
-@GameTestHolder(FluidTankCommon.modId)
 class CatTest {
-  private final val BATCH = "defaultBatch"
+  private final val BATCH = GetGameTestMethods.DEFAULT_BATCH
+
+  def tests(): java.util.List[TestFunction] = {
+    val all = generator().asScala ++ fillMore() ++ fillFail() ++ drainWater()
+    all.asJava
+  }
 
   def generator(): java.util.List[TestFunction] = {
     GetGameTestMethods.getTests(getClass, this, BATCH, "cat_test")
@@ -30,7 +34,7 @@ class CatTest {
 
   def testGetFluids(helper: GameTestHelper): Unit = {
     val pos = new BlockPos(2, 1, 2)
-    val cat = assertInstanceOf(classOf[EntityChestAsTank], helper.getBlockEntity(pos))
+    val cat = helper.getBlockEntity(pos, classOf[EntityChestAsTank])
 
     val fluids = cat.getFluids.toScala.toSeq.flatMap(_.asScala)
     assertTrue(fluids.contains(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(2000))),
@@ -43,7 +47,7 @@ class CatTest {
 
   private def getHandler(helper: GameTestHelper): IFluidHandler = {
     val pos = new BlockPos(2, 1, 2)
-    val cat = assertInstanceOf(classOf[EntityChestAsTank], helper.getBlockEntity(pos))
+    val cat = helper.getBlockEntity(pos, classOf[EntityChestAsTank])
 
     val handler = assertDoesNotThrow(() => helper.getLevel.getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(pos), null))
     assertNotNull(handler)
@@ -78,7 +82,7 @@ class CatTest {
     helper.succeed()
   }
 
-  def fillMore(): java.util.List[TestFunction] = {
+  def fillMore(): Seq[TestFunction] = {
     val t = for {
       rot <- Rotation.values().toSeq
       kind <- Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
@@ -87,12 +91,14 @@ class CatTest {
       bucket = if (kind.contentEqual(FluidAmountUtil.BUCKET_WATER)) Items.WATER_BUCKET else Items.LAVA_BUCKET
       count = if (kind.contentEqual(FluidAmountUtil.BUCKET_WATER)) 4 else 5
     } yield {
-      new TestFunction(FluidTankCommon.modId + "." + BATCH,
+      GameTestFunctions.create(
+        BATCH,
+        "cat_test",
         s"cat_test_${kind.content.getKey.getPath}_${amount}_${rot.name()}".toLowerCase(Locale.ROOT),
-        FluidTankCommon.modId + ":" + FluidTankCommon.modId + "." + "cat_test", rot, 100, 0, true,
-        g => fillMore(g, fluid, count, bucket))
+        g => fillMore(g, fluid, count, bucket),
+      )
     }
-    t.asJava
+    t
   }
 
   private def fillMore(helper: GameTestHelper, fluid: FluidAmount, expectItemCount: Int, expectItem: Item): Unit = {
@@ -115,17 +121,19 @@ class CatTest {
     }
   }
 
-  def fillFail(): java.util.List[TestFunction] = {
+  def fillFail(): Seq[TestFunction] = {
     val t = for {
       kind <- Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
       a <- Seq(0, 500, 999)
       amount = GenericUnit.fromForge(a)
       fluid = kind.setAmount(amount)
-    } yield GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH,
+    } yield GameTestFunctions.create(
+      BATCH,
+      "cat_test",
       s"cat_test_fill_fail_${fluid.content.getKey.getPath}_$a".toLowerCase(Locale.ROOT),
-      "cat_test", g => fillFail(g, fluid)
+      g => fillFail(g, fluid)
     )
-    t.asJava
+    t
   }
 
   private def fillFail(helper: GameTestHelper, amount: FluidAmount): Unit = {
@@ -147,7 +155,7 @@ class CatTest {
     helper.succeed()
   }
 
-  def drainWater(): java.util.List[TestFunction] = {
+  def drainWater(): Seq[TestFunction] = {
     val t = for {
       a <- 1000 to 3000 by 500
     } yield {
@@ -155,10 +163,14 @@ class CatTest {
       val emptyBucket = 4 - waterBucket
       val drained = math.min(1000 * (a / 1000), 2000)
       val toDrain = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(a))
-      GameTestUtil.createWithStructure(FluidTankCommon.modId, BATCH, s"cat_test_drain_${toDrain.content.getKey.getPath}_$a",
-        "cat_test", g => drainWater(g, toDrain, waterBucket, emptyBucket, drained))
+      GameTestFunctions.create(
+        BATCH,
+        "cat_test",
+        s"cat_test_drain_${toDrain.content.getKey.getPath}_$a".toLowerCase(Locale.ROOT),
+        g => drainWater(g, toDrain, waterBucket, emptyBucket, drained),
+      )
     }
-    t.asJava
+    t
   }
 
   private def drainWater(helper: GameTestHelper, toDrain: FluidAmount, filledBucket: Int, emptyBucket: Int, drainedAmount: Int): Unit = {

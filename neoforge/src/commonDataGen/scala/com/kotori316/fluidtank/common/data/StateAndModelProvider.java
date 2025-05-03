@@ -9,8 +9,8 @@ import com.kotori316.fluidtank.tank.TankPos;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
-import net.minecraft.client.data.models.blockstates.Variant;
 import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
@@ -75,8 +75,8 @@ final class StateAndModelProvider extends ModelProvider {
         var location = TexturedModel.CUBE_TOP.updateTexture(t -> t.put(TextureSlot.SIDE, blockTexture("cat_side")).put(TextureSlot.TOP, blockTexture("cat_front")))
             .create(FluidTank.BLOCK_CAT.get(), blockModels.modelOutput);
         blockModels.blockStateOutput.accept(
-            BlockModelGenerators.createSimpleBlock(FluidTank.BLOCK_CAT.get(), location)
-                .with(blockModels.createColumnWithFacing())
+            BlockModelGenerators.createSimpleBlock(FluidTank.BLOCK_CAT.get(), BlockModelGenerators.plainVariant(location))
+                .with(BlockModelGenerators.ROTATIONS_COLUMN_WITH_FACING)
         );
         blockModels.registerSimpleItemModel(FluidTank.BLOCK_CAT.get(), location);
     }
@@ -142,8 +142,6 @@ final class StateAndModelProvider extends ModelProvider {
 
     void tank(BlockModelGenerators blockModels, ItemModelGenerators itemModels, BlockTank blockTank, TankModelTemplates templates) {
         var tier = blockTank.tier();
-        var tankPosProperty = PropertyDispatch.property(TankPos.TANK_POS_PROPERTY)
-            .generate(tankPos -> Variant.variant());
         var blockModel = ExtendedModelTemplateBuilder.builder()
             .parent(templates.tankBlock())
             .renderType(renderTypeName(RenderType.cutout()))
@@ -157,9 +155,10 @@ final class StateAndModelProvider extends ModelProvider {
             ,
             blockModels.modelOutput
         );
+        var tankPosProperty = PropertyDispatch.initial(TankPos.TANK_POS_PROPERTY)
+            .generate(tankPos -> BlockModelGenerators.plainVariant(blockModelLocation));
         blockModels.blockStateOutput.accept(
-            BlockModelGenerators.createSimpleBlock(blockTank, blockModelLocation)
-                .with(tankPosProperty)
+            MultiVariantGenerator.dispatch(blockTank).with(tankPosProperty)
         );
 
         var itemModel = ExtendedModelTemplateBuilder.builder()

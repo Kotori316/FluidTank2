@@ -216,26 +216,18 @@ jobs:
           git pull || true
         env:
           REF_NAME: ${{ github.head_ref }}
-      - name: VRT PR
-        if: ${{ github.event_name == 'pull_request' }}
-        run: npm run run:ci-pr
-        working-directory: vrt
-        env:
-          AWS_ACCESS_KEY_ID: ${{ steps.get-secrets.outputs.cloudflare_access_key }}
-          AWS_SECRET_ACCESS_KEY: ${{ steps.get-secrets.outputs.cloudflare_secret_key }}
-          AWS_ENDPOINT_URL: ${{ steps.get-secrets.outputs.cloudflare_s3_endpoint }}
-          AWS_REGION: auto
       - name: Get sha
-        if: ${{ github.event_name == 'push' }}
         id: get-sha
         uses: 'Kotori316/vrt-key-action@v2'
+        with:
+          save-key: ${{ github.event_name == 'push' }}
       - name: VRT Push
-        if: ${{ github.event_name == 'push' }}
-        run: npm run run:ci-push
+        run: npm run "${COMMAND}"
         working-directory: vrt
         env:
+          COMMAND: ${{ github.event_name == 'push' && 'run:ci-push' || 'run:ci-pr' }}
           EXPECTED_KEY: ${{ steps.get-sha.outputs.key }}
-          ACTUAL_KEY: ${{ github.sha }}
+          ACTUAL_KEY: ${{ steps.get-sha.outputs.actual-key }}
           AWS_ACCESS_KEY_ID: ${{ steps.get-secrets.outputs.cloudflare_access_key }}
           AWS_SECRET_ACCESS_KEY: ${{ steps.get-secrets.outputs.cloudflare_secret_key }}
           AWS_ENDPOINT_URL: ${{ steps.get-secrets.outputs.cloudflare_s3_endpoint }}

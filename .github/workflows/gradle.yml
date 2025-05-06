@@ -228,7 +228,7 @@ jobs:
       - name: Get sha
         if: ${{ github.event_name == 'push' }}
         id: get-sha
-        uses: 'Kotori316/vrt-key-action@v1'
+        uses: 'Kotori316/vrt-key-action@v2'
       - name: VRT Push
         if: ${{ github.event_name == 'push' }}
         run: npm run run:ci-push

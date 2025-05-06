@@ -225,26 +225,21 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ steps.get-secrets.outputs.cloudflare_secret_key }}
           AWS_ENDPOINT_URL: ${{ steps.get-secrets.outputs.cloudflare_s3_endpoint }}
           AWS_REGION: auto
+      - name: Get sha
+        if: ${{ github.event_name == 'push' }}
+        id: get-sha
+        uses: 'Kotori316/vrt-key-action@v1'
       - name: VRT Push
         if: ${{ github.event_name == 'push' }}
         run: npm run run:ci-push
         working-directory: vrt
         env:
-          EXPECTED_KEY: ${{ github.event.before }}
+          EXPECTED_KEY: ${{ steps.get-sha.outputs.key }}
           ACTUAL_KEY: ${{ github.sha }}
           AWS_ACCESS_KEY_ID: ${{ steps.get-secrets.outputs.cloudflare_access_key }}
           AWS_SECRET_ACCESS_KEY: ${{ steps.get-secrets.outputs.cloudflare_secret_key }}
           AWS_ENDPOINT_URL: ${{ steps.get-secrets.outputs.cloudflare_s3_endpoint }}
           AWS_REGION: auto
-      - name: Set sha
-        if: ${{ github.event_name == 'push' }}
-        run: |
-          set -eu
-          ID_TOKEN=$(curl -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value')
-          curl -X PUT -H "Authorization: Bearer ${ID_TOKEN}" "https://vrt-key-holer.kotori316.com/Kotori316/FluidTank2/${BRANCH_NAME}" -d "${SHA}"
-        env:
-          BRANCH_NAME: ${{ github.ref_name }}
-          SHA: ${{ github.sha }}
 
   merge-checker:
     if: always()

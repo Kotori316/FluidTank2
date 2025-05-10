@@ -19,6 +19,9 @@ public enum PotionType {
         return item;
     }
 
+    /**
+     * @throws IllegalArgumentException if the item is not a potion item.
+     */
     public static PotionType fromItemUnsafe(Item item) {
         if (item == Items.POTION) return NORMAL;
         if (item == Items.SPLASH_POTION) return SPLASH;

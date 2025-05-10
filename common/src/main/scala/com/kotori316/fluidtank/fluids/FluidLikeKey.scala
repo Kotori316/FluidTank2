@@ -22,14 +22,14 @@ object FluidLikeKey {
   def from(fluidAmount: FluidAmount): FluidLikeKey = FluidLikeKey(fluidAmount.content, fluidAmount.componentPatch)
 
   implicit val FluidKeyHash: Hash[FluidLikeKey] = Hash.fromUniversalHashCode
-  implicit val FluidKeyShow: Show[FluidLikeKey] = key =>
-    key.fluid match {
-      case VanillaFluid(fluid) =>
-        key.tag match {
-          case Some(tag) => f"FluidLikeKey(${BuiltInRegistries.FLUID.getKey(fluid)}, $tag)"
-          case None => f"FluidLikeKey(${BuiltInRegistries.FLUID.getKey(fluid)})"
-        }
-      case VanillaPotion(potionType) =>
-        f"FluidLikeKey($potionType, ${key.tag.orNull})"
+  implicit val FluidKeyShow: Show[FluidLikeKey] = key => {
+    val name = key.fluid match {
+      case VanillaFluid(fluid) => BuiltInRegistries.FLUID.getKey(fluid)
+      case VanillaPotion(potionType) => potionType.toString
     }
+    key.tag match {
+      case Some(tag) => f"FluidLikeKey($name, $tag)"
+      case None => f"FluidLikeKey($name)"
+    }
+  }
 }

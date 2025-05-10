@@ -29,11 +29,6 @@ jobs:
         env:
           RUN_JUNIT: true
           DISABLE_FORGE: true
-      - name: Prepare GameTest
-        run: |
-          (./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer --no-daemon) || \
-            (sleep 5 && ./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer --no-daemon) || \
-            (sleep 5 && ./gradlew configureLaunch downloadAssets prepareRuns writeMinecraftClasspathGameTestServer --no-daemon) || true
       - name: GameTest
         run: ./gradlew runGameTestServer
         env:

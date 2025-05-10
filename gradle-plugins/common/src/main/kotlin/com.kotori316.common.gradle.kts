@@ -63,9 +63,7 @@ repositories {
         name = "ModMaven"
         url = uri("https://modmaven.dev/")
         content {
-            includeVersion("appeng", "appliedenergistics2-forge", project.property("ae2_forge_version") as String)
             includeVersion("appeng", "appliedenergistics2", project.property("ae2_neoforge_version") as String)
-            includeVersion("appeng", "appliedenergistics2-fabric", project.property("ae2_fabric_version") as String)
         }
     }
     maven {

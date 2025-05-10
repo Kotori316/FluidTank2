@@ -118,11 +118,6 @@ dependencies {
         name = "jei-${project.property("jei_fabric_repo_version")}-fabric",
         version = project.property("jei_fabric_version").toString()
     )*/
-    modCompileOnly(
-        group = "appeng",
-        name = "appliedenergistics2-fabric",
-        version = project.property("ae2_fabric_version").toString()
-    ) { isTransitive = false }
     //noinspection SpellCheckingInspection
     modImplementation(group = "teamreborn", name = "energy", version = "3.0.0")
     modImplementation("com.kotori316:debug-utility-fabric:${project.property("debug_util_version")}") {

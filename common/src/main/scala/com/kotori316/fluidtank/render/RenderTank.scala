@@ -20,7 +20,7 @@ abstract class RenderTank(context: BlockEntityRendererProvider.Context) extends 
     if (!blockEntity.getTank.isEmpty) {
       profiler.push("Rendering")
       matrix.pushPose()
-      val b = buffer.getBuffer(RenderType.translucent)
+      val b = buffer.getBuffer(RenderType.cutout()) // TODO Check rendering type
       val tank = blockEntity.getVisualTank
       if (tank.box != null) {
         val texture = getFluidTexture(blockEntity.getTank, blockEntity)

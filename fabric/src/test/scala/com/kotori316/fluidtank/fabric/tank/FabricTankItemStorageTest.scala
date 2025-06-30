@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.fabric.tank
 
-import com.kotori316.fluidtank.FluidTankCommon
+import com.kotori316.fluidtank.MCImplicits.merge
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank, TankUtil}
 import com.kotori316.fluidtank.fabric.recipe.{ModifiableSingleItemStorage, RecipeInventoryUtil}
 import com.kotori316.fluidtank.fabric.{BeforeMC, FluidTank}
@@ -11,9 +11,12 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidConstants, FluidVariant}
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.util.ProblemReporter
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.level.storage.TagValueOutput
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertFalse, assertNotEquals, assertNotNull, assertNull, assertTrue}
 import org.junit.jupiter.api.{Nested, Test}
 import org.junit.jupiter.params.ParameterizedTest
@@ -38,11 +41,12 @@ final class FabricTankItemStorageTest extends BeforeMC {
   @Test
   def initialState1(): Unit = {
     val stack = new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD))
-    val tag = Option(stack.get(DataComponents.BLOCK_ENTITY_DATA)).map(_.copyTag()).getOrElse(new CompoundTag())
-    tag.putString(TileTank.KEY_TIER, Tier.WOOD.name)
+    val tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING)
+    tagValueOutput.merge(Option(stack.get(DataComponents.BLOCK_ENTITY_DATA)).map(_.copyTag()).getOrElse(new CompoundTag()))
+    tagValueOutput.putString(TileTank.KEY_TIER, Tier.WOOD.name)
     val tank = Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit(Tier.WOOD.getCapacity))
-    tag.put(TileTank.KEY_TANK, TankUtil.save(tank))
-    PlatformItemAccess.setTileTag(stack, tag, s"${FluidTankCommon.modId}:test")
+    tagValueOutput.store(TileTank.KEY_TANK, Tank.codec, tank)
+    PlatformItemAccess.setTileTag(stack, tagValueOutput, BlockEntityType.TEST_BLOCK)
     val storage = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
     assertAll(
       () => assertEquals(FluidConstants.BUCKET, storage.getAmount),
@@ -56,11 +60,12 @@ final class FabricTankItemStorageTest extends BeforeMC {
   def initialState2(): Unit = {
     val tier = Tier.STONE
     val stack = new ItemStack(FluidTank.TANK_MAP.get(tier))
-    val tag = Option(stack.get(DataComponents.BLOCK_ENTITY_DATA)).map(_.copyTag()).getOrElse(new CompoundTag())
-    tag.putString(TileTank.KEY_TIER, tier.name)
+    val tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING)
+    tagValueOutput.merge(Option(stack.get(DataComponents.BLOCK_ENTITY_DATA)).map(_.copyTag()).getOrElse(new CompoundTag()))
+    tagValueOutput.putString(TileTank.KEY_TIER, tier.name)
     val tank = Tank.apply(FluidAmountUtil.BUCKET_LAVA.setAmount(GenericUnit.fromForge(3000)), GenericUnit(tier.getCapacity))
-    tag.put(TileTank.KEY_TANK, TankUtil.save(tank))
-    PlatformItemAccess.setTileTag(stack, tag, s"${FluidTankCommon.modId}:test")
+    tagValueOutput.store(TileTank.KEY_TANK, Tank.codec, tank)
+    PlatformItemAccess.setTileTag(stack, tagValueOutput, BlockEntityType.TEST_BLOCK)
     val handler = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
     assertAll(
       () => assertEquals(FluidConstants.BUCKET * 3, handler.getAmount),

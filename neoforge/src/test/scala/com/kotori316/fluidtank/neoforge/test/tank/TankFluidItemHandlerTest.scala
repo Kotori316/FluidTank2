@@ -1,7 +1,6 @@
 package com.kotori316.fluidtank.neoforge.test.tank
 
-import com.kotori316.fluidtank.FluidTankCommon
-import com.kotori316.fluidtank.contents.{GenericUnit, Tank, TankUtil}
+import com.kotori316.fluidtank.contents.{GenericUnit, Tank}
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, fluidAccess}
 import com.kotori316.fluidtank.item.PlatformItemAccess
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
@@ -9,10 +8,12 @@ import com.kotori316.fluidtank.neoforge.tank.TankFluidItemHandler
 import com.kotori316.fluidtank.neoforge.test.BeforeMC
 import com.kotori316.fluidtank.tank.{Tier, TileTank}
 import net.minecraft.core.component.DataComponents
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.util.ProblemReporter
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.{ItemStack, Items}
+import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.material.Fluids
+import net.minecraft.world.level.storage.TagValueOutput
 import net.neoforged.neoforge.fluids.FluidStack
 import net.neoforged.neoforge.fluids.capability.IFluidHandler
 import org.junit.jupiter.api.Assertions.*
@@ -38,11 +39,11 @@ class TankFluidItemHandlerTest extends BeforeMC {
   @Test
   def load(): Unit = {
     val tank = Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(16000))
-    val tag = new CompoundTag()
-    tag.put(TileTank.KEY_TANK, TankUtil.save(tank))
-    tag.putString(TileTank.KEY_TIER, Tier.STONE.name())
+    val tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING)
+    tagValueOutput.store(TileTank.KEY_TANK, Tank.codec, tank)
+    tagValueOutput.putString(TileTank.KEY_TIER, Tier.STONE.name())
     val stack = new ItemStack(Items.APPLE)
-    PlatformItemAccess.setTileTag(stack, tag, s"${FluidTankCommon.modId}:test")
+    PlatformItemAccess.setTileTag(stack, tagValueOutput, BlockEntityType.TEST_BLOCK)
 
     val handler = new TankFluidItemHandler(Tier.STONE, stack)
     assertEquals(tank, handler.getTank)

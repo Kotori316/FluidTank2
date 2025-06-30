@@ -7,14 +7,13 @@ import com.kotori316.fluidtank.fluids.FluidLike;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.storage.TagValueOutput;
 import org.apache.logging.log4j.util.Lazy;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public interface PlatformItemAccess {
     static PlatformItemAccess getInstance() {
@@ -32,19 +31,8 @@ public interface PlatformItemAccess {
 
     DataComponentType<Tank<FluidLike>> fluidTankComponentType();
 
-    static void setTileTag(@NotNull ItemStack stack, @Nullable CompoundTag tileTag, @Nullable String tileTypeId) {
-        if (tileTag == null || tileTag.isEmpty()) {
-            stack.remove(DataComponents.BLOCK_ENTITY_DATA);
-        } else {
-            if (!tileTag.contains("id")) {
-                if (tileTypeId != null) {
-                    tileTag.putString("id", tileTypeId);
-                } else {
-                    throw new IllegalStateException("Missing tile type id in %s".formatted(tileTag));
-                }
-            }
-            stack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tileTag));
-        }
+    static void setTileTag(@NotNull ItemStack stack, @NotNull TagValueOutput tagValueOutput, @NotNull BlockEntityType<?> blockEntityType) {
+        BlockItem.setBlockEntityData(stack, blockEntityType, tagValueOutput);
     }
 
     static String convertIngredientToString(Ingredient ingredient) {

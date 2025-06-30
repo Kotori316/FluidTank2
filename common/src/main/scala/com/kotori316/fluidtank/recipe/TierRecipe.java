@@ -17,10 +17,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
@@ -29,7 +29,7 @@ import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.storage.TagValueOutput;
 import org.apache.logging.log4j.util.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -119,16 +119,14 @@ public final class TierRecipe implements CraftingRecipe {
             .reduce(GenericAmount::add).orElse(FluidAmountUtil.EMPTY());
 
         if (fluidAmount.nonEmpty()) {
-            CompoundTag compound = new CompoundTag();
+            try (var reporter = new ProblemReporter.ScopedCollector(LOGGER)) {
+                TagValueOutput tagValueOutput = TagValueOutput.createWithContext(reporter, access);
+                var tank = new Tank<>(fluidAmount, GenericUnit.apply(tier.getCapacity()));
+                tagValueOutput.store(TileTank.KEY_TANK(), Tank.codec(FluidAmountUtil.access()), tank);
+                tagValueOutput.putString(TileTank.KEY_TIER(), tier.name());
 
-            var tank = new Tank<>(fluidAmount, GenericUnit.apply(tier.getCapacity()));
-            CompoundTag tankTag = TankUtil.save(tank, FluidAmountUtil.access());
-            compound.put(TileTank.KEY_TANK(), tankTag);
-            compound.putString(TileTank.KEY_TIER(), tier.name());
-
-            var location = BlockEntityType.getKey(PlatformTankAccess.getInstance().getNormalType());
-            assert location != null : "The tile type must be registered";
-            PlatformItemAccess.setTileTag(result, compound, location.toString());
+                PlatformItemAccess.setTileTag(result, tagValueOutput, PlatformTankAccess.getInstance().getNormalType());
+            }
         }
 
         return result;

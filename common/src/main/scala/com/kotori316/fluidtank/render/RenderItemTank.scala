@@ -11,9 +11,13 @@ import net.minecraft.client.renderer.special.SpecialModelRenderer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.component.DataComponents
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.ProblemReporter
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
+import net.minecraft.world.level.storage.TagValueInput
+import org.joml.Vector3f
 
+import java.util
 import java.util.Locale
 
 class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends SpecialModelRenderer[RenderItemTank.RenderContext] {
@@ -28,7 +32,7 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
     for (d <- patterns.data if !d.isEmpty) {
       val level = Minecraft.getInstance.level
       tileTank.setLevel(level)
-      tileTank.loadAdditional(d.copyTag(), level.registryAccess())
+      tileTank.loadAdditional(TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), d.copyTag()))
       if (tileTank.getTank.hasContent) {
         Minecraft.getInstance.getBlockEntityRenderDispatcher.render(
           tileTank, 0, poseStack, bufferSource
@@ -36,6 +40,8 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
       }
     }
   }
+
+  override def getExtents(output: util.Set[Vector3f]): Unit = {}
 
   override def extractArgument(stack: ItemStack): RenderItemTank.RenderContext = {
     RenderItemTank.RenderContext(

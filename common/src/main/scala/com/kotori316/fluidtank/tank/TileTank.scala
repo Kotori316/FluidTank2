@@ -3,17 +3,19 @@ package com.kotori316.fluidtank.tank
 import cats.implicits.toShow
 import com.kotori316.fluidtank.MCImplicits.*
 import com.kotori316.fluidtank.connection.Connection
-import com.kotori316.fluidtank.contents.{GenericUnit, Tank, TankUtil}
+import com.kotori316.fluidtank.contents.{GenericUnit, Tank}
 import com.kotori316.fluidtank.fluids.*
 import com.kotori316.fluidtank.tank.TileTank.{KEY_STACK_NAME, KEY_TANK, KEY_TIER}
 import com.kotori316.fluidtank.{DebugLogging, FluidTankCommon}
 import net.minecraft.core.{BlockPos, HolderLookup}
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.{Component, ComponentSerialization}
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
+import net.minecraft.util.ExtraCodecs
 import net.minecraft.world.Nameable
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.storage.{ValueInput, ValueOutput}
 import org.jetbrains.annotations.{NotNull, Nullable}
 
 import java.util.Locale
@@ -48,18 +50,25 @@ abstract class TileTank(var tier: Tier, t: BlockEntityType[? <: TileTank], p: Bl
   def getVisualTank: VisualTank
 
   // Override of BlockEntity
-  override def loadAdditional(tag: CompoundTag, provider: HolderLookup.Provider): Unit = {
-    super.loadAdditional(tag, provider)
-    this.setTank(TankUtil.load(tag.getCompoundOrEmpty(KEY_TANK)))
-    this.tier = tag.stringConvert(KEY_TIER, Tier.valueOf, Tier.INVALID)
-    this.customName = tag.getString(KEY_STACK_NAME).toScala.map(s => Component.Serializer.fromJson(s, provider))
+  override def loadAdditional(input: ValueInput): Unit = {
+    super.loadAdditional(input)
+    this.setTank(input.read(KEY_TANK, Tank.codec).orElseGet(() => {
+      // necessary keys are unavailable
+      FluidTankCommon.logOnceInMinute("TankUtil.load failed",
+        () => s"tag: ${input.read(KEY_TANK, ExtraCodecs.JAVA)}",
+        () => new IllegalArgumentException("TankUtil.load failed"))
+      val access = FluidAmountUtil.access
+      Tank(access.newInstance(access.empty, GenericUnit.ZERO, Option.empty), GenericUnit.ZERO)
+    }))
+    this.tier = input.stringConvert(KEY_TIER, Tier.valueOf, Tier.INVALID)
+    this.customName = input.read(KEY_STACK_NAME, ComponentSerialization.CODEC).toScala
   }
 
-  override def saveAdditional(tag: CompoundTag, provider: HolderLookup.Provider): Unit = {
-    tag.put(KEY_TANK, TankUtil.save(this.tank))
-    tag.putString(KEY_TIER, this.tier.name())
-    this.customName.foreach(c => tag.putString(KEY_STACK_NAME, Component.Serializer.toJson(c, provider)))
-    super.saveAdditional(tag, provider)
+  override def saveAdditional(output: ValueOutput): Unit = {
+    output.store(KEY_TANK, Tank.codec, this.tank)
+    output.putString(KEY_TIER, this.tier.name())
+    this.customName.foreach(c => output.store(KEY_STACK_NAME, ComponentSerialization.CODEC, c))
+    super.saveAdditional(output)
   }
 
   override def getUpdateTag(provider: HolderLookup.Provider): CompoundTag = this.saveWithoutMetadata(provider)

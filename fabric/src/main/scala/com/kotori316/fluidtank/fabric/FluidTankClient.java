@@ -6,10 +6,10 @@ import com.kotori316.fluidtank.fabric.render.FluidRenderHelperFabric;
 import com.kotori316.fluidtank.fabric.render.RenderTankFabric;
 import com.kotori316.fluidtank.render.RenderItemCodecs;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.special.SpecialModelRenderers;
 
 import java.util.Map;
@@ -20,10 +20,10 @@ public final class FluidTankClient implements ClientModInitializer {
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Client Initialize {}", FluidTankCommon.modId);
         PacketHandler.Client.initClient();
 
-        var renderType = RenderType.cutoutMipped();
-        FluidTank.TANK_MAP.values().forEach(b -> BlockRenderLayerMap.INSTANCE.putBlock(b, renderType));
-        BlockRenderLayerMap.INSTANCE.putBlock(FluidTank.BLOCK_CREATIVE_TANK, renderType);
-        BlockRenderLayerMap.INSTANCE.putBlock(FluidTank.BLOCK_VOID_TANK, renderType);
+        var renderType = ChunkSectionLayer.CUTOUT_MIPPED;
+        FluidTank.TANK_MAP.values().forEach(b -> BlockRenderLayerMap.putBlock(b, renderType));
+        BlockRenderLayerMap.putBlock(FluidTank.BLOCK_CREATIVE_TANK, renderType);
+        BlockRenderLayerMap.putBlock(FluidTank.BLOCK_VOID_TANK, renderType);
         // FluidTank.TANK_MAP.values().forEach(b -> BuiltinItemRendererRegistry.INSTANCE.register(b, RenderItemTank.INSTANCE()));
         // BuiltinItemRendererRegistry.INSTANCE.register(FluidTank.BLOCK_CREATIVE_TANK, RenderItemTank.INSTANCE());
         // BuiltinItemRendererRegistry.INSTANCE.register(FluidTank.BLOCK_VOID_TANK, RenderItemTank.INSTANCE());

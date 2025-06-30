@@ -11,6 +11,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.core.{BlockPos, Direction, HolderLookup}
 import net.minecraft.resources.{ResourceKey, ResourceLocation}
+import net.minecraft.util.ProblemReporter
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.{Item, ItemStack}
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityTicker, B
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
 import net.minecraft.world.level.block.{Block, EntityBlock}
 import net.minecraft.world.level.material.PushReaction
+import net.minecraft.world.level.storage.TagValueOutput
 import net.minecraft.world.level.{BlockGetter, Level, LevelReader}
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.{CollisionContext, VoxelShape}
@@ -111,7 +113,11 @@ abstract class BlockTank(val tier: Tier) extends Block(
   def saveTankNBT(tileEntity: BlockEntity, stack: ItemStack, provider: HolderLookup.Provider): Unit = {
     tileEntity match {
       case tank: TileTank =>
-        if (!tank.getTank.isEmpty) PlatformItemAccess.setTileTag(stack, tank.saveWithId(provider), null) // id is already saved
+        if (!tank.getTank.isEmpty) {
+          val valueOutput = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, provider)
+          tank.saveWithId(valueOutput)
+          PlatformItemAccess.setTileTag(stack, valueOutput, tank.getType)
+        }
         if (tank.hasCustomName) stack.set(DataComponents.CUSTOM_NAME, tank.getCustomName)
       case _ => // should be unreachable
     }

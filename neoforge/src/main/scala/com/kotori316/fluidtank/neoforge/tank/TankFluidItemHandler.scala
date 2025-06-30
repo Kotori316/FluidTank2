@@ -9,7 +9,9 @@ import com.kotori316.fluidtank.neoforge.fluid.TankFluidHandler
 import com.kotori316.fluidtank.tank.{Tier, TileTank}
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.util.ProblemReporter
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.storage.TagValueOutput
 import net.neoforged.neoforge.fluids.capability.{IFluidHandler, IFluidHandlerItem}
 import org.jetbrains.annotations.VisibleForTesting
 
@@ -38,14 +40,15 @@ class TankFluidItemHandler(tier: Tier, stack: ItemStack) extends TankFluidHandle
       // Other mods might add own tags in BlockEntityTag, but remove them as they will cause rendering issue.
       getContainer.remove(DataComponents.BLOCK_ENTITY_DATA)
     } else {
-      val tankTag = TankUtil.save(tank)
+      val tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING)
       val tag = Option(getContainer.getComponentsPatch.get(DataComponents.BLOCK_ENTITY_DATA))
         .flatMap(_.toScala)
         .map(_.copyTag())
         .getOrElse(new CompoundTag())
-      tag.put(TileTank.KEY_TANK, tankTag)
-      tag.putString(TileTank.KEY_TIER, tier.name())
-      PlatformItemAccess.setTileTag(getContainer, tag, FluidTank.TILE_TANK_TYPE.getId.toString)
+      tagValueOutput.store(tag)
+      tagValueOutput.store(TileTank.KEY_TANK, Tank.codec, tank)
+      tagValueOutput.putString(TileTank.KEY_TIER, tier.name())
+      PlatformItemAccess.setTileTag(getContainer, tagValueOutput, FluidTank.TILE_TANK_TYPE.get())
     }
   }
 

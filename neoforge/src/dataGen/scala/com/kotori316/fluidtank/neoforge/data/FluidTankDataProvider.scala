@@ -19,7 +19,7 @@ object FluidTankDataProvider {
 }
 
 @Mod("fluidtank_data")
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber()
 class FluidTankDataProvider {
 
 }

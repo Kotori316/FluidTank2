@@ -30,13 +30,13 @@ object FluidTankCommonDataProvider {
     ))
     event.addProvider(StateAndModelProvider(event.getGenerator.getPackOutput))
     event.addProvider(PackMetadataGenerator(event.getGenerator.getPackOutput)
-      .add(PackMetadataSection.TYPE, PackMetadataSection(Component.literal("FluidTank Resources"), DetectedVersion.BUILT_IN.getPackVersion(PackType.CLIENT_RESOURCES)))
+      .add(PackMetadataSection.TYPE, PackMetadataSection(Component.literal("FluidTank Resources"), DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES)))
     )
   }
 }
 
 @Mod("fluidtank_common_data")
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber()
 class FluidTankCommonDataProvider {
 
 }

@@ -27,7 +27,7 @@
     ]
   },
   "depends": {
-    "fabric": ">=0.105.0+1.21.1",
+    "fabric": ">=0.128.2+1.21.7",
     "minecraft": ">=${mc_version}",
     "kotori_scala": ">=3.1.0"
   },

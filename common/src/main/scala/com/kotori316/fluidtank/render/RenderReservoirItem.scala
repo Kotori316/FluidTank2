@@ -46,7 +46,7 @@ final class RenderReservoirItem(protected val model: ReservoirModel, renderHelpe
       val color = getFluidColor(tank)
       val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
       box.render(
-        buffer = bufferSource.getBuffer(RenderType.cutout()), // TODO check rendering
+        buffer = bufferSource.getBuffer(RenderType.translucentMovingBlock()),
         matrix = poseStack, sprite = texture,
         alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF
       )
@@ -56,7 +56,6 @@ final class RenderReservoirItem(protected val model: ReservoirModel, renderHelpe
   }
 
   override def getExtents(output: java.util.Set[Vector3f]): Unit = {
-    // TODO What should I do here?
   }
 
   override def extractArgument(stack: ItemStack): RenderReservoirItem.RenderContext = {

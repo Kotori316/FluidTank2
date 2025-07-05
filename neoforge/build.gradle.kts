@@ -179,6 +179,8 @@ dependencies {
     }
 
     "gameTestImplementation"(sourceSets.main.get().output)
+    "gameTestImplementation"(platform("org.junit:junit-bom:${project.property("jupiterVersion")}"))
+    "gameTestImplementation"("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

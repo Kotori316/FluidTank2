@@ -108,7 +108,7 @@ dependencies {
     ) { isTransitive = false }
 
     // Other mods
-    modCompileOnly(
+    modImplementation(
         group = "curse.maven",
         name = "jade-324717",
         version = project.property("jade_fabric_id").toString()
@@ -119,7 +119,11 @@ dependencies {
         version = project.property("jei_fabric_version").toString()
     )*/
     //noinspection SpellCheckingInspection
-    modImplementation(group = "teamreborn", name = "energy", version = "3.0.0")
+    modImplementation(
+        group = "teamreborn",
+        name = "energy",
+        version = project.property("fabric_energy_version").toString()
+    )
     modImplementation("com.kotori316:debug-utility-fabric:${project.property("debug_util_version")}") {
         exclude("net.fabricmc.fabric-api", "fabric-api")
     }

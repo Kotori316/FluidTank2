@@ -9,7 +9,7 @@ import snownee.jade.api.IWailaPlugin;
 import snownee.jade.api.WailaPlugin;
 
 @WailaPlugin(FluidTankCommon.modId)
-public class FluidTankJadePlugin implements IWailaPlugin {
+public final class FluidTankJadePlugin implements IWailaPlugin {
     public FluidTankJadePlugin() {
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Registering {}", getClass().getSimpleName());
     }
@@ -23,6 +23,6 @@ public class FluidTankJadePlugin implements IWailaPlugin {
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         IWailaPlugin.super.registerClient(registration);
-        registration.registerBlockComponent(new FluidTankJadeProvider(), BlockTank.class);
+        registration.registerBlockComponent(new FluidTankJadeComponentProvider(), BlockTank.class);
     }
 }

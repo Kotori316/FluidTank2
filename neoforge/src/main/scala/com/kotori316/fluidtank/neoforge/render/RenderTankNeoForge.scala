@@ -10,13 +10,11 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.level.material.Fluids
-import net.neoforged.api.distmarker.{Dist, OnlyIn}
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
 import net.neoforged.neoforge.fluids.FluidType
 
 import scala.jdk.OptionConverters.RichOptional
 
-@OnlyIn(Dist.CLIENT)
 class RenderTankNeoForge(d: BlockEntityRendererProvider.Context) extends RenderTank(d) {
 
   override def getFluidTexture(tank: Tank[FluidLike], blockEntity: TileTank): TextureAtlasSprite = {

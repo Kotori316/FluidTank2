@@ -7,8 +7,6 @@ import com.kotori316.fluidtank.neoforge.render.RenderTankNeoForge;
 import com.kotori316.fluidtank.render.RenderItemCodecs;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -34,7 +32,6 @@ public abstract class SideProxy {
         };
     }
 
-    @OnlyIn(Dist.CLIENT)
     private static class ClientProxy extends SideProxy {
         private static SideProxy client() {
             return new ClientProxy();

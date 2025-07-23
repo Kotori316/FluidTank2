@@ -1,27 +1,13 @@
 package com.kotori316.fluidtank.neoforge.integration.jade;
 
 import com.kotori316.fluidtank.integration.tooltip.TooltipContent;
-import com.kotori316.fluidtank.tank.TileTank;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import snownee.jade.api.*;
-import snownee.jade.api.config.IPluginConfig;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.IServerDataProvider;
+import snownee.jade.api.TooltipPosition;
 
-class FluidTankJadeProvider implements IServerDataProvider<BlockAccessor>, IBlockComponentProvider {
-    @Override
-    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-        if (accessor.getBlockEntity() instanceof TileTank tileTank) {
-            var content = TooltipContent.getTooltipTextJava(
-                accessor.getServerData(),
-                tileTank,
-                config.get(TooltipContent.JADE_CONFIG_SHORT()),
-                config.get(TooltipContent.JADE_CONFIG_COMPACT()),
-                Minecraft.getInstance().getLocale()
-            );
-            tooltip.addAll(content);
-        }
-    }
+final class FluidTankJadeProvider implements IServerDataProvider<BlockAccessor> {
 
     @Override
     public void appendServerData(CompoundTag compoundTag, BlockAccessor accessor) {

@@ -141,7 +141,7 @@ dependencies {
         isTransitive = false
     }
 
-    compileOnly(
+    implementation(
         group = "curse.maven",
         name = "jade-324717",
         version = project.property("jade_neoforge_id").toString()

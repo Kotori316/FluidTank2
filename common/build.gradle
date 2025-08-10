@@ -1,6 +1,6 @@
 plugins {
     id("my.common")
-    id("architectury-plugin").version("3.4-SNAPSHOT")
+    id("architectury-plugin").version("3.4.161")
     id("dev.architectury.loom").version("1.10.434")
     id("com.kotori316.plugin.cf").version("1.+")
 }

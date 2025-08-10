@@ -144,7 +144,6 @@ dependencies {
     // Test Dependencies.
     // Required these libraries to execute the tests.
     // The library will avoid errors of ForgeRegistry and Capability.
-    modImplementation(group: "com.kotori316", name: "test_utility", version: project.testUtilVersion)
     testImplementation(group: "org.mockito", name: "mockito-core", version: project.mockitoVersion)
     testImplementation(group: "org.mockito", name: "mockito-inline", version: project.mockitoVersion)
     forgeRuntimeLibrary(platform(group: "org.junit", name: "junit-bom", version: project.jupiterVersion))

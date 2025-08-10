@@ -56,6 +56,13 @@ repositories {
             includeVersion("appeng", "appliedenergistics2-fabric", project.ae2_fabric_version)
         }
     }
+    maven {
+        name = "GuideME Snapshots"
+        url = "https://central.sonatype.com/repository/maven-snapshots/"
+        content {
+            includeModule("org.appliedenergistics", "guideme")
+        }
+    }
 }
 
 architectury {

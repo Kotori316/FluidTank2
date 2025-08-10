@@ -2,9 +2,9 @@ name: Java CI
 
 on:
   push:
-    branches: [ "1.20" ]
+    branches: [ "1.20.1" ]
   pull_request:
-    branches: [ "1.20" ]
+    branches: [ "1.20.1" ]
 
 permissions:
   contents: read
@@ -21,30 +21,16 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - run: chmod +x ./gradlew
-      - uses: gradle/gradle-build-action@v2
-        with:
-          cache-read-only: false
-          gradle-home-cache-cleanup: true
       - name: Tool chain check
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: javaToolchains
+        run: ./gradlew javaToolchains
       - name: Check build environments
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :buildEnvironment :forge:buildEnvironment :fabric:buildEnvironment
+        run: ./gradlew :buildEnvironment :forge:buildEnvironment :fabric:buildEnvironment
       - name: Check changelog
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: checkChangelog
+        run: ./gradlew checkChangelog
       - name: Check Release Version
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: checkReleaseVersion
+        run: ./gradlew checkReleaseVersion
       - name: Generate Jar
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :fabric:remapJar :forge:remapJar
+        run: ./gradlew :fabric:remapJar :forge:remapJar
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -67,14 +53,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - run: chmod +x ./gradlew
-      - uses: gradle/gradle-build-action@v2
-        with:
-          cache-read-only: false
-          gradle-home-cache-cleanup: true
       - name: Common JUnit
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :common:test
+        run: ./gradlew :common:test
 
   test:
     runs-on: ubuntu-latest
@@ -94,20 +74,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - run: chmod +x ./gradlew
-      - uses: gradle/gradle-build-action@v2
-        with:
-          cache-read-only: false
-          gradle-home-cache-cleanup: true
       - name: ${{ matrix.platform }} JUnit
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :${{ matrix.platform }}:test
+        run: ./gradlew :${{ matrix.platform }}:test
       - name: ${{ matrix.platform }} GameTest
-        uses: gradle/gradle-build-action@v2
         env:
           RUN_GAME_TEST: true
-        with:
-          arguments: :${{ matrix.platform }}:runGameTest
+        run: ./gradlew :${{ matrix.platform }}:runGameTest
 
   forge-data-gen:
     runs-on: ubuntu-latest
@@ -121,25 +93,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - run: chmod +x ./gradlew
-      - uses: gradle/gradle-build-action@v2
-        with:
-          cache-read-only: false
-          gradle-home-cache-cleanup: true
       - name: Compile
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :forge:genDataClasses
+        run: ./gradlew :forge:genDataClasses
       - name: Prepare Run
         run: >-
           ./gradlew configureLaunch downloadAssets ||
           (sleep 5 && ./gradlew configureLaunch downloadAssets) ||
           (sleep 5 && ./gradlew configureLaunch downloadAssets)
       - name: Forge DataGen
-        uses: gradle/gradle-build-action@v2
         timeout-minutes: 5
         env:
           RUN_DATA_GEN: true
-        with:
-          arguments: :forge:runData
+        run: ./gradlew :forge:runData
       - name: Check updated files
         run: git status

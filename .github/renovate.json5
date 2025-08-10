@@ -6,7 +6,8 @@
   ],
   "baseBranches": [
     "1.21",
-    "$default",
+    "1.20.1",
+    "$default"
   ],
   "packageRules": [
     {

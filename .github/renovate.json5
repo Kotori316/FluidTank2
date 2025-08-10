@@ -28,6 +28,16 @@
         "^net.neoforged.gradle.userdev"
       ],
       "enabled": false
+    },
+    {
+      "matchManagers": [
+        "gradle"
+      ],
+      "matchPackagePatterns": [
+        "^com.kotori316:test_utility",
+        "^com.kotori316:test_utility_dependency"
+      ],
+      "enabled": false
     }
   ]
 }

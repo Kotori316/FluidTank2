@@ -1,5 +1,5 @@
-import com.kotori316.plugin.cf.CallVersionFunctionTask
 import com.kotori316.plugin.cf.CallVersionCheckFunctionTask
+import com.kotori316.plugin.cf.CallVersionFunctionTask
 
 import java.util.stream.Collectors
 
@@ -140,6 +140,7 @@ dependencies {
         modImplementation(group: "mezz.jei", name: "jei-1.20.1-forge", version: project.jei_forge_version) { transitive false }
     }
     modImplementation(group: "appeng", name: "appliedenergistics2-forge", version: project.ae2_forge_version) { transitive false }
+    modImplementation(group: "org.appliedenergistics", name: "guideme", version: "20.1.11") { transitive false }
 
     // Test Dependencies.
     // Required these libraries to execute the tests.

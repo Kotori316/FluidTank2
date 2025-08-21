@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: gradle/actions/wrapper-validation@v4
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -50,7 +50,7 @@ jobs:
       DISABLE_FABRIC: ${{ matrix.platform != 'fabric' }}
       DISABLE_NEOFORGE: ${{ matrix.platform != 'neoforge' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: gradle/actions/wrapper-validation@v4
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -102,7 +102,7 @@ jobs:
       DISABLE_FABRIC: true
       DISABLE_NEOFORGE: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: gradle/actions/wrapper-validation@v4
       - name: Setup Java JDK
         uses: actions/setup-java@v4

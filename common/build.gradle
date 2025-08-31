@@ -44,3 +44,7 @@ publishing {
         // Add repositories to publish to here.
     }
 }
+
+afterEvaluate {
+    tasks.remapJar.mustRunAfter(tasks.compileTestScala)
+}

@@ -286,4 +286,5 @@ tasks.register("checkReleaseVersion", CallVersionCheckFunctionTask.class) {
 
 afterEvaluate {
     rootProject.tasks.named("githubRelease").configure { it.dependsOn(":fabric:assemble") }
+    tasks.remapJar.mustRunAfter(tasks.compileTestScala)
 }

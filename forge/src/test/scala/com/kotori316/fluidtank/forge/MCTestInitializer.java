@@ -231,7 +231,13 @@ public final class MCTestInitializer implements BeforeAllCallback {
         }
     }
 
-    private record DummyModInfo(String name) implements IModInfo, IConfigurable {
+    private static final class DummyModInfo implements IModInfo, IConfigurable {
+        private final String name;
+
+        private DummyModInfo(String name) {
+            this.name = name;
+        }
+
         @Override
         public IModFileInfo getOwningFile() {
             return new DummyModFileInfo();
@@ -312,7 +318,6 @@ public final class MCTestInitializer implements BeforeAllCallback {
             return List.of();
         }
 
-        @Override
         public String name() {
             return this.name;
         }

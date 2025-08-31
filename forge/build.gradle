@@ -1,5 +1,5 @@
-import com.kotori316.plugin.cf.CallVersionFunctionTask
 import com.kotori316.plugin.cf.CallVersionCheckFunctionTask
+import com.kotori316.plugin.cf.CallVersionFunctionTask
 
 import java.util.stream.Collectors
 
@@ -10,7 +10,7 @@ plugins {
     id("com.github.johnrengelman.shadow").version("8.1.1")
     id("com.matthewprenger.cursegradle").version("1.4.0")
     id("com.modrinth.minotaur").version("2.+")
-    id("com.kotori316.plugin.cf").version("1.+")
+    id("com.kotori316.plugin.cf").version("3.+")
 }
 
 archivesBaseName = "${project.archives_base_name}-forge"
@@ -141,6 +141,7 @@ dependencies {
         modImplementation(group: "mezz.jei", name: "jei-1.20.1-forge", version: project.jei_forge_version) { transitive false }
     }
     modImplementation(group: "appeng", name: "appliedenergistics2-forge", version: project.ae2_forge_version) { transitive false }
+    modImplementation(group: "org.appliedenergistics", name: "guideme", version: "20.1.11") { transitive false }
 
     // Test Dependencies.
     // Required these libraries to execute the tests.
@@ -372,4 +373,5 @@ tasks.register("checkReleaseVersion", CallVersionCheckFunctionTask.class) {
 
 afterEvaluate {
     rootProject.tasks.named("githubRelease").configure { it.dependsOn(":forge:assemble") }
+    tasks.remapJar.mustRunAfter(tasks.compileTestScala)
 }

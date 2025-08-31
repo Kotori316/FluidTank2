@@ -1,7 +1,6 @@
 package com.kotori316.fluidtank.forge.gametest;
 
 import com.kotori316.fluidtank.FluidTankCommon;
-import com.kotori316.testutil.GameTestUtil;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;

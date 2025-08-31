@@ -5,7 +5,6 @@ import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
 import com.kotori316.fluidtank.forge.cat.EntityChestAsTank
 import com.kotori316.fluidtank.forge.fluid.ForgeConverter.{FluidAmount2FluidStack, FluidStack2FluidAmount}
-import com.kotori316.testutil.GameTestUtil
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
 import net.minecraft.world.item.{Item, Items}

@@ -4,7 +4,6 @@ import com.kotori316.fluidtank.config.PlatformConfigAccess
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, PlatformFluidAccess, PotionType}
 import com.kotori316.fluidtank.{FluidTankCommon, PlatformAccess}
-import com.kotori316.testutil.GameTestUtil
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.alchemy.{Potion, PotionUtils, Potions}

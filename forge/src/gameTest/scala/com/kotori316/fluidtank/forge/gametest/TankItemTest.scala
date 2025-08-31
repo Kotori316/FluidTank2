@@ -3,12 +3,11 @@ package com.kotori316.fluidtank.forge.gametest
 import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.forge.FluidTank
 import com.kotori316.fluidtank.tank.Tier
-import com.kotori316.testutil.GameTestUtil
 import net.minecraft.gametest.framework.{GameTest, GameTestHelper}
 import net.minecraft.world.item.{BlockItem, ItemStack}
 import net.minecraft.world.level.material.Fluids
-import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.fluids.capability.IFluidHandler
+import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.gametest.{GameTestHolder, PrefixGameTestTemplate}
 import org.junit.jupiter.api.Assertions
 

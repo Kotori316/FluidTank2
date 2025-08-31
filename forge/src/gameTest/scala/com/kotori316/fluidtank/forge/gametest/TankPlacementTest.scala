@@ -2,7 +2,6 @@ package com.kotori316.fluidtank.forge.gametest
 
 import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.tank.Tier
-import com.kotori316.testutil.GameTestUtil
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
 import net.minecraft.world.level.block.{Block, Blocks}

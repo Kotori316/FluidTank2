@@ -9,7 +9,6 @@ import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.forge.FluidTank;
 import com.kotori316.fluidtank.forge.recipe.TierRecipeForge;
 import com.kotori316.fluidtank.tank.Tier;
-import com.kotori316.testutil.GameTestUtil;
 import io.netty.buffer.ByteBufAllocator;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.gametest.framework.GameTestGenerator;
@@ -45,10 +44,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("unused")
 @GameTestHolder(FluidTankCommon.modId)
 @PrefixGameTestTemplate(value = false)
-final class RecipeTest {
+public final class RecipeTest {
 
     @GameTestGenerator
-    List<TestFunction> generator() {
+    public List<TestFunction> generator() {
         return GetGameTestMethods.getTests(getClass(), this, "recipe_test");
     }
 
@@ -114,7 +113,7 @@ final class RecipeTest {
     }
 
     @GameTestGenerator
-    List<TestFunction> combineFluids() {
+    public List<TestFunction> combineFluids() {
         var fluids = IntStream.of(500, 1000, 2000, 3000, 4000)
             .mapToObj(GenericUnit::fromForge)
             .flatMap(a -> Stream.of(FluidAmountUtil.BUCKET_WATER(), FluidAmountUtil.BUCKET_LAVA())
@@ -164,7 +163,7 @@ final class RecipeTest {
     }
 
     @GameTestGenerator
-    List<TestFunction> serialize() {
+    public List<TestFunction> serialize() {
         return Stream.of(Tier.values()).filter(Tier::isNormalTankTier)
             .filter(Predicate.isEqual(Tier.WOOD).negate())
             .flatMap(t -> Stream.of(
@@ -232,7 +231,7 @@ final class RecipeTest {
 
     @GameTestGenerator
     @SuppressWarnings("ConstantConditions")
-    List<TestFunction> loadJsonInData() throws IOException {
+    public List<TestFunction> loadJsonInData() throws IOException {
         var recipeParent = Path.of("../../common/src/generated/resources", "data/fluidtank/recipes");
         try (var files = Files.find(recipeParent, 1, (path, a) -> path.getFileName().toString().endsWith(".json"))) {
             return files.map(p -> GameTestUtil.create(FluidTankCommon.modId, "recipe_test", "load_" + FilenameUtils.getBaseName(p.getFileName().toString()),

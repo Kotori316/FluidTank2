@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank.forge.data.mixin;
+package com.kotori316.fluidtank.forge.mixin;
 
 import net.minecraft.data.DataGenerator;
 import org.spongepowered.asm.mixin.Mixin;

@@ -20,7 +20,7 @@ jobs:
           comment_on_pr: 'false'
           job_summary: 'true'
           theme: 'dark'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: gradle/actions/wrapper-validation@v4
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -65,7 +65,7 @@ jobs:
           comment_on_pr: 'false'
           job_summary: 'true'
           theme: 'dark'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: gradle/actions/wrapper-validation@v4
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -128,7 +128,7 @@ jobs:
       DISABLE_FABRIC: true
       DISABLE_NEOFORGE: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: gradle/actions/wrapper-validation@v4
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -167,7 +167,7 @@ jobs:
       DISABLE_NEOFORGE: true
       SCREENSHOT_DIR: /tmp/vrt/screenshots
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: '0'
       - uses: gradle/actions/wrapper-validation@v4

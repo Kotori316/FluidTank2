@@ -42,6 +42,7 @@ sourceSets {
 loom {
     forge {
         useForgeLoggerConfig = true
+        mixinConfig("fluidtank.mixins.json")
     }
 
     runs {
@@ -174,8 +175,8 @@ afterEvaluate {
 }
 
 shadowJar {
-    exclude "fabric.mod.json"
-    exclude "architectury.common.json"
+    exclude("fabric.mod.json")
+    exclude("architectury.common.json")
 
     configurations = [project.configurations.shadowCommon]
     archiveClassifier.set("dev")

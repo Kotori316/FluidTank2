@@ -8,7 +8,6 @@ import com.kotori316.fluidtank.forge.FluidTank
 import com.kotori316.fluidtank.forge.gametest.GetGameTestMethods.{assertEqualHelper, assertEqualStack}
 import com.kotori316.fluidtank.forge.gametest.TankTest.placeTank
 import com.kotori316.fluidtank.tank.Tier
-import com.kotori316.testutil.GameTestUtil
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.{GameTestGenerator, GameTestHelper, TestFunction}
 import net.minecraft.world.InteractionHand

@@ -10,7 +10,6 @@ import com.kotori316.fluidtank.tank.BlockTank;
 import com.kotori316.fluidtank.tank.TankPos;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
-import com.kotori316.testutil.GameTestUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertPosException;
 import net.minecraft.gametest.framework.GameTestGenerator;
@@ -39,12 +38,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("unused")
 @GameTestHolder(FluidTankCommon.modId)
 @PrefixGameTestTemplate(value = false)
-final class TankTest {
+public final class TankTest {
 
     private static final String BATCH = "defaultBatch";
 
     @GameTestGenerator
-    List<TestFunction> fillTest() {
+    public List<TestFunction> fillTest() {
         return GetGameTestMethods.getTests(getClass(), this, BATCH);
     }
 
@@ -344,7 +343,7 @@ final class TankTest {
     }
 
     @GameTestGenerator
-    List<TestFunction> drainPotionSurvival1() {
+    public List<TestFunction> drainPotionSurvival1() {
         return Stream.of(PotionType.values()).flatMap(t ->
             Stream.of(Potions.LONG_INVISIBILITY, Potions.WATER, Potions.EMPTY, Potions.NIGHT_VISION).map(p ->
                 GameTestUtil.create(FluidTankCommon.modId, BATCH,
@@ -370,7 +369,7 @@ final class TankTest {
     }
 
     @GameTestGenerator
-    List<TestFunction> drainPotionFailSurvival() {
+    public List<TestFunction> drainPotionFailSurvival() {
         return Stream.of(PotionType.values()).flatMap(t ->
             Stream.of(Potions.LONG_INVISIBILITY, Potions.WATER, Potions.EMPTY, Potions.NIGHT_VISION).map(p ->
                 GameTestUtil.create(FluidTankCommon.modId, BATCH,

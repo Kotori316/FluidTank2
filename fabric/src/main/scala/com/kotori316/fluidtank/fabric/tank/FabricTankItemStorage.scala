@@ -4,13 +4,13 @@ import com.kotori316.fluidtank.contents.*
 import com.kotori316.fluidtank.fabric.FluidTank
 import com.kotori316.fluidtank.fabric.fluid.FabricTankStorage
 import com.kotori316.fluidtank.fluids.{FluidAmountUtil, FluidLike, fluidAccess}
-import com.kotori316.fluidtank.tank.{ItemBlockTank, Tier, TileTank}
+import com.kotori316.fluidtank.tank.{ItemBlockTank, PlatformTankAccess, Tier, TileTank}
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
 import net.minecraft.core.component.{DataComponentPatch, DataComponentType, DataComponents}
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.TypedEntityData
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.jdk.OptionConverters.RichOptional
@@ -23,7 +23,7 @@ class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c
     val maybeTank = for {
       blockEntityData <- Option(componentPatch.get(DataComponents.BLOCK_ENTITY_DATA)).flatMap(_.toScala)
       if blockEntityData.contains(TileTank.KEY_TANK)
-      customTag = blockEntityData.copyTag()
+      customTag = blockEntityData.copyTagWithoutId()
       tankTag <- customTag.getCompound(TileTank.KEY_TANK).toScala
     } yield TankUtil.load(tankTag)
     maybeTank.getOrElse(Tank(FluidAmountUtil.EMPTY, GenericUnit(getTier.getCapacity)))
@@ -33,9 +33,10 @@ class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c
 
   override def saveTank(newTank: Tank[FluidLike]): ItemVariant = {
     val componentPatch = this.context.getItemVariant.getComponents
-    val tileTag = Option(componentPatch.get(DataComponents.BLOCK_ENTITY_DATA))
+    val component = Option(componentPatch.get(DataComponents.BLOCK_ENTITY_DATA))
       .flatMap(_.toScala)
-      .map(_.copyTag())
+    val tileTag = component
+      .map(_.copyTagWithoutId())
       .getOrElse(new CompoundTag())
 
     if (newTank.isEmpty) {
@@ -54,7 +55,7 @@ class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c
     if (tileTag.isEmpty) {
       componentBuilder.remove(DataComponents.BLOCK_ENTITY_DATA)
     } else {
-      componentBuilder.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tileTag))
+      componentBuilder.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(component.map(_.`type`()).getOrElse(PlatformTankAccess.getInstance().getNormalType), tileTag))
     }
     ItemVariant.of(context.getItemVariant.getItem, componentBuilder.build())
   }
@@ -62,7 +63,9 @@ class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c
 
 object FabricTankItemStorage {
   def register(): Unit = {
-    FluidStorage.ITEM.registerForItems((_, context) => new FabricTankItemStorage(context),
-      FluidTank.TANK_MAP.values().asScala.toSeq *)
+    FluidStorage.ITEM.registerForItems(
+      (_, context) => new FabricTankItemStorage(context),
+      FluidTank.TANK_MAP.values().asScala.toSeq *
+    )
   }
 }

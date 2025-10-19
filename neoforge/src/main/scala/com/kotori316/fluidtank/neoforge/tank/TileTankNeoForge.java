@@ -38,7 +38,7 @@ public final class TileTankNeoForge extends TileTank {
     @Override
     public void setTank(Tank<FluidLike> tank) {
         super.setTank(tank);
-        if (this.level != null && !this.level.isClientSide) { // In server side
+        if (this.level != null && !this.level.isClientSide()) { // In server side
             PacketHandler.sendToClient(new FluidTankContentMessageNeoForge(this), level);
         } else {
             // In client side

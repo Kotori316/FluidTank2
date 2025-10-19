@@ -17,7 +17,7 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
 class BlockChestAsTankNeoForge extends BlockChestAsTank {
 
   override def transferFluid(level: Level, pos: BlockPos, player: Player, hand: InteractionHand, stack: ItemStack): InteractionResult = {
-    val storage = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, Direction.UP)
+    val storage = level.getCapability(Capabilities.Fluid.BLOCK, pos, Direction.UP)
     if (storage == null) {
       return InteractionResult.PASS
     }

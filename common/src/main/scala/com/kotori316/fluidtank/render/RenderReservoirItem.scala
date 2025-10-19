@@ -6,12 +6,11 @@ import com.kotori316.fluidtank.fluids.FluidLike
 import com.kotori316.fluidtank.reservoir.ItemReservoir
 import com.kotori316.fluidtank.tank.Tier
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.special.SpecialModelRenderer
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
+import net.minecraft.client.renderer.{RenderType, SubmitNodeCollector}
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.util.{ARGB, Mth}
+import net.minecraft.util.{Mth, Unit as UtilUnit}
 import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
 import org.joml.Vector3f
 
@@ -19,16 +18,12 @@ import java.util.Locale
 
 final class RenderReservoirItem(protected val model: ReservoirModel, renderHelper: FluidRenderHelper) extends SpecialModelRenderer[RenderReservoirItem.RenderContext] {
 
-  override def render(patterns: RenderReservoirItem.RenderContext, displayContext: ItemDisplayContext, poseStack: PoseStack, bufferSource: MultiBufferSource, packedLight: Int, packedOverlay: Int, hasFoilType: Boolean): Unit = {
+  override def submit(patterns: RenderReservoirItem.RenderContext, displayContext: ItemDisplayContext, poseStack: PoseStack, nodeCollector: SubmitNodeCollector, packedLight: Int, packedOverlay: Int, hasFoilType: Boolean, outlineColor: Int): Unit = {
     poseStack.pushPose()
     poseStack.scale(1.0F, 1.0F, 1.0F)
     poseStack.translate(0, 0, 0.5f)
-
-    val vertexConsumer = ItemRenderer.getFoilBuffer(bufferSource,
-      this.model.renderType(RenderReservoirItem.textureNameMap(patterns.tier)),
-      true, patterns.hasFoil)
     // RenderSystem.enableCull()
-    this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, ARGB.color(255, -1))
+    nodeCollector.submitModel(this.model, UtilUnit.INSTANCE, poseStack, this.model.renderType(RenderReservoirItem.textureNameMap(patterns.tier)), packedLight, packedOverlay, outlineColor, null)
 
     val tank = patterns.tank
     if (tank.hasContent) {
@@ -45,11 +40,13 @@ final class RenderReservoirItem(protected val model: ReservoirModel, renderHelpe
       val texture = getFluidTexture(tank)
       val color = getFluidColor(tank)
       val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
-      box.render(
-        buffer = bufferSource.getBuffer(RenderType.translucentMovingBlock()),
-        matrix = poseStack, sprite = texture,
-        alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF
-      )
+      nodeCollector.submitCustomGeometry(poseStack, RenderType.translucentMovingBlock(), (_, buffer) => {
+        box.render(
+          buffer = buffer,
+          matrix = poseStack, sprite = texture,
+          alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF
+        )
+      })
     }
 
     poseStack.popPose()

@@ -11,8 +11,9 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Unit;
 
-public final class TankModel extends Model {
+public final class TankModel extends Model<Unit> {
     public static final ModelLayerLocation LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "tank"), "main");
 
     public TankModel(ModelPart root) {

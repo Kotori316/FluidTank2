@@ -28,7 +28,7 @@ abstract class RenderTank(val context: BlockEntityRendererProvider.Context) exte
         val texture = getFluidTexture(renderState.tank, renderState.tileTank)
         val color = getFluidColor(renderState.tank, renderState.tileTank)
 
-        val value = Box.lightValue.overrideBlock(getLuminance(renderState.tank)) // TODO packed light
+        val value = Box.LightValue(renderState.lightCoords).overrideBlock(getLuminance(renderState.tank))
         val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
         nodeCollector.submitCustomGeometry(matrix, RenderType.translucentMovingBlock(), (pose, buffer) => {
           tank.box.render(buffer, pose, texture, alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)

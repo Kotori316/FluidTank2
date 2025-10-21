@@ -26,7 +26,7 @@ public abstract class SideProxy {
     public abstract Optional<Level> getLevel(IPayloadContext context);
 
     public static SideProxy get() {
-        return switch (FMLEnvironment.dist) {
+        return switch (FMLEnvironment.getDist()) {
             case CLIENT -> ClientProxy.client();
             case DEDICATED_SERVER -> ServerProxy.server();
         };

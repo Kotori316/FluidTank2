@@ -7,7 +7,6 @@ import com.kotori316.fluidtank.reservoir.ItemReservoir
 import com.kotori316.fluidtank.tank.Tier
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.special.SpecialModelRenderer
-import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.{RenderType, SubmitNodeCollector}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.{Mth, Unit as UtilUnit}
@@ -37,8 +36,8 @@ final class RenderReservoirItem(protected val model: ReservoirModel, renderHelpe
       val box = Box(0.5, minY, 0.5d / 16d,
         0.5, maxY, 0.5d / 16d,
         11.9d / 16d, maxY - minY, 0.99d / 16d, firstSide = false, endSide = false)
-      val texture = getFluidTexture(tank)
-      val color = getFluidColor(tank)
+      val texture = renderHelper.getFluidTexture(tank)
+      val color = renderHelper.getFluidColor(tank)
       val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
       nodeCollector.submitCustomGeometry(poseStack, RenderType.translucentMovingBlock(), (pose, buffer) => {
         box.render(
@@ -60,10 +59,6 @@ final class RenderReservoirItem(protected val model: ReservoirModel, renderHelpe
     val tank = reservoir.getTank(stack)
     RenderReservoirItem.RenderContext(reservoir.tier, stack.hasFoil, tank)
   }
-
-  def getFluidTexture(tank: Tank[FluidLike]): TextureAtlasSprite = renderHelper.getFluidTexture(tank)
-
-  def getFluidColor(tank: Tank[FluidLike]): Int = renderHelper.getFluidColor(tank)
 }
 
 object RenderReservoirItem {

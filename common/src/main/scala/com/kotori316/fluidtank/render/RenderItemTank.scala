@@ -8,6 +8,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.special.SpecialModelRenderer
+import net.minecraft.client.renderer.state.CameraRenderState
 import net.minecraft.core.BlockPos
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
@@ -33,8 +34,10 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
       tileTank.setLevel(level)
       tileTank.loadAdditional(TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), d))
       if (tileTank.getTank.hasContent) {
-        Minecraft.getInstance.getModelManager.specialBlockModelRenderer.get
-          .renderByBlock(PlatformTankAccess.getInstance().getTankBlockMap.get(patterns.tier).get(), ItemDisplayContext.NONE, poseStack, nodeCollector, packedLight, packedOverlay, outlineColor)
+        val stateForTile: TankRenderState = Minecraft.getInstance.getBlockEntityRenderDispatcher.tryExtractRenderState(tileTank, 0, null)
+        Minecraft.getInstance.getBlockEntityRenderDispatcher.submit(
+          stateForTile, poseStack, nodeCollector, new CameraRenderState()
+        )
       }
     }
   }

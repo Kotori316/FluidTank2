@@ -40,10 +40,10 @@ final class RenderReservoirItem(protected val model: ReservoirModel, renderHelpe
       val texture = getFluidTexture(tank)
       val color = getFluidColor(tank)
       val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
-      nodeCollector.submitCustomGeometry(poseStack, RenderType.translucentMovingBlock(), (_, buffer) => {
+      nodeCollector.submitCustomGeometry(poseStack, RenderType.translucentMovingBlock(), (pose, buffer) => {
         box.render(
           buffer = buffer,
-          matrix = poseStack, sprite = texture,
+          matrix = pose, sprite = texture,
           alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF
         )
       })

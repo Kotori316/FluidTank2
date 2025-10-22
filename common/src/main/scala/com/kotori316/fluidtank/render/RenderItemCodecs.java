@@ -38,7 +38,7 @@ public final class RenderItemCodecs {
         @Override
         public SpecialModelRenderer<?> bake(SpecialModelRenderer.BakingContext context) {
             var model = new ReservoirModel(context.entityModelSet().bakeLayer(ReservoirModel.LOCATION));
-            return new RenderReservoirItem(model, helper);
+            return new RenderReservoirItem(model, context.materials(), helper);
         }
 
         @Override

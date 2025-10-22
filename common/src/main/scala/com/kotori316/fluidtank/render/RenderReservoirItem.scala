@@ -8,6 +8,7 @@ import com.kotori316.fluidtank.tank.Tier
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.special.SpecialModelRenderer
 import net.minecraft.client.renderer.{RenderType, SubmitNodeCollector}
+import net.minecraft.client.resources.model.MaterialSet
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.{Mth, Unit as UtilUnit}
 import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
@@ -15,7 +16,7 @@ import org.joml.Vector3f
 
 import java.util.Locale
 
-final class RenderReservoirItem(protected val model: ReservoirModel, renderHelper: FluidRenderHelper) extends SpecialModelRenderer[RenderReservoirItem.RenderContext] {
+final class RenderReservoirItem(protected val model: ReservoirModel, protected val materialSet: MaterialSet, renderHelper: FluidRenderHelper) extends SpecialModelRenderer[RenderReservoirItem.RenderContext] {
 
   override def submit(patterns: RenderReservoirItem.RenderContext, displayContext: ItemDisplayContext, poseStack: PoseStack, nodeCollector: SubmitNodeCollector, packedLight: Int, packedOverlay: Int, hasFoilType: Boolean, outlineColor: Int): Unit = {
     poseStack.pushPose()
@@ -36,7 +37,7 @@ final class RenderReservoirItem(protected val model: ReservoirModel, renderHelpe
       val box = Box(0.5, minY, 0.5d / 16d,
         0.5, maxY, 0.5d / 16d,
         11.9d / 16d, maxY - minY, 0.99d / 16d, firstSide = false, endSide = false)
-      val texture = renderHelper.getFluidTexture(tank)
+      val texture = renderHelper.getFluidTexture(tank, materialSet)
       val color = renderHelper.getFluidColor(tank)
       val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
       nodeCollector.submitCustomGeometry(poseStack, RenderType.translucentMovingBlock(), (pose, buffer) => {

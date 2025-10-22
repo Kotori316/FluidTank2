@@ -1,6 +1,6 @@
 {
   "volta": {
-    "node": "22.20.0"
+    "node": "22.21.0"
   },
   "scripts": {
     "run:ci-pr": "npx reg-suit run --config regconfig.json",

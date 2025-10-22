@@ -409,7 +409,8 @@ public final class TankTest {
         block.saveTankNBT(tile, stack, helper.getLevel().registryAccess());
         var data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
         assertNotNull(data);
-        assertTrue(data.contains("id"), "Saved nbt must have id field since 1.20.5");
+        // assertTrue(data.contains("id"), "Saved nbt must have id field since 1.20.5");
+        assertFalse(data.contains("id"), "Saved nbt must not have id field since 1.21.10");
 
         helper.succeed();
     }

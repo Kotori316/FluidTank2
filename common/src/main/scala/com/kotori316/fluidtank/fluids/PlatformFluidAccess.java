@@ -19,6 +19,10 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.function.ToLongBiFunction;
+
 public interface PlatformFluidAccess {
     @NotNull
     static PlatformFluidAccess getInstance() {
@@ -54,6 +58,28 @@ public interface PlatformFluidAccess {
      */
     @NotNull
     TransferStack drainItem(GenericAmount<FluidLike> toDrain, ItemStack fluidContainer, Player player, InteractionHand hand, boolean execute);
+
+    static <TRANSACTION extends AutoCloseable> TransferStack moveItemInTransaction(ItemStack stack, Player player, boolean execute, TransferStack result, Supplier<TRANSACTION> startTransaction, Consumer<TRANSACTION> transactionCommit, ToLongBiFunction<ItemStack, TRANSACTION> exchange) {
+        if (result.moved().nonEmpty()) {
+            try (TRANSACTION transaction = startTransaction.get()) {
+                long exchanged = exchange.applyAsLong(result.toReplace(), transaction);
+                if (exchanged == 1) {
+                    if (execute && TransferFluid.shouldMoveItem(player)) {
+                        transactionCommit.accept(transaction);
+                    }
+                    return result.setShouldMove(false);
+                }
+                // Failed to exchange drained item, abort
+            } catch (Exception e) {
+                // Basically unreachable as transaction implementation doesn't throw anything.
+                throw new RuntimeException(e);
+            }
+            return new TransferStack(FluidAmountUtil.EMPTY(), stack, false);
+        } else {
+            // Nothing moved
+            return result;
+        }
+    }
 
     @Nullable SoundEvent getEmptySound(GenericAmount<FluidLike> fluid);
 

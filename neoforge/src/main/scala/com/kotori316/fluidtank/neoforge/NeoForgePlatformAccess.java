@@ -6,10 +6,7 @@ import com.kotori316.fluidtank.cat.BlockChestAsTank;
 import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
 import com.kotori316.fluidtank.contents.Tank;
-import com.kotori316.fluidtank.fluids.FluidAmountUtil;
-import com.kotori316.fluidtank.fluids.FluidLike;
-import com.kotori316.fluidtank.fluids.VanillaFluid;
-import com.kotori316.fluidtank.fluids.VanillaPotion;
+import com.kotori316.fluidtank.fluids.*;
 import com.kotori316.fluidtank.neoforge.cat.EntityChestAsTank;
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter;
 import com.kotori316.fluidtank.potions.PotionFluidHandler;
@@ -35,14 +32,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.SoundActions;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -67,14 +67,14 @@ final class NeoForgePlatformAccess implements PlatformAccess {
         if (potionHandler.isValidHandler()) {
             return potionHandler.getContent();
         }
-        return FluidUtil.getFluidContained(stack)
-            .map(NeoForgeConverter::toAmount)
+        return Optional.ofNullable(ItemAccess.forStack(stack).getCapability(Capabilities.Fluid.ITEM))
+            .map(r -> NeoForgeConverter.toAmount(r.getResource(0), r.getAmountAsLong(0)))
             .orElse(FluidAmountUtil.EMPTY());
     }
 
     @Override
     public boolean isFluidContainer(ItemStack stack) {
-        return FluidUtil.getFluidHandler(stack).isPresent() ||
+        return ItemAccess.forStack(stack).getCapability(Capabilities.Fluid.ITEM) != null ||
             PotionFluidHandler.apply(stack).isValidHandler();
     }
 
@@ -91,30 +91,54 @@ final class NeoForgePlatformAccess implements PlatformAccess {
 
     @Override
     public @NotNull TransferStack fillItem(GenericAmount<FluidLike> toFill, ItemStack fluidContainer, Player player, InteractionHand hand, boolean execute) {
+        var itemAccess = ItemAccess.forPlayerInteraction(player, hand);
         if (toFill.content() instanceof VanillaPotion vanillaPotion) {
             var potionHandler = PotionFluidHandler.apply(fluidContainer);
-            return potionHandler.fill(toFill, vanillaPotion);
+            var result = potionHandler.fill(toFill, vanillaPotion);
+            return moveItem(fluidContainer, player, execute, result, itemAccess);
         }
-        return FluidUtil.getFluidHandler(fluidContainer.copyWithCount(1))
-            .map(h -> {
-                int filledAmount = h.fill(NeoForgeConverter.toStack(toFill), IFluidHandler.FluidAction.EXECUTE);
-                return new TransferStack(toFill.setAmount(GenericUnit.fromForge(filledAmount)), h.getContainer());
-            })
-            .orElse(new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer));
+        var fluidHandler = itemAccess.getCapability(Capabilities.Fluid.ITEM);
+        if (fluidHandler == null) {
+            return new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer, false);
+        }
+        int filled;
+        try (Transaction transaction = Transaction.openRoot()) {
+            filled = fluidHandler.insert(NeoForgeConverter.toVariant(toFill), NeoForgeConverter.forgeAmount(toFill), transaction);
+            // Items in creative player should not be changed.
+            if (execute && TransferFluid.shouldMoveItem(player)) transaction.commit();
+        }
+        return new TransferStack(toFill.setAmount(GenericUnit.fromForge(filled)), itemAccess.getResource().toStack(itemAccess.getAmount()), false);
     }
 
     @Override
     public @NotNull TransferStack drainItem(GenericAmount<FluidLike> toDrain, ItemStack fluidContainer, Player player, InteractionHand hand, boolean execute) {
+        var itemAccess = ItemAccess.forPlayerInteraction(player, hand);
         if (toDrain.content() instanceof VanillaPotion v) {
             var potionHandler = PotionFluidHandler.apply(fluidContainer);
-            return potionHandler.drain(toDrain, v);
+            var result = potionHandler.drain(toDrain, v);
+            return moveItem(fluidContainer, player, execute, result, itemAccess);
         }
-        return FluidUtil.getFluidHandler(fluidContainer.copyWithCount(1))
-            .map(h -> {
-                var drained = h.drain(NeoForgeConverter.toStack(toDrain), IFluidHandler.FluidAction.EXECUTE);
-                return new TransferStack(NeoForgeConverter.toAmount(drained), h.getContainer());
-            })
-            .orElse(new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer));
+        var fluidHandler = itemAccess.getCapability(Capabilities.Fluid.ITEM);
+        if (fluidHandler == null) {
+            return new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer, false);
+        }
+        int drained;
+        try (Transaction transaction = Transaction.openRoot()) {
+            drained = fluidHandler.extract(NeoForgeConverter.toVariant(toDrain), NeoForgeConverter.forgeAmount(toDrain), transaction);
+            // Items in creative player should not be changed.
+            if (execute && TransferFluid.shouldMoveItem(player)) transaction.commit();
+        }
+        return new TransferStack(toDrain.setAmount(GenericUnit.fromForge(drained)), itemAccess.getResource().toStack(itemAccess.getAmount()), false);
+    }
+
+    @NotNull
+    private static TransferStack moveItem(ItemStack stack, Player player, boolean execute, TransferStack result, ItemAccess context) {
+        return PlatformFluidAccess.moveItemInTransaction(
+            stack, player, execute, result,
+            Transaction::openRoot,
+            Transaction::commit,
+            (itemStack, transaction) -> context.exchange(ItemResource.of(itemStack), 1, transaction)
+        );
     }
 
     @Override

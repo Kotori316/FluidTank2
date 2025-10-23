@@ -145,22 +145,12 @@ final class FabricPlatformAccess implements PlatformAccess {
 
     @NotNull
     private static TransferStack moveItem(ItemStack stack, Player player, boolean execute, TransferStack result, ContainerItemContext context) {
-        if (result.moved().nonEmpty()) {
-            try (Transaction transaction = Transaction.openOuter()) {
-                var exchanged = context.exchange(ItemVariant.of(result.toReplace()), 1, transaction);
-                if (exchanged == 1) {
-                    if (execute && TransferFluid.shouldMoveItem(player)) {
-                        transaction.commit();
-                    }
-                    return result.setShouldMove(false);
-                }
-                // Failed to exchange drained item, abort
-            }
-            return new TransferStack(FluidAmountUtil.EMPTY(), stack, false);
-        } else {
-            // Nothing moved
-            return result;
-        }
+        return PlatformFluidAccess.moveItemInTransaction(
+            stack, player, execute, result,
+            Transaction::openOuter,
+            Transaction::commit,
+            (itemStack, transaction) -> context.exchange(ItemVariant.of(itemStack), 1, transaction)
+        );
     }
 
     @Override

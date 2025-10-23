@@ -2,10 +2,10 @@ package com.kotori316.fluidtank.neoforge.render
 
 import com.kotori316.fluidtank.contents.Tank
 import com.kotori316.fluidtank.fluids.{FluidLike, VanillaFluid, VanillaPotion}
-import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
-import com.kotori316.fluidtank.render.{RenderItemCodecs, RenderTank}
+import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter
+import com.kotori316.fluidtank.render.RenderTank
 import com.kotori316.fluidtank.tank.TileTank
-import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.Sheets
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.core.component.DataComponents
@@ -23,7 +23,7 @@ class RenderTankNeoForge(d: BlockEntityRendererProvider.Context) extends RenderT
     val fluid = FluidLike.asFluid(tank.content.content, Fluids.WATER)
     val attributes = IClientFluidTypeExtensions.of(fluid)
     val resource = attributes.getStillTexture(fluid.defaultFluidState(), world, pos)
-    Minecraft.getInstance.getTextureAtlas(RenderItemCodecs.atlas()).apply(resource)
+    d.materials().get(Sheets.BLOCKS_MAPPER.apply(resource))
   }
 
   override def getFluidColor(tank: Tank[FluidLike], blockEntity: TileTank): Int = {
@@ -36,7 +36,7 @@ class RenderTankNeoForge(d: BlockEntityRendererProvider.Context) extends RenderT
         if (attributes.getClass == classOf[FluidType]) {
           normal
         } else {
-          val stackColor = attributes.getTintColor(fluidAmount.toStack)
+          val stackColor = attributes.getTintColor(NeoForgeConverter.toStack(fluidAmount))
           if (normal == stackColor) {
             val world = getTankWorld(blockEntity)
             val pos = getTankPos(blockEntity)

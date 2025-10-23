@@ -1,53 +1,50 @@
 package com.kotori316.fluidtank.neoforge.fluid
 
-import com.kotori316.fluidtank.contents.{DefaultTransferEnv, GenericUnit, Tank}
+import com.kotori316.fluidtank.contents.Operations.TankOperation
+import com.kotori316.fluidtank.contents.{DefaultTransferEnv, Tank}
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidLike}
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
-import net.neoforged.neoforge.fluids.FluidStack
-import net.neoforged.neoforge.fluids.capability.{IFluidHandler, IFluidHandlerItem}
+import net.neoforged.neoforge.transfer.ResourceHandler
+import net.neoforged.neoforge.transfer.fluid.FluidResource
+import net.neoforged.neoforge.transfer.transaction.{SnapshotJournal, TransactionContext}
 
-trait TankFluidHandler extends IFluidHandlerItem {
+abstract class TankFluidHandler extends SnapshotJournal[Tank[FluidLike]] with ResourceHandler[FluidResource] {
   def getTank: Tank[FluidLike]
 
   def saveTank(newTank: Tank[FluidLike]): Unit
 
-  override def getTanks: Int = 1
+  override final def createSnapshot(): Tank[FluidLike] = getTank
 
-  override def getTankCapacity(i: Int): Int = getTank.capacity.asForge
+  override final def revertToSnapshot(snapshot: Tank[FluidLike]): Unit = saveTank(snapshot)
 
-  override def getFluidInTank(i: Int): FluidStack = getTank.content.toStack
+  final def getCapability(ignored: Void): TankFluidHandler = this
 
-  override def isFluidValid(i: Int, fluidStack: FluidStack): Boolean = true
+  override def size(): Int = 1
 
-  override def fill(fluidStack: FluidStack, fluidAction: IFluidHandler.FluidAction): Int = {
-    val op = getTank.fillOp
-    val (_, rest, tank) = op.run(DefaultTransferEnv, fluidStack.toAmount)
-    if (fluidAction.execute()) saveTank(tank)
-    fluidStack.getAmount - rest.amount.asForge
+  override def getCapacityAsLong(index: Int, resource: FluidResource): Long = getTank.capacity.asNeoForge
+
+  override def getResource(index: Int): FluidResource = getTank.content.asVariant
+
+  override def getAmountAsLong(index: Int): Long = getTank.content.amount.asNeoForge
+
+  override def isValid(index: Int, resource: FluidResource): Boolean = true
+
+  override def insert(index: Int, resource: FluidResource, amount: Int, transaction: TransactionContext): Int = {
+    opInternal(getTank.fillOp, NeoForgeConverter.toAmount(resource, amount), transaction)
   }
 
-  override def drain(drain: FluidStack, fluidAction: IFluidHandler.FluidAction): FluidStack = {
-    val tank = getTank
-    if (tank.isEmpty) {
-      FluidStack.EMPTY
+  override def extract(index: Int, resource: FluidResource, amount: Int, transaction: TransactionContext): Int = {
+    if (getTank.isEmpty) {
+      0
     } else {
-      drainInternal(tank, drain.toAmount, fluidAction)
+      opInternal(getTank.drainOp, NeoForgeConverter.toAmount(resource, amount), transaction)
     }
   }
 
-  override def drain(amount: Int, fluidAction: IFluidHandler.FluidAction): FluidStack = {
-    val tank = getTank
-    if (tank.isEmpty) {
-      FluidStack.EMPTY
-    } else {
-      drainInternal(tank, tank.content.setAmount(GenericUnit.fromForge(amount)), fluidAction)
-    }
+  private def opInternal(op: TankOperation[FluidLike], fluid: FluidAmount, transaction: TransactionContext): Int = {
+    val (_, rest, newTank) = op.run(DefaultTransferEnv, fluid)
+    updateSnapshots(transaction)
+    saveTank(newTank)
+    fluid.amount.asForge - rest.amount.asForge
   }
-
-  private def drainInternal(tank: Tank[FluidLike], drainAmount: FluidAmount, fluidAction: IFluidHandler.FluidAction): FluidStack = {
-    val (_, rest, newTank) = tank.drainOp.run(DefaultTransferEnv, drainAmount)
-    if (fluidAction.execute()) saveTank(newTank)
-    (drainAmount - rest).toStack
-  }
-
 }

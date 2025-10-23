@@ -12,23 +12,22 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.ProblemReporter
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.storage.TagValueOutput
-import net.neoforged.neoforge.fluids.capability.{IFluidHandler, IFluidHandlerItem}
+import net.neoforged.neoforge.transfer.transaction.Transaction
 import org.jetbrains.annotations.VisibleForTesting
 
 import scala.jdk.OptionConverters.RichOptional
+import scala.util.Using
 
 class TankFluidItemHandler(tier: Tier, stack: ItemStack) extends TankFluidHandler {
 
-  def getCapability(ignored: Void): IFluidHandlerItem = this
-
-  override def getContainer: ItemStack = stack
+  def getContainer: ItemStack = stack
 
   override def getTank: Tank[FluidLike] = {
     val componentPatch = getContainer.getComponentsPatch
     val maybeTank = for {
       blockEntityData <- Option(componentPatch.get(DataComponents.BLOCK_ENTITY_DATA)).flatMap(_.toScala)
       if blockEntityData.contains(TileTank.KEY_TANK)
-      customTag = blockEntityData.copyTag()
+      customTag = blockEntityData.copyTagWithoutId()
       tankTag <- customTag.getCompound(TileTank.KEY_TANK).toScala
     } yield TankUtil.load(tankTag)
     maybeTank.getOrElse(Tank(FluidAmountUtil.EMPTY, GenericUnit(tier.getCapacity)))
@@ -43,7 +42,7 @@ class TankFluidItemHandler(tier: Tier, stack: ItemStack) extends TankFluidHandle
       val tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING)
       val tag = Option(getContainer.getComponentsPatch.get(DataComponents.BLOCK_ENTITY_DATA))
         .flatMap(_.toScala)
-        .map(_.copyTag())
+        .map(_.copyTagWithoutId())
         .getOrElse(new CompoundTag())
       tagValueOutput.store(tag)
       tagValueOutput.store(TileTank.KEY_TANK, Tank.codec, tank)
@@ -54,6 +53,9 @@ class TankFluidItemHandler(tier: Tier, stack: ItemStack) extends TankFluidHandle
 
   @VisibleForTesting
   def fill(fill: FluidAmount, execute: Boolean): Unit = {
-    this.fill(fill.toStack, if (execute) IFluidHandler.FluidAction.EXECUTE else IFluidHandler.FluidAction.SIMULATE)
+    Using(Transaction.openRoot()) { tx =>
+      this.insert(fill.asVariant, fill.amount.asForge, tx)
+      if (execute) tx.commit()
+    }
   }
 }

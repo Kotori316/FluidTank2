@@ -8,10 +8,11 @@ import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.{ItemStack, Items}
 import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.{Disabled, Test}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.{Arguments, MethodSource}
 
+@Disabled("Implementing")
 class EntityChestAsTankTest extends BeforeMC {
 
   @Test

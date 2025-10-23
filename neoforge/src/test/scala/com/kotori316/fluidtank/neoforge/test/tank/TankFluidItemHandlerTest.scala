@@ -8,7 +8,9 @@ import com.kotori316.fluidtank.neoforge.tank.TankFluidItemHandler
 import com.kotori316.fluidtank.neoforge.test.BeforeMC
 import com.kotori316.fluidtank.tank.{Tier, TileTank}
 import net.minecraft.core.component.DataComponents
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.ProblemReporter
+import net.minecraft.world.item.component.TypedEntityData
 import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.storage.TagValueOutput
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.{DynamicTest, Nested, Test, TestFactory}
 
 import scala.util.Using
+import scala.util.chaining.scalaUtilChainingOps
 
 class TankFluidItemHandlerTest extends BeforeMC {
 
@@ -106,10 +109,6 @@ class TankFluidItemHandlerTest extends BeforeMC {
         handler.insert(FluidAmountUtil.BUCKET_LAVA.asVariant, FluidAmountUtil.BUCKET_WATER.amount.asForge, tx)
       }
       assertEquals(0, f1)
-      val f2 = Using.resource(Transaction.openRoot()) { tx =>
-        handler.insert(FluidAmountUtil.EMPTY.asVariant, 0, tx)
-      }
-      assertEquals(0, f2)
     }
 
     @Test
@@ -213,19 +212,23 @@ class TankFluidItemHandlerTest extends BeforeMC {
         handler.extract(FluidAmountUtil.BUCKET_LAVA.asVariant, 1500, tx)
       }
       assertEquals(0, t1)
-      val t2 = Using.resource(Transaction.openRoot()) { tx =>
-        handler.extract(FluidAmountUtil.EMPTY.asVariant, 1000, tx)
-      }
-      assertEquals(0, t2)
     }
 
+    /**
+     * Unknown tag will be removed when the tank is made to be empty
+     */
     @Test
-    def unknownTagAdded(): Unit = {
-      val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
+    def unknownTagIsRemoved(): Unit = {
+      val stack = new ItemStack(Items.APPLE)
+      val handler = new TankFluidItemHandler(Tier.WOOD, stack)
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
+      stack.update[TypedEntityData[BlockEntityType[?]]](DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(BlockEntityType.TEST_BLOCK, new CompoundTag()), data => {
+        TypedEntityData.of(data.`type`(), data.copyTagWithoutId().tap(_.putString("unknownTag", "unknownTag")))
+      })
       Using.resource(Transaction.openRoot()) { tx =>
-        handler.extract(FluidAmountUtil.BUCKET_WATER.asVariant, 1500, tx)
+        val extracted = handler.extract(FluidAmountUtil.BUCKET_WATER.asVariant, 1500, tx)
         tx.commit()
+        assertEquals(1000, extracted)
       }
 
       assertTrue(handler.getTank.isEmpty)

@@ -12,7 +12,7 @@ public final class FromCommon {
     }
 
     public List<TestFunction> createTestFunctionsPlace() {
-        return GameTestFunctions.createTestFunctionsPlace(GameTestFunctions.BATCH, TestFunction.EMPTY_STRUCTURE);
+        return GameTestFunctions.createTestFunctionsPlace(GameTestFunctions.BATCH, TestFunction.EMPTY_STRUCTURE, false);
     }
 
     public List<TestFunction> load2032Tank() {

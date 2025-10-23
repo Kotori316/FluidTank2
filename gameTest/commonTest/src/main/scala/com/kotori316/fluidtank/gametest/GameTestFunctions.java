@@ -34,14 +34,14 @@ public final class GameTestFunctions {
         ).flatMap(Function.identity()).toList();
     }
 
-    public static List<TestFunction> createTestFunctionsPlace(String batchName, String structureName) {
+    public static List<TestFunction> createTestFunctionsPlace(String batchName, String structureName, boolean includeCat) {
         ResourceLocation.parse(structureName);
         List<Class<?>> classes = List.of(
         );
         var fromClass = getTestFunctionStream(batchName, structureName, classes, 100);
         return Stream.of(
             fromClass,
-            CatGameTest.tests(batchName, structureName),
+            includeCat ? CatGameTest.tests(batchName, structureName) : Stream.<TestFunction>of(),
             ReservoirTest.tests(batchName, structureName),
             TankTest.tests(batchName, structureName)
         ).flatMap(Function.identity()).toList();

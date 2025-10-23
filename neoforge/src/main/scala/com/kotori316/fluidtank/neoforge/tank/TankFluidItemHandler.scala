@@ -53,7 +53,7 @@ class TankFluidItemHandler(tier: Tier, stack: ItemStack) extends TankFluidHandle
 
   @VisibleForTesting
   def fill(fill: FluidAmount, execute: Boolean): Unit = {
-    Using(Transaction.openRoot()) { tx =>
+    Using.resource(Transaction.openRoot()) { tx =>
       this.insert(fill.asVariant, fill.amount.asForge, tx)
       if (execute) tx.commit()
     }

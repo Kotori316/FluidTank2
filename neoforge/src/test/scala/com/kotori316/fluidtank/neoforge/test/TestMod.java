@@ -5,8 +5,12 @@ import com.kotori316.fluidtank.PlatformAccess;
 import com.kotori316.fluidtank.neoforge.cat.EntityChestAsTank;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+
+import java.util.function.Consumer;
 
 @Mod("fluidtank_test")
 public final class TestMod {
@@ -14,7 +18,7 @@ public final class TestMod {
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Initialize {} with {}", container.getModId(), container.getClass().getName());
     }
 
-    public static IFluidHandler getCatHandler(IItemHandlerModifiable handler) {
+    public static ResourceHandler<FluidResource> getCatHandler(ResourceHandler<ItemResource> handler) {
         return EntityChestAsTank.getProxy(handler);
     }
 
@@ -26,6 +30,12 @@ public final class TestMod {
             return (PlatformAccess) constructor.newInstance();
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static void inTransaction(Consumer<Transaction> consumer) {
+        try (var tx = Transaction.openRoot()) {
+            consumer.accept(tx);
         }
     }
 }

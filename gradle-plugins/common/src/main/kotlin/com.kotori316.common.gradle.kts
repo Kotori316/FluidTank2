@@ -78,11 +78,9 @@ configurations {
 }
 
 dependencies {
-    implementation(
-        group = "org.typelevel",
-        name = "cats-core_3",
-        version = project.property("cats_version") as String
-    ) { exclude("org.scala-lang") }
+    implementation("org.typelevel:cats-core_3:${project.property("cats_version")}") {
+        exclude("org.scala-lang")
+    }
 
     testImplementation(platform("org.junit:junit-bom:${project.property("jupiterVersion")}"))
     testImplementation("org.junit.jupiter:junit-jupiter")

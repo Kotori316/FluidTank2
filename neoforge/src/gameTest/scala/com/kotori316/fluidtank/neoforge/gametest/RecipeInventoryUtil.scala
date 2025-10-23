@@ -2,7 +2,6 @@ package com.kotori316.fluidtank.neoforge.gametest
 
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.neoforge.FluidTank
-import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.FluidAmount2FluidStack
 import com.kotori316.fluidtank.neoforge.tank.TankFluidItemHandler
 import com.kotori316.fluidtank.tank.{ItemBlockTank, Tier}
 import net.minecraft.world.SimpleContainer
@@ -10,7 +9,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.{AbstractContainerMenu, Slot, TransientCraftingContainer}
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.CraftingInput
-import net.neoforged.neoforge.fluids.capability.IFluidHandler
 
 import scala.jdk.javaapi.CollectionConverters
 
@@ -41,7 +39,7 @@ object RecipeInventoryUtil {
   def getFilledTankStack(tier: Tier, fluid: FluidAmount): ItemStack = {
     val stack = new ItemStack(FluidTank.TANK_MAP.get(tier).get())
     val handler = getFluidHandler(stack)
-    handler.fill(fluid.toStack, IFluidHandler.FluidAction.EXECUTE)
+    handler.fill(fluid, true)
     stack
   }
 

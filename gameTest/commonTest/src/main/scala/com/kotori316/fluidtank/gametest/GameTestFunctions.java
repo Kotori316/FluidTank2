@@ -6,6 +6,7 @@ import com.kotori316.fluidtank.gametest.cat.CatGameTest;
 import com.kotori316.fluidtank.gametest.reservoir.ReservoirTest;
 import com.kotori316.fluidtank.gametest.tank.TankTest;
 import com.kotori316.testutil.common.TestFunction;
+import com.kotori316.testutil.common.TestFunctionException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -56,29 +57,25 @@ public final class GameTestFunctions {
             .filter(m -> m.getParameterCount() == 1)
             .filter(m -> m.getParameterTypes()[0] == GameTestHelper.class)
             .filter(m -> m.getReturnType() == void.class)
-            .map(m ->
-                TestFunction.createWithStructure(FluidTankCommon.modId, batchName, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "%s_%s".formatted(m.getDeclaringClass().getSimpleName(), m.getName())), structureName, g -> {
+            .map(m -> {
+                var formatted = "%s_%s".formatted(m.getDeclaringClass().getSimpleName(), m.getName());
+                var testName = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, formatted);
+                return TestFunction.createWithStructure(FluidTankCommon.modId, batchName, testName, structureName, g -> {
                     try {
                         m.setAccessible(true);
                         m.invoke(null, g);
                     } catch (InvocationTargetException e) {
-                        if (e.getCause() instanceof RuntimeException r) throw r;
-                        else throw new RuntimeException(e.getCause());
+                        var cause = e.getCause() != null ? e.getCause() : e;
+                        var a = new TestFunctionException(testName, cause.getMessage());
+                        a.addSuppressed(cause);
+                        throw a;
                     } catch (ReflectiveOperationException | AssertionError e) {
-                        throw new RuntimeException(e);
+                        var a = new TestFunctionException(testName, e.getMessage());
+                        a.addSuppressed(e);
+                        throw a;
                     }
-                })
-            );
-    }
-
-    public static Consumer<GameTestHelper> wrapper(Consumer<GameTestHelper> test) {
-        return g -> {
-            try {
-                test.accept(g);
-            } catch (AssertionError e) {
-                throw new RuntimeException(e);
-            }
-        };
+                });
+            });
     }
 
     public static @NotNull TestFunction create(String batchName, String structureName, String name, Consumer<GameTestHelper> test) {

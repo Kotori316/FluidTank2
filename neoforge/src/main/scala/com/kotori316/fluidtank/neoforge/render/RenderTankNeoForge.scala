@@ -5,12 +5,12 @@ import com.kotori316.fluidtank.fluids.{FluidLike, VanillaFluid, VanillaPotion}
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter
 import com.kotori316.fluidtank.render.RenderTank
 import com.kotori316.fluidtank.tank.TileTank
-import net.minecraft.client.renderer.Sheets
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.level.material.Fluids
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
+import net.neoforged.neoforge.client.textures.FluidSpriteCache
 import net.neoforged.neoforge.fluids.FluidType
 
 import scala.jdk.OptionConverters.RichOptional
@@ -23,7 +23,7 @@ class RenderTankNeoForge(d: BlockEntityRendererProvider.Context) extends RenderT
     val fluid = FluidLike.asFluid(tank.content.content, Fluids.WATER)
     val attributes = IClientFluidTypeExtensions.of(fluid)
     val resource = attributes.getStillTexture(fluid.defaultFluidState(), world, pos)
-    d.materials().get(Sheets.BLOCKS_MAPPER.apply(resource))
+    FluidSpriteCache.getSprite(resource)
   }
 
   override def getFluidColor(tank: Tank[FluidLike], blockEntity: TileTank): Int = {

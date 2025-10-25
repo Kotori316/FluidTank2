@@ -75,6 +75,17 @@ public final class TankTest {
         helper.succeed();
     }
 
+    static void interactWithEmptyHand(GameTestHelper helper) {
+        var basePos = BlockPos.ZERO.above();
+        var tile = placeTank(helper, basePos, Tier.WOOD);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        assertTrue(player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty(), "Test assumption, player has nothing in his hand");
+        assertTrue(tile.getTank().isEmpty(), "Test assumption, tank must be empty");
+
+        helper.useBlock(basePos, player);
+        helper.succeed();
+    }
+
     static void fill1(GameTestHelper helper) {
         var basePos = BlockPos.ZERO.above();
         var tile = placeTank(helper, basePos, Tier.WOOD);

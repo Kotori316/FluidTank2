@@ -74,6 +74,9 @@ final class NeoForgePlatformAccess implements PlatformAccess {
 
     @Override
     public boolean isFluidContainer(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
         return ItemAccess.forStack(stack).getCapability(Capabilities.Fluid.ITEM) != null ||
             PotionFluidHandler.apply(stack).isValidHandler();
     }

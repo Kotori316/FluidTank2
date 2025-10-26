@@ -53,6 +53,10 @@ final class RenderReservoirItem(protected val model: ReservoirModel, protected v
   }
 
   override def getExtents(output: java.util.Set[Vector3f]): Unit = {
+    val pose = new PoseStack()
+    pose.translate(0.5F, 0.0F, 0.5F)
+    pose.scale(-1.0F, -1.0F, 1.0F)
+    this.model.root.getExtentsForGui(pose, output)
   }
 
   override def extractArgument(stack: ItemStack): RenderReservoirItem.RenderContext = {

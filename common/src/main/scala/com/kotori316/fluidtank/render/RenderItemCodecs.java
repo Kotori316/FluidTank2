@@ -5,7 +5,6 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,11 +67,6 @@ public final class RenderItemCodecs {
         public MapCodec<? extends SpecialModelRenderer.Unbaked> type() {
             return codec;
         }
-    }
-
-    @SuppressWarnings("deprecation")
-    public static ResourceLocation atlas() {
-        return TextureAtlas.LOCATION_BLOCKS;
     }
 
     public static void registerSpecialModelRenderersCodec(FluidRenderHelper helper, BiConsumer<ResourceLocation, MapCodec<? extends SpecialModelRenderer.Unbaked>> registerFunction, Map<ResourceLocation, SpecialModelRenderer.Unbaked> predefined) {

@@ -42,7 +42,12 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
     }
   }
 
-  override def getExtents(output: util.Set[Vector3f]): Unit = {}
+  override def getExtents(output: util.Set[Vector3f]): Unit = {
+    val pose = new PoseStack()
+    pose.translate(0.5F, 0.0F, 0.5F)
+    pose.scale(-1.0F, -1.0F, 1.0F)
+    this.model.root.getExtentsForGui(pose, output)
+  }
 
   override def extractArgument(stack: ItemStack): RenderItemTank.RenderContext = {
     RenderItemTank.RenderContext(

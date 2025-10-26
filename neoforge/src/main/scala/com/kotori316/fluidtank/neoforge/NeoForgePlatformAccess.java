@@ -239,4 +239,9 @@ final class NeoForgePlatformAccess implements PlatformAccess {
             return List.of();
         }
     }
+
+    @Override
+    public @NotNull Platforms getPlatform() {
+        return Platforms.NEOFORGE;
+    }
 }

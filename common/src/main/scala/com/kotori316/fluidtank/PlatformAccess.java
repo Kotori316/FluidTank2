@@ -5,11 +5,12 @@ import com.kotori316.fluidtank.fluids.PlatformFluidAccess;
 import com.kotori316.fluidtank.item.PlatformItemAccess;
 import com.kotori316.fluidtank.tank.PlatformTankAccess;
 
-public interface PlatformAccess extends PlatformFluidAccess, PlatformTankAccess, PlatformItemAccess, PlatformChestAsTankAccess {
+public interface PlatformAccess extends PlatformFluidAccess, PlatformTankAccess, PlatformItemAccess, PlatformChestAsTankAccess, PlatformBaseAccess {
     static void setInstance(PlatformAccess access) {
         PlatformFluidAccess.setInstance(access);
         PlatformTankAccess.setInstance(access);
         PlatformItemAccess.setInstance(access);
         PlatformChestAsTankAccess.setInstance(access);
+        PlatformBaseAccess.setInstance(access);
     }
 }

@@ -228,4 +228,9 @@ final class FabricPlatformAccess implements PlatformAccess {
     public @NotNull List<GenericAmount<FluidLike>> getCATFluids(Level level, BlockPos pos) {
         return ChestAsTankStorage.getCATFluids(level, pos);
     }
+
+    @Override
+    public @NotNull Platforms getPlatform() {
+        return Platforms.FABRIC;
+    }
 }

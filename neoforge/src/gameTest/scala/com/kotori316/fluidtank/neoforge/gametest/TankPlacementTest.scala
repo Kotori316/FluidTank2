@@ -12,6 +12,7 @@ import net.minecraft.gametest.framework.GameTestHelper
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.{Block, Blocks}
+import net.neoforged.neoforge.transfer.access.ItemAccess
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals}
 
 import java.util.Locale
@@ -68,7 +69,7 @@ final class TankPlacementTest {
     assertEquals(1, drops.size, "Drop was " + drops)
 
     val stack = drops.get(0)
-    val handler = new TankFluidItemHandler(tier, stack)
+    val handler = new TankFluidItemHandler(tier, ItemAccess.forStack(stack))
     assertAll(
       () => assertEquals(FluidTank.TANK_MAP.get(tier).get().itemBlock, stack.getItem),
       () => assertEquals(1, stack.getCount),
@@ -88,7 +89,7 @@ final class TankPlacementTest {
       true,
       helper.makeMockPlayer(GameType.CREATIVE),
     )
-    val handler = new TankFluidItemHandler(tier, stack)
+    val handler = new TankFluidItemHandler(tier, ItemAccess.forStack(stack))
     assertAll(
       () => assertEquals(FluidTank.TANK_MAP.get(tier).get().itemBlock, stack.getItem),
       () => assertEquals(1, stack.getCount),

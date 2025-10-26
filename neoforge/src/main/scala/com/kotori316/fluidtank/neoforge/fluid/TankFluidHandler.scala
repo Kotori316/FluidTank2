@@ -5,19 +5,15 @@ import com.kotori316.fluidtank.contents.{DefaultTransferEnv, Tank}
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidLike}
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
 import net.neoforged.neoforge.transfer.ResourceHandler
+import net.neoforged.neoforge.transfer.access.ItemAccess
 import net.neoforged.neoforge.transfer.fluid.FluidResource
-import net.neoforged.neoforge.transfer.transaction.{SnapshotJournal, TransactionContext}
+import net.neoforged.neoforge.transfer.item.ItemResource
+import net.neoforged.neoforge.transfer.transaction.TransactionContext
 
-abstract class TankFluidHandler extends SnapshotJournal[Tank[FluidLike]] with ResourceHandler[FluidResource] {
+abstract class TankFluidHandler(protected final val context: ItemAccess) extends ResourceHandler[FluidResource] {
   def getTank: Tank[FluidLike]
 
-  def saveTank(newTank: Tank[FluidLike]): Unit
-
-  override final def createSnapshot(): Tank[FluidLike] = getTank
-
-  override final def revertToSnapshot(snapshot: Tank[FluidLike]): Unit = saveTank(snapshot)
-
-  final def getCapability(ignored: Void): TankFluidHandler = this
+  def saveTank(newTank: Tank[FluidLike]): ItemResource
 
   override def size(): Int = 1
 
@@ -43,8 +39,12 @@ abstract class TankFluidHandler extends SnapshotJournal[Tank[FluidLike]] with Re
 
   private def opInternal(op: TankOperation[FluidLike], fluid: FluidAmount, transaction: TransactionContext): Int = {
     val (_, rest, newTank) = op.run(DefaultTransferEnv, fluid)
-    updateSnapshots(transaction)
-    saveTank(newTank)
-    fluid.amount.asForge - rest.amount.asForge
+    val newItem = saveTank(newTank)
+    if (this.context.exchange(newItem, 1, transaction) == 1) {
+      fluid.amount.asForge - rest.amount.asForge
+    } else {
+      // Not inserted
+      0
+    }
   }
 }

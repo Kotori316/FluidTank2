@@ -64,9 +64,10 @@ class TankFluidHandlerTest {
     val basePos = BlockPos.ZERO.above()
     val tile = TankTest.placeTank(helper, basePos, Tier.WOOD).asInstanceOf[TileTankNeoForge]
     val handler = getTankCapability(helper, basePos, tile)
+    assertEquals(4000, handler.getCapacityAsLong(0, FluidResource.EMPTY))
 
     val filled: Int = Using.resource(Transaction.openRoot()) { tx =>
-      val d = handler.extract(FluidAmountUtil.BUCKET_WATER.asVariant, FluidAmountUtil.BUCKET_WATER.amount.asForge, tx)
+      val d = handler.insert(FluidAmountUtil.BUCKET_WATER.asVariant, FluidAmountUtil.BUCKET_WATER.amount.asForge, tx)
       tx.close()
       d
     }
@@ -80,15 +81,56 @@ class TankFluidHandlerTest {
     val tile = TankTest.placeTank(helper, basePos, Tier.WOOD).asInstanceOf[TileTankNeoForge]
     TankTest.placeTank(helper, basePos.above(), Tier.STONE)
     val handler = getTankCapability(helper, basePos, tile)
+    assertEquals(20000, handler.getCapacityAsLong(0, FluidResource.EMPTY))
 
     val toFill = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(20000))
     val filled: Int = Using.resource(Transaction.openRoot()) { tx =>
-      val d = handler.extract(toFill.asVariant, toFill.amount.asForge, tx)
+      val d = handler.insert(toFill.asVariant, toFill.amount.asForge, tx)
       tx.commit()
       d
     }
     assertEquals(20000, filled)
     assertEqualHelper(Option(toFill), tile.getConnection.getContent)
+    helper.succeed()
+  }
+
+  def drainSimulate1(helper: GameTestHelper): Unit = {
+    val basePos = BlockPos.ZERO.above()
+    val tile = TankTest.placeTank(helper, basePos, Tier.WOOD).asInstanceOf[TileTankNeoForge]
+    val handler = getTankCapability(helper, basePos, tile)
+    assertEquals(4000, handler.getCapacityAsLong(0, FluidResource.EMPTY))
+    val content = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(3000))
+    tile.getConnection.getHandler.fill(content, execute = true)
+    assertEquals(3000L, handler.getAmountAsLong(0))
+
+    val toDrain = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(2000))
+    val drained = Using.resource(Transaction.openRoot()) { tx =>
+      val d = handler.extract(toDrain.asVariant, toDrain.amount.asForge, tx)
+      tx.close()
+      d
+    }
+    assertEquals(toDrain.amount.asForge, drained)
+    assertEquals(3000L, handler.getAmountAsLong(0))
+    helper.succeed()
+  }
+
+  def drainExecute1(helper: GameTestHelper): Unit = {
+    val basePos = BlockPos.ZERO.above()
+    val tile = TankTest.placeTank(helper, basePos, Tier.WOOD).asInstanceOf[TileTankNeoForge]
+    val handler = getTankCapability(helper, basePos, tile)
+    assertEquals(4000, handler.getCapacityAsLong(0, FluidResource.EMPTY))
+    val content = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(3000))
+    tile.getConnection.getHandler.fill(content, execute = true)
+    assertEquals(3000L, handler.getAmountAsLong(0))
+
+    val toDrain = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(2000))
+    val drained = Using.resource(Transaction.openRoot()) { tx =>
+      val d = handler.extract(toDrain.asVariant, toDrain.amount.asForge, tx)
+      tx.commit()
+      d
+    }
+    assertEquals(toDrain.amount.asForge, drained)
+    assertEquals(1000L, handler.getAmountAsLong(0))
     helper.succeed()
   }
 

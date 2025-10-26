@@ -12,7 +12,7 @@ public final class ItemBlockTankNeoForge extends ItemBlockTank {
         super(b);
     }
 
-    public static ResourceHandler<FluidResource> initCapabilities(ItemStack stack, ItemAccess ignored) {
-        return new TankFluidItemHandler(((ItemBlockTankNeoForge) stack.getItem()).blockTank().tier(), stack);
+    public static ResourceHandler<FluidResource> initCapabilities(ItemStack stack, ItemAccess access) {
+        return new TankFluidItemHandler(((ItemBlockTankNeoForge) stack.getItem()).blockTank().tier(), access);
     }
 }

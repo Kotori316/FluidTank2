@@ -9,6 +9,7 @@ import com.kotori316.fluidtank.contents.Tank;
 import com.kotori316.fluidtank.fluids.*;
 import com.kotori316.fluidtank.neoforge.cat.EntityChestAsTank;
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter;
+import com.kotori316.fluidtank.neoforge.integration.neoforge.SingleBucketResourceHandler;
 import com.kotori316.fluidtank.potions.PotionFluidHandler;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
@@ -24,6 +25,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -34,7 +36,9 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.SoundActions;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
@@ -67,7 +71,7 @@ final class NeoForgePlatformAccess implements PlatformAccess {
         if (potionHandler.isValidHandler()) {
             return potionHandler.getContent();
         }
-        return Optional.ofNullable(ItemAccess.forStack(stack).getCapability(Capabilities.Fluid.ITEM))
+        return Optional.ofNullable(NeoForgePlatformAccess.getFluidHandler(ItemAccess.forStack(stack)))
             .map(r -> NeoForgeConverter.toAmount(r.getResource(0), r.getAmountAsLong(0)))
             .orElse(FluidAmountUtil.EMPTY());
     }
@@ -77,7 +81,7 @@ final class NeoForgePlatformAccess implements PlatformAccess {
         if (stack.isEmpty()) {
             return false;
         }
-        return ItemAccess.forStack(stack).getCapability(Capabilities.Fluid.ITEM) != null ||
+        return NeoForgePlatformAccess.getFluidHandler(ItemAccess.forStack(stack)) != null ||
             PotionFluidHandler.apply(stack).isValidHandler();
     }
 
@@ -100,7 +104,7 @@ final class NeoForgePlatformAccess implements PlatformAccess {
             var result = potionHandler.fill(toFill, vanillaPotion);
             return moveItem(fluidContainer, player, execute, result, itemAccess);
         }
-        var fluidHandler = itemAccess.getCapability(Capabilities.Fluid.ITEM);
+        var fluidHandler = NeoForgePlatformAccess.getFluidHandler(itemAccess);
         if (fluidHandler == null) {
             return new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer, false);
         }
@@ -121,7 +125,7 @@ final class NeoForgePlatformAccess implements PlatformAccess {
             var result = potionHandler.drain(toDrain, v);
             return moveItem(fluidContainer, player, execute, result, itemAccess);
         }
-        var fluidHandler = itemAccess.getCapability(Capabilities.Fluid.ITEM);
+        var fluidHandler = NeoForgePlatformAccess.getFluidHandler(itemAccess);
         if (fluidHandler == null) {
             return new TransferStack(FluidAmountUtil.EMPTY(), fluidContainer, false);
         }
@@ -142,6 +146,17 @@ final class NeoForgePlatformAccess implements PlatformAccess {
             Transaction::commit,
             (itemStack, transaction) -> context.exchange(ItemResource.of(itemStack), 1, transaction)
         );
+    }
+
+    @Nullable
+    public static ResourceHandler<FluidResource> getFluidHandler(ItemAccess access) {
+        var item = access.getResource();
+        // Override resource handler for buckets
+        // Milk bucket is enabled in constructor of FluidTank, so I don't check the bindings for Milk
+        if (item.is(Items.BUCKET) || item.is(Items.MILK_BUCKET) || item.getItem() instanceof BucketItem) {
+            return new SingleBucketResourceHandler(access);
+        }
+        return access.getCapability(Capabilities.Fluid.ITEM);
     }
 
     @Override

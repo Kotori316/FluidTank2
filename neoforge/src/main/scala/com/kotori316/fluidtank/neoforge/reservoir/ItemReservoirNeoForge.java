@@ -12,7 +12,7 @@ public final class ItemReservoirNeoForge extends ItemReservoir {
         super(tier);
     }
 
-    public static ResourceHandler<FluidResource> initCapabilities(ItemStack stack, ItemAccess ignored) {
-        return new ReservoirFluidHandler((ItemReservoir) stack.getItem(), stack);
+    public static ResourceHandler<FluidResource> initCapabilities(ItemStack stack, ItemAccess access) {
+        return new ReservoirFluidHandler((ItemReservoir) stack.getItem(), access);
     }
 }

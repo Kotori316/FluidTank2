@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.{AbstractContainerMenu, Slot, TransientCraftingContainer}
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.CraftingInput
+import net.neoforged.neoforge.transfer.access.ItemAccess
 
 import scala.jdk.javaapi.CollectionConverters
 
@@ -31,7 +32,7 @@ object RecipeInventoryUtil {
   }
 
   def getFluidHandler(stack: ItemStack): TankFluidItemHandler = stack.getItem match {
-    case tank: ItemBlockTank => new TankFluidItemHandler(tank.blockTank.tier, stack)
+    case tank: ItemBlockTank => new TankFluidItemHandler(tank.blockTank.tier, ItemAccess.forStack(stack))
     // case reservoir: ReservoirItem => new TankItemFluidHandler(reservoir.tier, stack)
     case _ => throw new IllegalArgumentException(s"Stack $stack has no valid handler")
   }

@@ -29,6 +29,7 @@ final class TankItemTest {
 
   def tankItemCheckNbt(helper: GameTestHelper): Unit = {
     val stack = new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD).get)
+    Assertions.assertNull(stack.get(DataComponents.BLOCK_ENTITY_DATA))
     val handler = ItemAccess.forStack(stack).getCapability(Capabilities.Fluid.ITEM)
     Assertions.assertNotNull(handler)
     Using.resource(Transaction.openRoot()) { tx =>

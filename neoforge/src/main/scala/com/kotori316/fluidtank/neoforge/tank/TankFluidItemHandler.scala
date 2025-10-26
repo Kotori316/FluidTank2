@@ -56,10 +56,19 @@ class TankFluidItemHandler(tier: Tier, access: ItemAccess) extends TankFluidHand
   }
 
   @VisibleForTesting
-  def fill(fill: FluidAmount, execute: Boolean): Unit = {
+  def fill(fill: FluidAmount, execute: Boolean = true): Unit = {
     Using.resource(Transaction.openRoot()) { tx =>
       this.insert(fill.asVariant, fill.amount.asForge, tx)
       if (execute) tx.commit()
+    }
+  }
+
+  @VisibleForTesting
+  def setTank(tank: Tank[FluidLike]): Unit = {
+    val savedStack = saveTank(tank)
+    Using.resource(Transaction.openRoot()) { tx =>
+      this.context.exchange(savedStack, this.context.getAmount, tx)
+      tx.commit()
     }
   }
 }

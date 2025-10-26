@@ -104,7 +104,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     @Test
     def fillToFilled1(): Unit = {
       val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
-      handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
+      handler.setTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
 
       val f1 = Using.resource(Transaction.openRoot()) { tx =>
         handler.insert(FluidAmountUtil.BUCKET_LAVA.asVariant, FluidAmountUtil.BUCKET_WATER.amount.asForge, tx)
@@ -115,7 +115,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     @Test
     def fillToFilled2(): Unit = {
       val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
-      handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
+      handler.setTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
 
       val f1 = Using.resource(Transaction.openRoot()) { tx =>
         handler.insert(FluidAmountUtil.BUCKET_WATER.asVariant, 500, tx)
@@ -126,7 +126,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     @Test
     def fillToFilled3(): Unit = {
       val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
-      handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(3800)), GenericUnit.fromForge(4000)))
+      handler.setTank(Tank(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(3800)), GenericUnit.fromForge(4000)))
 
       val f1 = Using.resource(Transaction.openRoot()) { tx =>
         handler.insert(FluidAmountUtil.BUCKET_WATER.asVariant, 500, tx)
@@ -150,7 +150,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     @Test
     def drain1(): Unit = {
       val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
-      handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
+      handler.setTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
 
       val d1 = Using.resource(Transaction.openRoot()) { tx =>
         handler.extract(FluidAmountUtil.BUCKET_WATER.asVariant, 500, tx)
@@ -177,7 +177,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     @Test
     def drain2(): Unit = {
       val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
-      handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
+      handler.setTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
       val d2 = Using.resource(Transaction.openRoot()) { tx =>
         val r = handler.extract(FluidAmountUtil.BUCKET_WATER.asVariant, 1000, tx)
         tx.commit()
@@ -192,7 +192,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     @Test
     def drain3(): Unit = {
       val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
-      handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
+      handler.setTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
       val d2 = Using.resource(Transaction.openRoot()) { tx =>
         val r = handler.extract(FluidAmountUtil.BUCKET_WATER.asVariant, 1500, tx)
         tx.commit()
@@ -207,7 +207,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     @Test
     def drainFail(): Unit = {
       val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
-      handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
+      handler.setTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
 
       val t1 = Using.resource(Transaction.openRoot()) { tx =>
         handler.extract(FluidAmountUtil.BUCKET_LAVA.asVariant, 1500, tx)
@@ -222,7 +222,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     def unknownTagIsRemoved(): Unit = {
       val stack = new ItemStack(Items.APPLE)
       val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(stack))
-      handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
+      handler.setTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
       stack.update[TypedEntityData[BlockEntityType[?]]](DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(BlockEntityType.TEST_BLOCK, new CompoundTag()), data => {
         TypedEntityData.of(data.`type`(), data.copyTagWithoutId().tap(_.putString("unknownTag", "unknownTag")))
       })

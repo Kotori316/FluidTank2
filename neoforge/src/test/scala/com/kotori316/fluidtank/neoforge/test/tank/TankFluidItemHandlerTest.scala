@@ -14,6 +14,7 @@ import net.minecraft.world.item.component.TypedEntityData
 import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.storage.TagValueOutput
+import net.neoforged.neoforge.transfer.access.ItemAccess
 import net.neoforged.neoforge.transfer.fluid.FluidResource
 import net.neoforged.neoforge.transfer.transaction.Transaction
 import org.junit.jupiter.api.Assertions.*
@@ -26,7 +27,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
 
   @Test
   def create(): Unit = {
-    val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
+    val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
     assertTrue(handler.getContainer.is(Items.APPLE))
   }
 
@@ -34,7 +35,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
   def capacity(): Array[DynamicTest] = {
     val tiers = Tier.values().filter(_.isNormalTankTier)
     tiers.map(t => DynamicTest.dynamicTest(t.toString, () => {
-      val handler = new TankFluidItemHandler(t, new ItemStack(Items.APPLE))
+      val handler = new TankFluidItemHandler(t, ItemAccess.forStack(new ItemStack(Items.APPLE)))
       assertEquals(GenericUnit(t.getCapacity).asForge, handler.getCapacityAsLong(0, FluidResource.EMPTY))
     }))
   }
@@ -48,7 +49,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     val stack = new ItemStack(Items.APPLE)
     PlatformItemAccess.setTileTag(stack, tagValueOutput, BlockEntityType.TEST_BLOCK)
 
-    val handler = new TankFluidItemHandler(Tier.STONE, stack)
+    val handler = new TankFluidItemHandler(Tier.STONE, ItemAccess.forStack(stack))
     assertEquals(tank, handler.getTank)
   }
 
@@ -56,7 +57,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
   class FillTest {
     @Test
     def fillToEmpty(): Unit = {
-      val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
+      val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
       assertTrue(handler.getTank.isEmpty)
 
       Using.resource(Transaction.openRoot()) { tx =>
@@ -81,7 +82,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
 
     @Test
     def fillToEmpty2(): Unit = {
-      val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
+      val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
       assertTrue(handler.getTank.isEmpty)
 
       val filled1 = Using.resource(Transaction.openRoot()) { tx =>
@@ -102,7 +103,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
 
     @Test
     def fillToFilled1(): Unit = {
-      val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
+      val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
 
       val f1 = Using.resource(Transaction.openRoot()) { tx =>
@@ -113,7 +114,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
 
     @Test
     def fillToFilled2(): Unit = {
-      val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
+      val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
 
       val f1 = Using.resource(Transaction.openRoot()) { tx =>
@@ -124,7 +125,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
 
     @Test
     def fillToFilled3(): Unit = {
-      val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
+      val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(3800)), GenericUnit.fromForge(4000)))
 
       val f1 = Using.resource(Transaction.openRoot()) { tx =>
@@ -148,7 +149,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
   class DrainTest {
     @Test
     def drain1(): Unit = {
-      val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
+      val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
 
       val d1 = Using.resource(Transaction.openRoot()) { tx =>
@@ -175,7 +176,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
 
     @Test
     def drain2(): Unit = {
-      val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
+      val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
       val d2 = Using.resource(Transaction.openRoot()) { tx =>
         val r = handler.extract(FluidAmountUtil.BUCKET_WATER.asVariant, 1000, tx)
@@ -190,7 +191,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
 
     @Test
     def drain3(): Unit = {
-      val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
+      val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
       val d2 = Using.resource(Transaction.openRoot()) { tx =>
         val r = handler.extract(FluidAmountUtil.BUCKET_WATER.asVariant, 1500, tx)
@@ -205,7 +206,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
 
     @Test
     def drainFail(): Unit = {
-      val handler = new TankFluidItemHandler(Tier.WOOD, new ItemStack(Items.APPLE))
+      val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(new ItemStack(Items.APPLE)))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
 
       val t1 = Using.resource(Transaction.openRoot()) { tx =>
@@ -220,7 +221,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     @Test
     def unknownTagIsRemoved(): Unit = {
       val stack = new ItemStack(Items.APPLE)
-      val handler = new TankFluidItemHandler(Tier.WOOD, stack)
+      val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(stack))
       handler.saveTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
       stack.update[TypedEntityData[BlockEntityType[?]]](DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(BlockEntityType.TEST_BLOCK, new CompoundTag()), data => {
         TypedEntityData.of(data.`type`(), data.copyTagWithoutId().tap(_.putString("unknownTag", "unknownTag")))

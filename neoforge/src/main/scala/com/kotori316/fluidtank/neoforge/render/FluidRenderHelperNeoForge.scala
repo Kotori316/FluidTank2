@@ -6,9 +6,11 @@ import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter
 import com.kotori316.fluidtank.render.{FluidRenderHelper, RenderItemCodecs}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.resources.model.MaterialSet
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.level.material.Fluids
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
+import net.neoforged.neoforge.client.textures.FluidSpriteCache
 
 import java.util.Objects
 import scala.jdk.javaapi.OptionConverters
@@ -18,11 +20,11 @@ object FluidRenderHelperNeoForge extends FluidRenderHelper {
   final lazy val reservoirUnbaked = RenderItemCodecs.reservoirModelUnbaked(this)
   final lazy val tankUnbaked = RenderItemCodecs.tankModelUnbaked(this)
 
-  override def getFluidTexture(tank: Tank[FluidLike]): TextureAtlasSprite = {
+  override def getFluidTexture(tank: Tank[FluidLike], materialSet: MaterialSet): TextureAtlasSprite = {
     val fluid = FluidLike.asFluid(tank.content.content, Fluids.WATER)
     val attribute = IClientFluidTypeExtensions.of(fluid)
     val location = attribute.getStillTexture(fluid.defaultFluidState, Minecraft.getInstance.level, Objects.requireNonNull(Minecraft.getInstance.player).getOnPos)
-    Minecraft.getInstance.getTextureAtlas(RenderItemCodecs.atlas).apply(location)
+    FluidSpriteCache.getSprite(location)
   }
 
   override def getFluidColor(tank: Tank[FluidLike]): Int = {

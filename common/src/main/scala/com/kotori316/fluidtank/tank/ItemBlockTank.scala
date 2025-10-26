@@ -24,7 +24,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, new I
     super.appendHoverText(stack, context, tooltipDisplay, tooltip, isAdvanced)
     val component = stack.get(DataComponents.BLOCK_ENTITY_DATA)
     if (component != null) {
-      val nbt = component.copyTag()
+      val nbt = component.copyTagWithoutId()
       val tankTag = nbt.getCompoundOrEmpty(TileTank.KEY_TANK)
       val access = FluidAmountUtil.access
       val fluid = access.read(tankTag.getCompoundOrEmpty(access.KEY_CONTENT))

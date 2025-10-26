@@ -6,34 +6,45 @@ import com.kotori316.fluidtank.tank.TileTank
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.blockentity.{BlockEntityRenderer, BlockEntityRendererProvider}
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer
+import net.minecraft.client.renderer.state.CameraRenderState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
+import net.minecraft.client.renderer.{RenderType, SubmitNodeCollector}
 import net.minecraft.core.BlockPos
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 
-abstract class RenderTank(context: BlockEntityRendererProvider.Context) extends BlockEntityRenderer[TileTank] {
-  override final def render(blockEntity: TileTank, partialTick: Float, matrix: PoseStack, buffer: MultiBufferSource, packedLight: Int, packedOverlay: Int, vec3: Vec3): Unit = {
+abstract class RenderTank(val context: BlockEntityRendererProvider.Context) extends BlockEntityRenderer[TileTank, TankRenderState] {
+  override final def submit(renderState: TankRenderState, matrix: PoseStack, nodeCollector: SubmitNodeCollector, cameraRenderState: CameraRenderState): Unit = {
     val profiler = Profiler.get()
     profiler.push("RenderTank")
-    if (!blockEntity.getTank.isEmpty) {
+    if (!renderState.tank.isEmpty) {
       profiler.push("Rendering")
       matrix.pushPose()
-      val b = buffer.getBuffer(RenderType.translucentMovingBlock())
-      val tank = blockEntity.getVisualTank
-      if (tank.box != null) {
-        val texture = getFluidTexture(blockEntity.getTank, blockEntity)
-        val color = getFluidColor(blockEntity.getTank, blockEntity)
 
-        val value = Box.LightValue(packedLight).overrideBlock(getLuminance(blockEntity.getTank))
+      val tank = renderState.visualTank
+      if (tank.box != null) {
+        val texture = getFluidTexture(renderState.tank, renderState.tileTank)
+        val color = getFluidColor(renderState.tank, renderState.tileTank)
+
+        val value = Box.LightValue(renderState.lightCoords).overrideBlock(getLuminance(renderState.tank))
         val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
-        tank.box.render(b, matrix, texture, alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
+        nodeCollector.submitCustomGeometry(matrix, RenderType.translucentMovingBlock(), (pose, buffer) => {
+          tank.box.render(buffer, pose, texture, alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
+        })
       }
       matrix.popPose()
       profiler.pop()
     }
     profiler.pop()
+  }
+
+  override def createRenderState(): TankRenderState = new TankRenderState
+
+  override def extractRenderState(blockEntity: TileTank, renderState: TankRenderState, partialTick: Float, cameraPosition: Vec3, breakProgress: ModelFeatureRenderer.CrumblingOverlay): Unit = {
+    super.extractRenderState(blockEntity, renderState, partialTick, cameraPosition, breakProgress)
+    renderState.extract(blockEntity)
   }
 
   def getFluidTexture(tank: Tank[FluidLike], blockEntity: TileTank): TextureAtlasSprite

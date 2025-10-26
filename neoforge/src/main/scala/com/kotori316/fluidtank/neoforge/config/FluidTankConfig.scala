@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.neoforge.config
 
 import com.kotori316.fluidtank.config.ConfigData
 import com.kotori316.fluidtank.tank.Tier
-import net.neoforged.fml.loading.FMLLoader
+import net.neoforged.fml.loading.FMLEnvironment
 import net.neoforged.neoforge.common.ModConfigSpec
 
 import java.util.Locale
@@ -35,8 +35,8 @@ class FluidTankConfig(builder: ModConfigSpec.Builder) {
   builder.pop()
 
   private final val debug: ModConfigSpec.BooleanValue = builder.comment("Debug mode")
-    .comment(s"Default: ${ConfigData.DEFAULT.debug || !FMLLoader.isProduction}")
-    .define("debug", ConfigData.DEFAULT.debug || !FMLLoader.isProduction)
+    .comment(s"Default: ${ConfigData.DEFAULT.debug || !FMLEnvironment.isProduction}")
+    .define("debug", ConfigData.DEFAULT.debug || !FMLEnvironment.isProduction)
   private final val changeItemInCreative: ModConfigSpec.BooleanValue = builder.comment("True to allow to modify items in player attracting")
     .comment(s"Default: ${ConfigData.DEFAULT.changeItemInCreative}")
     .define("changeItemInCreative", ConfigData.DEFAULT.changeItemInCreative)

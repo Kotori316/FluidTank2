@@ -40,6 +40,7 @@ public class GetGameTestMethods {
             new SideProxyTest().generator(),
             new TankFluidHandlerTest().generator(),
             new TankPlacementTest().tests(),
+            new TankItemTest().tests(),
             new TankTest().fillTest()
         ).flatMap(Collection::stream);
         tests.forEach(TestFunctionRegister::registerTestFunction);

@@ -23,7 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
@@ -87,7 +87,7 @@ public final class TierRecipe implements CraftingRecipe {
         return tankStacks.size() == 4 &&
             tankStacks.stream().map(s -> s.get(DataComponents.BLOCK_ENTITY_DATA))
                 .filter(Objects::nonNull)
-                .map(CustomData::copyTag)
+                .map(TypedEntityData::copyTagWithoutId)
                 .flatMap(n -> n.getCompound(TileTank.KEY_TANK()).stream())
                 .map(nbt -> TankUtil.load(nbt, FluidAmountUtil.access()))
                 .map(Tank::content)
@@ -111,7 +111,7 @@ public final class TierRecipe implements CraftingRecipe {
             .filter(s -> s.getItem() instanceof ItemBlockTank)
             .map(s -> s.get(DataComponents.BLOCK_ENTITY_DATA))
             .filter(Objects::nonNull)
-            .map(CustomData::copyTag)
+            .map(TypedEntityData::copyTagWithoutId)
             .flatMap(n -> n.getCompound(TileTank.KEY_TANK()).stream())
             .map(nbt -> TankUtil.load(nbt, FluidAmountUtil.access()))
             .map(Tank::content)

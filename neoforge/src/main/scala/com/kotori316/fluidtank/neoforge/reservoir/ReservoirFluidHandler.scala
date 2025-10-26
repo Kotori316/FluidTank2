@@ -4,16 +4,16 @@ import com.kotori316.fluidtank.contents.Tank
 import com.kotori316.fluidtank.fluids.FluidLike
 import com.kotori316.fluidtank.neoforge.fluid.TankFluidHandler
 import com.kotori316.fluidtank.reservoir.ItemReservoir
-import net.minecraft.world.item.ItemStack
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem
+import net.neoforged.neoforge.transfer.access.ItemAccess
+import net.neoforged.neoforge.transfer.item.ItemResource
 
-class ReservoirFluidHandler(reservoir: ItemReservoir, stack: ItemStack) extends TankFluidHandler {
+class ReservoirFluidHandler(reservoir: ItemReservoir, access: ItemAccess) extends TankFluidHandler(access) {
 
-  override def getContainer: ItemStack = stack
+  override def getTank: Tank[FluidLike] = reservoir.getTank(this.context.getResource.toStack)
 
-  def getCapability(ignored: Void): IFluidHandlerItem = this
-
-  override def getTank: Tank[FluidLike] = reservoir.getTank(stack)
-
-  override def saveTank(newTank: Tank[FluidLike]): Unit = reservoir.saveTank(stack, newTank)
+  override def saveTank(newTank: Tank[FluidLike]): ItemResource = {
+    val stack = this.context.getResource.toStack
+    reservoir.saveTank(stack, newTank)
+    ItemResource.of(stack)
+  }
 }

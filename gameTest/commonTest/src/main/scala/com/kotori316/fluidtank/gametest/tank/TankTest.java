@@ -75,6 +75,17 @@ public final class TankTest {
         helper.succeed();
     }
 
+    static void interactWithEmptyHand(GameTestHelper helper) {
+        var basePos = BlockPos.ZERO.above();
+        var tile = placeTank(helper, basePos, Tier.WOOD);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        assertTrue(player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty(), "Test assumption, player has nothing in his hand");
+        assertTrue(tile.getTank().isEmpty(), "Test assumption, tank must be empty");
+
+        helper.useBlock(basePos, player);
+        helper.succeed();
+    }
+
     static void fill1(GameTestHelper helper) {
         var basePos = BlockPos.ZERO.above();
         var tile = placeTank(helper, basePos, Tier.WOOD);
@@ -124,7 +135,7 @@ public final class TankTest {
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BUCKET));
         helper.useBlock(basePos, player);
 
-        assertTrue(tile.getTank().isEmpty());
+        assertTrue(tile.getTank().isEmpty(), "The tank content must be consumed");
         assertEquals(Items.WATER_BUCKET, player.getItemInHand(InteractionHand.MAIN_HAND).getItem(), "In survival, the item must change.");
         helper.succeed();
     }
@@ -139,7 +150,7 @@ public final class TankTest {
         assertEquals(0, player.getInventory().countItem(Items.WATER_BUCKET), "Test assumption");
         helper.useBlock(basePos, player);
 
-        assertTrue(tile.getTank().isEmpty());
+        assertTrue(tile.getTank().isEmpty(), "The tank content must be consumed");
         assertEquals(Items.BUCKET, player.getItemInHand(InteractionHand.MAIN_HAND).getItem(), "In survival, the item must change.");
         assertEquals(9, player.getItemInHand(InteractionHand.MAIN_HAND).getCount(), "In survival, the item must change.");
         assertEquals(1, player.getInventory().countItem(Items.WATER_BUCKET));
@@ -409,7 +420,8 @@ public final class TankTest {
         block.saveTankNBT(tile, stack, helper.getLevel().registryAccess());
         var data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
         assertNotNull(data);
-        assertTrue(data.contains("id"), "Saved nbt must have id field since 1.20.5");
+        // assertTrue(data.contains("id"), "Saved nbt must have id field since 1.20.5");
+        assertFalse(data.contains("id"), "Saved nbt must not have id field since 1.21.10");
 
         helper.succeed();
     }

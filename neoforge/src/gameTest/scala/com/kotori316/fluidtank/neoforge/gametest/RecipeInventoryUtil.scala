@@ -2,15 +2,14 @@ package com.kotori316.fluidtank.neoforge.gametest
 
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.neoforge.FluidTank
-import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.FluidAmount2FluidStack
 import com.kotori316.fluidtank.neoforge.tank.TankFluidItemHandler
 import com.kotori316.fluidtank.tank.{ItemBlockTank, Tier}
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.inventory.{AbstractContainerMenu, Slot, TransientCraftingContainer}
+import net.minecraft.world.inventory.{AbstractContainerMenu, Slot}
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.CraftingInput
-import net.neoforged.neoforge.fluids.capability.IFluidHandler
+import net.neoforged.neoforge.transfer.access.ItemAccess
 
 import scala.jdk.javaapi.CollectionConverters
 
@@ -18,7 +17,6 @@ object RecipeInventoryUtil {
 
   def getInv(s1: String = "", s2: String = "", s3: String = "", itemMap: scala.collection.Map[Character, ItemStack]): CraftingInput = {
     val map = itemMap.toMap + (Character.valueOf(' ') -> ItemStack.EMPTY)
-    val cf = new TransientCraftingContainer(new DummyContainer(), 3, 3)
 
     require(s1.length <= 3 && s2.length <= 3 && s3.length <= 3, s"Over 4 elements are not allowed. ${(s1, s2, s3)}")
     require(s1.nonEmpty || s2.nonEmpty || s3.nonEmpty, "All Empty?")
@@ -33,7 +31,7 @@ object RecipeInventoryUtil {
   }
 
   def getFluidHandler(stack: ItemStack): TankFluidItemHandler = stack.getItem match {
-    case tank: ItemBlockTank => new TankFluidItemHandler(tank.blockTank.tier, stack)
+    case tank: ItemBlockTank => new TankFluidItemHandler(tank.blockTank.tier, ItemAccess.forStack(stack))
     // case reservoir: ReservoirItem => new TankItemFluidHandler(reservoir.tier, stack)
     case _ => throw new IllegalArgumentException(s"Stack $stack has no valid handler")
   }
@@ -41,7 +39,7 @@ object RecipeInventoryUtil {
   def getFilledTankStack(tier: Tier, fluid: FluidAmount): ItemStack = {
     val stack = new ItemStack(FluidTank.TANK_MAP.get(tier).get())
     val handler = getFluidHandler(stack)
-    handler.fill(fluid.toStack, IFluidHandler.FluidAction.EXECUTE)
+    handler.fill(fluid)
     stack
   }
 

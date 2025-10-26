@@ -2,22 +2,51 @@ package com.kotori316.fluidtank.neoforge.cat
 
 import com.kotori316.fluidtank.cat.{BlockChestAsTank, PlatformChestAsTankAccess}
 import com.kotori316.fluidtank.contents.GenericUnit
-import com.kotori316.fluidtank.fluids.PlatformFluidAccess
-import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter
+import com.kotori316.fluidtank.fluids.{FluidAmount, PlatformFluidAccess}
+import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.{InteractionHand, InteractionResult}
 import net.neoforged.neoforge.capabilities.Capabilities
-import net.neoforged.neoforge.fluids.capability.IFluidHandler
+import net.neoforged.neoforge.transfer.ResourceHandler
+import net.neoforged.neoforge.transfer.fluid.FluidResource
+import net.neoforged.neoforge.transfer.transaction.Transaction
 
 import scala.jdk.CollectionConverters.CollectionHasAsScala
+import scala.util.Using
 
 class BlockChestAsTankNeoForge extends BlockChestAsTank {
 
+  private def fillSimulate(storage: ResourceHandler[FluidResource], toFill: FluidAmount, stack: ItemStack, player: Player, hand: InteractionHand): Option[PlatformFluidAccess.TransferStack] = {
+    Using.resource(Transaction.openRoot()) { tx =>
+      val fillSimulate = storage.insert(toFill.asVariant, toFill.amount.asForge, tx)
+      if (fillSimulate > 0) {
+        Option(PlatformFluidAccess.getInstance().drainItem(toFill.setAmount(GenericUnit.fromForge(fillSimulate)), stack, player, hand, false))
+      } else {
+        Option.empty
+      }
+    }
+  }
+
+  private def fill(storage: ResourceHandler[FluidResource], toFill: FluidAmount, toDrain: FluidAmount, stack: ItemStack, player: Player, hand: InteractionHand): Option[PlatformFluidAccess.TransferStack] = {
+    Using.resource(Transaction.openRoot()) { tx =>
+      val filled = storage.insert(toFill.asVariant, toFill.amount.asForge, tx)
+      tx.commit()
+      Option(PlatformFluidAccess.getInstance().drainItem(toDrain.setAmount(GenericUnit.fromForge(filled)), stack, player, hand, true))
+    }
+  }
+
+  private def drain(storage: ResourceHandler[FluidResource], toDrain: FluidAmount): Unit = {
+    Using.resource(Transaction.openRoot()) { tx =>
+      storage.extract(toDrain.asVariant, toDrain.amount.asForge, tx)
+      tx.commit()
+    }
+  }
+
   override def transferFluid(level: Level, pos: BlockPos, player: Player, hand: InteractionHand, stack: ItemStack): InteractionResult = {
-    val storage = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, Direction.UP)
+    val storage = level.getCapability(Capabilities.Fluid.BLOCK, pos, Direction.UP)
     if (storage == null) {
       return InteractionResult.PASS
     }
@@ -26,13 +55,10 @@ class BlockChestAsTankNeoForge extends BlockChestAsTank {
       for {
         toFill <- Option(PlatformFluidAccess.getInstance().getFluidContained(stack))
         if toFill.nonEmpty
-        fillSimulate = storage.fill(NeoForgeConverter.toStack(toFill), IFluidHandler.FluidAction.SIMULATE)
-        if fillSimulate > 0
-        canDrainFromItem = PlatformFluidAccess.getInstance().drainItem(toFill.setAmount(GenericUnit.fromForge(fillSimulate)), stack, player, hand, false)
+        canDrainFromItem <- fillSimulate(storage, toFill, stack, player, hand)
         if canDrainFromItem.moved().nonEmpty
-        filled = storage.fill(NeoForgeConverter.toStack(toFill), IFluidHandler.FluidAction.EXECUTE)
+        transferStack <- fill(storage, toFill, canDrainFromItem.moved(), stack, player, hand)
       } yield {
-        val transferStack = PlatformFluidAccess.getInstance().drainItem(canDrainFromItem.moved().setAmount(GenericUnit.fromForge(filled)), stack, player, hand, true)
         val drainedItem: ItemStack = transferStack.toReplace
         InteractionResult.SUCCESS_SERVER.heldItemTransformedTo(drainedItem)
       }
@@ -50,7 +76,7 @@ class BlockChestAsTankNeoForge extends BlockChestAsTank {
             if fillSimulate.nonEmpty
             filled = PlatformFluidAccess.getInstance().fillItem(fillSimulate, stack, player, hand, true)
           } yield {
-            storage.drain(NeoForgeConverter.toStack(filled.moved()), IFluidHandler.FluidAction.EXECUTE)
+            drain(storage, filled.moved())
             InteractionResult.SUCCESS_SERVER.heldItemTransformedTo(filled.toReplace)
           }
         }

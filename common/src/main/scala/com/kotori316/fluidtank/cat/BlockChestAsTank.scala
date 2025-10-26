@@ -43,7 +43,7 @@ abstract class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
 
   override def useWithoutItem(state: BlockState, level: Level, pos: BlockPos, player: Player, hit: BlockHitResult): InteractionResult = {
     if (!player.isCrouching) {
-      if (!level.isClientSide) {
+      if (!level.isClientSide()) {
         val fluids = PlatformChestAsTankAccess.getInstance().getCATFluids(level, pos)
         if (fluids.isEmpty) {
           player.displayClientMessage(Component.translatable("chat.fluidtank.cat_empty"), false)
@@ -66,7 +66,7 @@ abstract class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
 
   override def useItemOn(stack: ItemStack, state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
     if (PlatformFluidAccess.getInstance().isFluidContainer(stack)) {
-      if (!level.isClientSide) {
+      if (!level.isClientSide()) {
         transferFluid(level, pos, player, hand, stack)
       } else {
         InteractionResult.SUCCESS_SERVER

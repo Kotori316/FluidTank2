@@ -30,7 +30,7 @@ object FluidTankCommonDataProvider {
     ))
     event.addProvider(StateAndModelProvider(event.getGenerator.getPackOutput))
     event.addProvider(PackMetadataGenerator(event.getGenerator.getPackOutput)
-      .add(PackMetadataSection.TYPE, PackMetadataSection(Component.literal("FluidTank Resources"), DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES)))
+      .add(PackMetadataSection.CLIENT_TYPE, PackMetadataSection(Component.literal("FluidTank Resources"), DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES).minorRange()))
     )
   }
 }

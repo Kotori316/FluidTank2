@@ -13,7 +13,7 @@ final class SideProxyTest {
   }
 
   def checkProxyClass(helper: GameTestHelper): Unit = {
-    val clazz = FMLEnvironment.dist match {
+    val clazz = FMLEnvironment.getDist match {
       case Dist.DEDICATED_SERVER => Class.forName("com.kotori316.fluidtank.neoforge.SideProxy$ServerProxy")
       case Dist.CLIENT => Class.forName("com.kotori316.fluidtank.neoforge.SideProxy$ClientProxy")
     }

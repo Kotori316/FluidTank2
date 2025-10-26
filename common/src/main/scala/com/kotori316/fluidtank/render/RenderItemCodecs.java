@@ -2,7 +2,6 @@ package com.kotori316.fluidtank.render;
 
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
@@ -37,9 +36,9 @@ public final class RenderItemCodecs {
         }
 
         @Override
-        public SpecialModelRenderer<?> bake(EntityModelSet modelSet) {
-            var model = new ReservoirModel(modelSet.bakeLayer(ReservoirModel.LOCATION));
-            return new RenderReservoirItem(model, helper);
+        public SpecialModelRenderer<?> bake(SpecialModelRenderer.BakingContext context) {
+            var model = new ReservoirModel(context.entityModelSet().bakeLayer(ReservoirModel.LOCATION));
+            return new RenderReservoirItem(model, context.materials(), helper);
         }
 
         @Override
@@ -59,8 +58,8 @@ public final class RenderItemCodecs {
         }
 
         @Override
-        public SpecialModelRenderer<?> bake(EntityModelSet modelSet) {
-            var model = new TankModel(modelSet.bakeLayer(TankModel.LOCATION));
+        public SpecialModelRenderer<?> bake(SpecialModelRenderer.BakingContext context) {
+            var model = new TankModel(context.entityModelSet().bakeLayer(TankModel.LOCATION));
             return new RenderItemTank(model, helper);
         }
 

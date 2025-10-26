@@ -57,7 +57,7 @@ class PlatformAccessTest {
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
     val transferred = ACCESS.fillItem(FluidAmountUtil.BUCKET_LAVA, stack, player, InteractionHand.MAIN_HAND, true)
-    assertTrue(transferred.shouldMove, "Forge module didn't move items")
+    assertFalse(transferred.shouldMove, "NeoForge module move items")
     assertEquals(FluidAmountUtil.BUCKET_LAVA, transferred.moved)
     assertEquals(Items.LAVA_BUCKET, transferred.toReplace.getItem, "Transfer result")
 
@@ -70,7 +70,7 @@ class PlatformAccessTest {
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
     val transferred = ACCESS.drainItem(FluidAmountUtil.BUCKET_WATER, stack, player, InteractionHand.MAIN_HAND, true)
-    assertTrue(transferred.shouldMove, "Forge module didn't move items")
+    assertFalse(transferred.shouldMove, "NeoForge module move items")
     assertEquals(FluidAmountUtil.BUCKET_WATER, transferred.moved)
     assertEquals(Items.BUCKET, transferred.toReplace.getItem, "Transfer result")
 
@@ -83,7 +83,7 @@ class PlatformAccessTest {
     player.setItemInHand(InteractionHand.MAIN_HAND, stack)
 
     val transferred = ACCESS.drainItem(FluidAmountUtil.BUCKET_LAVA, stack, player, InteractionHand.MAIN_HAND, true)
-    assertTrue(transferred.shouldMove, "Forge module didn't move items")
+    assertFalse(transferred.shouldMove, "NeoForge module move items")
     assertEquals(FluidAmountUtil.BUCKET_LAVA, transferred.moved)
     assertEquals(Items.BUCKET, transferred.toReplace.getItem, "Transfer result")
 
@@ -176,7 +176,7 @@ class PlatformAccessTest {
 
     val toFill = potionFluid(potionType, potion)
     val transferred = ACCESS.fillItem(toFill, stack, player, InteractionHand.MAIN_HAND, true)
-    assertTrue(transferred.shouldMove, "Forge module didn't move items")
+    assertFalse(transferred.shouldMove, "NeoForge module move items")
     assertEquals(toFill, transferred.moved)
     val expected = PotionContents.createItemStack(potionType.getItem, potion)
     assertTrue(ItemStack.isSameItemSameComponents(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getComponents, transferred.toReplace.getComponents))
@@ -204,7 +204,7 @@ class PlatformAccessTest {
 
     val toDrain = potionFluid(potionType, potion)
     val transferred = ACCESS.drainItem(toDrain, stack, player, InteractionHand.MAIN_HAND, true)
-    assertTrue(transferred.shouldMove, "Forge module didn't move items")
+    assertFalse(transferred.shouldMove, "NeoForge module move items")
     assertEquals(toDrain, transferred.moved)
     val expected = Items.GLASS_BOTTLE.getDefaultInstance
     assertTrue(ItemStack.isSameItemSameComponents(expected, transferred.toReplace), "transferred, Ex: %s, Ac: %s".formatted(expected.getComponents, transferred.toReplace.getComponents))

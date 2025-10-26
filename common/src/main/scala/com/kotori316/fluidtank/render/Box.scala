@@ -20,7 +20,7 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
   val offZ: Double = sizeZ / 2
   val maxSize: Double = Math.max(Math.max(sizeX, sizeY), sizeZ)
 
-  def render(buffer: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lightValue: Box.LightValue): Unit = {
+  def render(buffer: VertexConsumer, matrix: PoseStack.Pose, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lightValue: Box.LightValue): Unit = {
     val n1X = dx
     val n1Y = Box.normalY(dx, dy, dz)
     val n1Z = dz
@@ -32,7 +32,7 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
       alpha, red, green, blue)
   }
 
-  protected final def renderInternal(r: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite,
+  protected final def renderInternal(r: VertexConsumer, matrix: PoseStack.Pose, sprite: TextureAtlasSprite,
                                      n1X: Double, n1Y: Double, n1Z: Double,
                                      n2X: Double, n2Z: Double, lv: Box.LightValue,
                                      alpha: Int, red: Int, green: Int, blue: Int): Unit = {
@@ -119,7 +119,7 @@ private class BoxX(startX: Double,
   extends Box(startX, y, z, endX, y, z, sizeX, sizeY, sizeZ, firstSide, endSide) {
   override val length: Double = dx
 
-  override def render(r: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+  override def render(r: VertexConsumer, matrix: PoseStack.Pose, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
     val buffer: Wrapper = new Wrapper(r)
     val count = Mth.floor(length / sizeX)
     val minU = sprite.getU0
@@ -178,7 +178,7 @@ private class BoxY(startY: Double,
   extends Box(x, startY, z, x, endY, z, sizeX, sizeY, sizeZ, firstSide, endSide) {
   override val length = dy
 
-  override def render(r: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+  override def render(r: VertexConsumer, matrix: PoseStack.Pose, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
     val buffer: Wrapper = new Wrapper(r)
     val count = Mth.floor(length / sizeY)
     val minU = sprite.getU0
@@ -238,7 +238,7 @@ private class BoxZ(startZ: Double,
   extends Box(x, y, startZ, x, y, endZ, sizeX, sizeY, sizeZ, firstSide, endSide) {
   override val length = dz
 
-  override def render(r: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+  override def render(r: VertexConsumer, matrix: PoseStack.Pose, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
     val buffer: Wrapper = new Wrapper(r)
     val count = Mth.floor(length / sizeZ)
     val minU = sprite.getU0
@@ -295,7 +295,7 @@ private class BoxXZ(startX: Double, startZ: Double, endX: Double, y: Double, end
   extends Box(startX, y, startZ, endX, y, endZ, sizeX, sizeY, sizeZ, firstSide, endSide) {
   override val length = Math.sqrt(dx * dx + dz * dz)
 
-  override def render(buffer: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+  override def render(buffer: VertexConsumer, matrix: PoseStack.Pose, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
     val n2Size = length
     renderInternal(buffer, matrix, sprite, 0, 0.5, 0, -dz / n2Size / 2, dx / n2Size / 2, lv, alpha, red, green, blue)
   }

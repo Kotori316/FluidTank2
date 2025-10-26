@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -46,9 +47,9 @@ final class TankTest {
         placeTank(helper, basePos, Tier.WOOD);
         placeTank(helper, basePos.above(), Tier.STONE);
 
-        var handler = helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(basePos), Direction.NORTH);
+        var handler = helper.getLevel().getCapability(Capabilities.Fluid.BLOCK, helper.absolutePos(basePos), Direction.NORTH);
         assertNotNull(handler);
-        assertEquals(20000, handler.getTankCapacity(0));
+        assertEquals(20000, handler.getCapacityAsLong(0, FluidResource.EMPTY));
         helper.succeed();
     }
 }

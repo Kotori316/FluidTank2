@@ -12,48 +12,63 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.ProblemReporter
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.storage.TagValueOutput
-import net.neoforged.neoforge.fluids.capability.{IFluidHandler, IFluidHandlerItem}
+import net.neoforged.neoforge.transfer.access.ItemAccess
+import net.neoforged.neoforge.transfer.item.ItemResource
+import net.neoforged.neoforge.transfer.transaction.Transaction
 import org.jetbrains.annotations.VisibleForTesting
 
 import scala.jdk.OptionConverters.RichOptional
+import scala.util.Using
 
-class TankFluidItemHandler(tier: Tier, stack: ItemStack) extends TankFluidHandler {
+class TankFluidItemHandler(tier: Tier, access: ItemAccess) extends TankFluidHandler(access) {
 
-  def getCapability(ignored: Void): IFluidHandlerItem = this
-
-  override def getContainer: ItemStack = stack
+  def getContainer: ItemStack = this.context.getResource.toStack
 
   override def getTank: Tank[FluidLike] = {
     val componentPatch = getContainer.getComponentsPatch
     val maybeTank = for {
       blockEntityData <- Option(componentPatch.get(DataComponents.BLOCK_ENTITY_DATA)).flatMap(_.toScala)
       if blockEntityData.contains(TileTank.KEY_TANK)
-      customTag = blockEntityData.copyTag()
+      customTag = blockEntityData.copyTagWithoutId()
       tankTag <- customTag.getCompound(TileTank.KEY_TANK).toScala
     } yield TankUtil.load(tankTag)
     maybeTank.getOrElse(Tank(FluidAmountUtil.EMPTY, GenericUnit(tier.getCapacity)))
   }
 
-  override def saveTank(tank: Tank[FluidLike]): Unit = {
+  override def saveTank(tank: Tank[FluidLike]): ItemResource = {
+    val stack = getContainer
     if (tank.isEmpty) {
       // remove tags related to block entity
       // Other mods might add own tags in BlockEntityTag, but remove them as they will cause rendering issue.
-      getContainer.remove(DataComponents.BLOCK_ENTITY_DATA)
+      stack.remove(DataComponents.BLOCK_ENTITY_DATA)
     } else {
       val tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING)
-      val tag = Option(getContainer.getComponentsPatch.get(DataComponents.BLOCK_ENTITY_DATA))
+      val tag = Option(stack.getComponentsPatch.get(DataComponents.BLOCK_ENTITY_DATA))
         .flatMap(_.toScala)
-        .map(_.copyTag())
+        .map(_.copyTagWithoutId())
         .getOrElse(new CompoundTag())
       tagValueOutput.store(tag)
       tagValueOutput.store(TileTank.KEY_TANK, Tank.codec, tank)
       tagValueOutput.putString(TileTank.KEY_TIER, tier.name())
-      PlatformItemAccess.setTileTag(getContainer, tagValueOutput, FluidTank.TILE_TANK_TYPE.get())
+      PlatformItemAccess.setTileTag(stack, tagValueOutput, FluidTank.TILE_TANK_TYPE.get())
+    }
+    ItemResource.of(stack)
+  }
+
+  @VisibleForTesting
+  def fill(fill: FluidAmount, execute: Boolean = true): Unit = {
+    Using.resource(Transaction.openRoot()) { tx =>
+      this.insert(fill.asVariant, fill.amount.asForge, tx)
+      if (execute) tx.commit()
     }
   }
 
   @VisibleForTesting
-  def fill(fill: FluidAmount, execute: Boolean): Unit = {
-    this.fill(fill.toStack, if (execute) IFluidHandler.FluidAction.EXECUTE else IFluidHandler.FluidAction.SIMULATE)
+  def setTank(tank: Tank[FluidLike]): Unit = {
+    val savedStack = saveTank(tank)
+    Using.resource(Transaction.openRoot()) { tx =>
+      this.context.exchange(savedStack, this.context.getAmount, tx)
+      tx.commit()
+    }
   }
 }

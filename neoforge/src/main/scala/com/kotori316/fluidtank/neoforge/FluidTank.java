@@ -160,11 +160,11 @@ public final class FluidTank {
     }
 
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, TILE_TANK_TYPE.get(), TileTankNeoForge::getCapability);
-        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, TILE_CREATIVE_TANK_TYPE.get(), TileCreativeTankNeoForge::getCapability);
-        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, TILE_VOID_TANK_TYPE.get(), TileVoidTankNeoForge::getCapability);
-        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, TILE_CAT.get(), EntityChestAsTank::getCapability);
-        event.registerItem(Capabilities.FluidHandler.ITEM, ItemBlockTankNeoForge::initCapabilities, TANK_MAP.values().stream().map(DeferredBlock::asItem).toArray(Item[]::new));
-        event.registerItem(Capabilities.FluidHandler.ITEM, ItemReservoirNeoForge::initCapabilities, RESERVOIR_MAP.values().stream().map(DeferredItem::asItem).toArray(Item[]::new));
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, TILE_TANK_TYPE.get(), TileTankNeoForge::getCapability);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, TILE_CREATIVE_TANK_TYPE.get(), TileCreativeTankNeoForge::getCapability);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, TILE_VOID_TANK_TYPE.get(), TileVoidTankNeoForge::getCapability);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, TILE_CAT.get(), EntityChestAsTank::getCapability);
+        event.registerItem(Capabilities.Fluid.ITEM, ItemBlockTankNeoForge::initCapabilities, TANK_MAP.values().stream().map(DeferredBlock::asItem).toArray(Item[]::new));
+        event.registerItem(Capabilities.Fluid.ITEM, ItemReservoirNeoForge::initCapabilities, RESERVOIR_MAP.values().stream().map(DeferredItem::asItem).toArray(Item[]::new));
     }
 }

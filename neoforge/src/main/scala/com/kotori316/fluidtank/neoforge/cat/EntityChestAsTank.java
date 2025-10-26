@@ -1,9 +1,7 @@
 package com.kotori316.fluidtank.neoforge.cat;
 
 import com.kotori316.fluidtank.contents.GenericAmount;
-import com.kotori316.fluidtank.contents.GenericUnit;
 import com.kotori316.fluidtank.fluids.FluidLike;
-import com.kotori316.fluidtank.fluids.FluidLikeKey;
 import com.kotori316.fluidtank.neoforge.FluidTank;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,25 +11,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import org.jetbrains.annotations.NotNull;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
-import scala.math.BigInt;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class EntityChestAsTank extends BlockEntity {
     public EntityChestAsTank(BlockPos pos, BlockState state) {
@@ -42,7 +32,7 @@ public class EntityChestAsTank extends BlockEntity {
     private FluidHandlerProxy proxy = null;
 
     @Nullable
-    public IFluidHandler getCapability(Direction ignored) {
+    public ResourceHandler<FluidResource> getCapability(Direction ignored) {
         if (!(getLevel() instanceof ServerLevel)) return null;
         if (this.proxy == null) {
             this.proxy = createProxy();
@@ -50,41 +40,73 @@ public class EntityChestAsTank extends BlockEntity {
         return proxy;
     }
 
-    @Nullable
     private FluidHandlerProxy createProxy() {
         var facing = getBlockState().getValue(BlockStateProperties.FACING);
         var pos = getBlockPos().relative(facing);
-        var cache = BlockCapabilityCache.create(Capabilities.ItemHandler.BLOCK, (ServerLevel) Objects.requireNonNull(getLevel()), pos, facing.getOpposite(), () -> true, () -> this.proxy = null);
-        if (cache.getCapability() instanceof IItemHandlerModifiable) {
-            return new FluidHandlerProxy(cache);
-        }
-        return null;
+        var cache = BlockCapabilityCache.create(Capabilities.Item.BLOCK, (ServerLevel) Objects.requireNonNull(getLevel()), pos, facing.getOpposite(), () -> true, () -> this.proxy = null);
+        return new FluidHandlerProxy(cache);
     }
 
     public Optional<List<GenericAmount<FluidLike>>> getFluids() {
-        return Optional.ofNullable(getCapability(null))
+        return Optional.empty();
+        /*return Optional.ofNullable(getCapability(null))
             .filter(FluidHandlerProxy.class::isInstance)
             .map(FluidHandlerProxy.class::cast)
             .map(FluidHandlerProxy::fluids)
             .map(m ->
                 m.entrySet().stream().map(e -> e.getKey().toAmount(e.getValue())).toList()
-            );
+            );*/
     }
 
-    static class FluidHandlerProxy implements IFluidHandler {
+    static class FluidHandlerProxy implements ResourceHandler<FluidResource> {
 
-        private final Supplier<IItemHandler> cache;
+        private final Supplier<ResourceHandler<ItemResource>> cache;
 
-        FluidHandlerProxy(BlockCapabilityCache<IItemHandler, ?> cache) {
+        FluidHandlerProxy(BlockCapabilityCache<ResourceHandler<ItemResource>, ?> cache) {
             this.cache = cache::getCapability;
         }
 
         @VisibleForTesting
-        FluidHandlerProxy(IItemHandlerModifiable handler) {
+        FluidHandlerProxy(ResourceHandler<ItemResource> handler) {
             this.cache = () -> handler;
         }
 
-        Optional<IFluidHandlerItem> getHandler(int slot) {
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public FluidResource getResource(int index) {
+            return null;
+        }
+
+        @Override
+        public long getAmountAsLong(int index) {
+            return 0;
+        }
+
+        @Override
+        public long getCapacityAsLong(int index, FluidResource resource) {
+            return 0;
+        }
+
+        @Override
+        public boolean isValid(int index, FluidResource resource) {
+            return false;
+        }
+
+        @Override
+        public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
+            return 0;
+        }
+
+        @Override
+        public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
+            return 0;
+        }
+
+        /*Optional<IFluidHandlerItem> getHandler(int slot) {
             return Optional.ofNullable(cache.get())
                 .map(i -> i.getStackInSlot(slot))
                 .flatMap(FluidUtil::getFluidHandler);
@@ -187,11 +209,11 @@ public class EntityChestAsTank extends BlockEntity {
                 .filter(Predicate.not(FluidStack::isEmpty))
                 .collect(Collectors.groupingBy(f -> FluidLikeKey.apply(FluidLike.of(f.getFluid()), f.getComponentsPatch()),
                     Collectors.reducing(BigInt.apply(0), f -> GenericUnit.asBigIntFromForge(f.getAmount()), BigInt::$plus)));
-        }
+        }*/
     }
 
     @VisibleForTesting
-    public static IFluidHandler getProxy(IItemHandlerModifiable handler) {
+    public static ResourceHandler<FluidResource> getProxy(ResourceHandler<ItemResource> handler) {
         return new FluidHandlerProxy(handler);
     }
 }

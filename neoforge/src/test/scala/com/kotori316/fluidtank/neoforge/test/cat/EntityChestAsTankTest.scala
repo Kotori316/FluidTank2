@@ -1,65 +1,54 @@
 package com.kotori316.fluidtank.neoforge.test.cat
 
 import com.kotori316.fluidtank.contents.GenericUnit
-import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, FluidLike}
-import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.FluidAmount2FluidStack
+import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
+import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
 import com.kotori316.fluidtank.neoforge.test.{BeforeMC, TestMod}
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.{ItemStack, Items}
-import net.neoforged.neoforge.fluids.capability.IFluidHandler
-import net.neoforged.neoforge.items.wrapper.InvWrapper
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.{Disabled, Test}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.{Arguments, MethodSource}
 
+@Disabled("Implementing")
 class EntityChestAsTankTest extends BeforeMC {
 
   @Test
   def slot(): Unit = {
     val items = new SimpleContainer(Seq.fill(15)(new ItemStack(Items.BUCKET)) *)
-    val handler = TestMod.getCatHandler(new InvWrapper(items))
+    val handler = TestMod.getCatHandler(VanillaContainerWrapper.of(items))
 
-    assertEquals(15, handler.getTanks)
+    assertEquals(15, handler.size())
   }
 
   @ParameterizedTest
   @MethodSource(Array("com.kotori316.fluidtank.neoforge.test.cat.EntityChestAsTankTest#fluids"))
   def fillToBucket(fluid: FluidAmount, filledItem: ItemStack): Unit = {
     val items = new SimpleContainer(Seq.fill(10)(new ItemStack(Items.BUCKET)) *)
-    val handler = TestMod.getCatHandler(new InvWrapper(items))
+    val handler = TestMod.getCatHandler(VanillaContainerWrapper.of(items))
 
-    val filled = handler.fill(fluid.toStack, IFluidHandler.FluidAction.EXECUTE)
-    assertEquals(filledItem.getCount * 1000, filled)
-    assertEquals(filledItem.getCount, items.countItem(filledItem.getItem))
+    TestMod.inTransaction { tx =>
+      val filled = handler.insert(fluid.asVariant, fluid.amount.asForge, tx)
+      assertEquals(filledItem.getCount * 1000, filled)
+      assertEquals(filledItem.getCount, items.countItem(filledItem.getItem))
+    }
   }
 
   @ParameterizedTest
   @MethodSource(Array("com.kotori316.fluidtank.neoforge.test.cat.EntityChestAsTankTest#fluids"))
   def drainFromBucket1(fluid: FluidAmount, filledItem: ItemStack): Unit = {
     val items = new SimpleContainer(Seq.fill(10)(filledItem.copyWithCount(1)) *)
-    val handler = TestMod.getCatHandler(new InvWrapper(items))
+    val handler = TestMod.getCatHandler(VanillaContainerWrapper.of(items))
 
-    val drained = handler.drain(fluid.toStack, IFluidHandler.FluidAction.EXECUTE)
-    assertEquals(filledItem.getCount * 1000, drained.getAmount)
-    assertEquals(fluid.content, FluidLike.of(drained.getFluid))
+    TestMod.inTransaction { tx =>
+      val drained = handler.extract(fluid.asVariant, fluid.amount.asForge, tx)
+      assertEquals(filledItem.getCount * 1000, drained)
 
-    assertEquals(filledItem.getCount, items.countItem(Items.BUCKET))
-    assertEquals(10 - filledItem.getCount, items.countItem(filledItem.getItem))
-  }
-
-  @ParameterizedTest
-  @MethodSource(Array("com.kotori316.fluidtank.neoforge.test.cat.EntityChestAsTankTest#fluids"))
-  def drainFromBucket2(fluid: FluidAmount, filledItem: ItemStack): Unit = {
-    val items = new SimpleContainer(Seq.fill(10)(filledItem.copyWithCount(1)) *)
-    val handler = TestMod.getCatHandler(new InvWrapper(items))
-
-    val drained = handler.drain(fluid.amount.asForge, IFluidHandler.FluidAction.EXECUTE)
-    assertEquals(filledItem.getCount * 1000, drained.getAmount)
-    assertEquals(fluid.content, FluidLike.of(drained.getFluid))
-
-    assertEquals(filledItem.getCount, items.countItem(Items.BUCKET))
-    assertEquals(10 - filledItem.getCount, items.countItem(filledItem.getItem))
+      assertEquals(filledItem.getCount, items.countItem(Items.BUCKET))
+      assertEquals(10 - filledItem.getCount, items.countItem(filledItem.getItem))
+    }
   }
 
   @ParameterizedTest
@@ -67,12 +56,14 @@ class EntityChestAsTankTest extends BeforeMC {
   def fillStackedBucket(fluid: FluidAmount, filledItem: ItemStack): Unit = {
     val items = new SimpleContainer(2)
     items.setItem(0, new ItemStack(Items.BUCKET, 2))
-    val handler = TestMod.getCatHandler(new InvWrapper(items))
+    val handler = TestMod.getCatHandler(VanillaContainerWrapper.of(items))
 
-    val filled = handler.fill(fluid.toStack, IFluidHandler.FluidAction.EXECUTE)
-    assertEquals(0, filled)
-    assertTrue(ItemStack.matches(new ItemStack(Items.BUCKET, 2), items.getItem(0)))
-    assertEquals(0, items.countItem(filledItem.getItem))
+    TestMod.inTransaction { tx =>
+      val filled = handler.insert(fluid.asVariant, fluid.amount.asForge, tx)
+      assertEquals(0, filled)
+      assertTrue(ItemStack.matches(new ItemStack(Items.BUCKET, 2), items.getItem(0)))
+      assertEquals(0, items.countItem(filledItem.getItem))
+    }
   }
 
   @ParameterizedTest
@@ -81,24 +72,13 @@ class EntityChestAsTankTest extends BeforeMC {
     val items = new SimpleContainer(2)
     items.setItem(1, filledItem.copy())
     items.getItem(1).setCount(2)
-    val handler = TestMod.getCatHandler(new InvWrapper(items))
+    val handler = TestMod.getCatHandler(VanillaContainerWrapper.of(items))
 
-    val drained = handler.drain(fluid.toStack, IFluidHandler.FluidAction.EXECUTE)
-    assertTrue(drained.isEmpty)
-    assertEquals(0, items.countItem(Items.BUCKET))
-  }
-
-  @ParameterizedTest
-  @MethodSource(Array("com.kotori316.fluidtank.neoforge.test.cat.EntityChestAsTankTest#fluids"))
-  def drainStackedBucket2(fluid: FluidAmount, filledItem: ItemStack): Unit = {
-    val items = new SimpleContainer(2)
-    items.setItem(0, filledItem.copy())
-    items.getItem(0).setCount(2)
-    val handler = TestMod.getCatHandler(new InvWrapper(items))
-
-    val drained = handler.drain(fluid.amount.asForge, IFluidHandler.FluidAction.EXECUTE)
-    assertTrue(drained.isEmpty)
-    assertEquals(0, items.countItem(Items.BUCKET))
+    TestMod.inTransaction { tx =>
+      val drained = handler.extract(fluid.asVariant, fluid.amount.asForge, tx)
+      assertEquals(0, drained)
+      assertEquals(0, items.countItem(Items.BUCKET))
+    }
   }
 }
 

@@ -5,6 +5,7 @@ import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, VanillaFlui
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponentPatch
 import net.neoforged.neoforge.fluids.FluidStack
+import net.neoforged.neoforge.transfer.fluid.FluidResource
 
 object NeoForgeConverter {
   def toStack(amount: FluidAmount): FluidStack = {
@@ -19,11 +20,20 @@ object NeoForgeConverter {
     FluidAmountUtil.from(stack.getFluid, GenericUnit.fromForge(stack.getAmount), Option(stack.getComponentsPatch))
   }
 
-  implicit final class FluidAmount2FluidStack(private val a: FluidAmount) extends AnyVal {
-    def toStack: FluidStack = NeoForgeConverter.toStack(a)
+  def toAmount(fluid: FluidResource, amount: Long): FluidAmount = {
+    FluidAmountUtil.from(fluid.getFluid, GenericUnit.fromForge(amount), Option(fluid.getComponentsPatch))
   }
 
-  implicit final class FluidStack2FluidAmount(private val stack: FluidStack) extends AnyVal {
-    def toAmount: FluidAmount = NeoForgeConverter.toAmount(stack)
+  def toVariant(amount: FluidAmount): FluidResource = {
+    amount.content match {
+      case VanillaFluid(fluid) => FluidResource.of(fluid)
+      case VanillaPotion(_) => FluidResource.EMPTY
+    }
+  }
+
+  def forgeAmount(amount: FluidAmount): Int = amount.amount.asForge
+
+  extension (amount: FluidAmount) {
+    def asVariant: FluidResource = NeoForgeConverter.toVariant(amount)
   }
 }

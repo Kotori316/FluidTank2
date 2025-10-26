@@ -65,7 +65,7 @@ class ReservoirTest {
 
         assertEquals(fluid + initial, tile.getTank.content)
         val modified = WOOD_RESERVOIR.getTank(player.getItemInHand(InteractionHand.MAIN_HAND))
-        assertTrue(modified.isEmpty)
+        assertTrue(modified.isEmpty, s"The reservoir content must be consumed, ${modified.content}")
 
         g.succeed()
       })
@@ -82,7 +82,7 @@ class ReservoirTest {
 
     assertEquals(FluidAmountUtil.BUCKET_WATER, tile.getTank.content)
     val modified = WOOD_RESERVOIR.getTank(player.getItemInHand(InteractionHand.MAIN_HAND))
-    assertTrue(modified.isEmpty)
+    assertTrue(modified.isEmpty, s"The reservoir content must be consumed, ${modified.content}")
 
     helper.succeed()
   }
@@ -99,7 +99,7 @@ class ReservoirTest {
 
     assertEquals(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.ONE_BUCKET.combineN(2)), tile.getTank.content)
     val modified = WOOD_RESERVOIR.getTank(player.getItemInHand(InteractionHand.MAIN_HAND))
-    assertTrue(modified.isEmpty)
+    assertTrue(modified.isEmpty, s"The reservoir content must be consumed, ${modified.content}")
 
     helper.succeed()
   }

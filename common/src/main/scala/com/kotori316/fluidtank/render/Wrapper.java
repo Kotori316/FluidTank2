@@ -7,6 +7,7 @@ import org.joml.Vector4f;
 
 import java.util.Objects;
 
+@SuppressWarnings("ClassCanBeRecord")
 final class Wrapper {
 
     private static final Vector4f vector4f = new Vector4f();
@@ -16,15 +17,15 @@ final class Wrapper {
         this.buffer = buffer;
     }
 
-    private static Vector4f getPosVector(float x, float y, float z, PoseStack matrix) {
-        Matrix4f matrix4f = matrix.last().pose();
+    private static Vector4f getPosVector(float x, float y, float z, PoseStack.Pose matrix) {
+        Matrix4f matrix4f = matrix.pose();
 
         vector4f.set(x, y, z, 1.0F);
         vector4f.mul(matrix4f);
         return vector4f;
     }
 
-    Wrapper pos(double x, double y, double z, PoseStack matrix) {
+    Wrapper pos(double x, double y, double z, PoseStack.Pose matrix) {
         Vector4f vector4f = getPosVector(((float) x), ((float) y), ((float) z), matrix);
         buffer.addVertex(vector4f.x(), vector4f.y(), vector4f.z());
         return this;
@@ -40,23 +41,14 @@ final class Wrapper {
         return this;
     }
 
-    @SuppressWarnings("SpellCheckingInspection")
     Wrapper lightmap(int sky, int block) {
         buffer.setUv1(10, 10).setUv2(block, sky);
         return this;
     }
 
-    Wrapper lightMap(int light, int overlay) {
-        buffer.setOverlay(overlay).setLight(light);
-        return this;
-    }
 
     void endVertex() {
         buffer.setNormal(0, 1, 0);
-    }
-
-    public VertexConsumer buffer() {
-        return buffer;
     }
 
     @Override

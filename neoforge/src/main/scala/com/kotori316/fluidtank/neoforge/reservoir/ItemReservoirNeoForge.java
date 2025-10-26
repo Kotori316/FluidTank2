@@ -3,14 +3,16 @@ package com.kotori316.fluidtank.neoforge.reservoir;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.Tier;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
 public final class ItemReservoirNeoForge extends ItemReservoir {
     public ItemReservoirNeoForge(Tier tier) {
         super(tier);
     }
 
-    public static IFluidHandlerItem initCapabilities(ItemStack stack, Void ignored) {
-        return new ReservoirFluidHandler((ItemReservoir) stack.getItem(), stack);
+    public static ResourceHandler<FluidResource> initCapabilities(ItemStack stack, ItemAccess access) {
+        return new ReservoirFluidHandler((ItemReservoir) stack.getItem(), access);
     }
 }

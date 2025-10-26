@@ -21,6 +21,8 @@ class GenericUnit private(val value: BigInt) extends AnyVal {
     }
   }
 
+  def asNeoForge: Long = asDisplay
+
   /**
    * Returns forge unit amount
    */

@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.MaterialSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -53,7 +54,7 @@ public final class FluidRenderHelperFabric implements FluidRenderHelper {
     }
 
     @Override
-    public TextureAtlasSprite getFluidTexture(Tank<FluidLike> tank) {
+    public TextureAtlasSprite getFluidTexture(Tank<FluidLike> tank, MaterialSet materialSet) {
         return getSprite(tank.content());
     }
 

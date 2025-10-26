@@ -13,7 +13,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.ProblemReporter
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.TypedEntityData
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.material.Fluids
 import net.minecraft.world.level.storage.TagValueOutput
@@ -23,6 +23,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 
 import scala.util.Using
+import scala.util.chaining.scalaUtilChainingOps
 
 @SuppressWarnings(Array("UnstableApiUsage"))
 //noinspection UnstableApiUsage
@@ -42,7 +43,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
   def initialState1(): Unit = {
     val stack = new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD))
     val tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING)
-    tagValueOutput.merge(Option(stack.get(DataComponents.BLOCK_ENTITY_DATA)).map(_.copyTag()).getOrElse(new CompoundTag()))
+    tagValueOutput.merge(Option(stack.get(DataComponents.BLOCK_ENTITY_DATA)).map(_.copyTagWithoutId()).getOrElse(new CompoundTag()))
     tagValueOutput.putString(TileTank.KEY_TIER, Tier.WOOD.name)
     val tank = Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit(Tier.WOOD.getCapacity))
     tagValueOutput.store(TileTank.KEY_TANK, Tank.codec, tank)
@@ -61,7 +62,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
     val tier = Tier.STONE
     val stack = new ItemStack(FluidTank.TANK_MAP.get(tier))
     val tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING)
-    tagValueOutput.merge(Option(stack.get(DataComponents.BLOCK_ENTITY_DATA)).map(_.copyTag()).getOrElse(new CompoundTag()))
+    tagValueOutput.merge(Option(stack.get(DataComponents.BLOCK_ENTITY_DATA)).map(_.copyTagWithoutId()).getOrElse(new CompoundTag()))
     tagValueOutput.putString(TileTank.KEY_TIER, tier.name)
     val tank = Tank.apply(FluidAmountUtil.BUCKET_LAVA.setAmount(GenericUnit.fromForge(3000)), GenericUnit(tier.getCapacity))
     tagValueOutput.store(TileTank.KEY_TANK, Tank.codec, tank)
@@ -80,7 +81,8 @@ final class FabricTankItemStorageTest extends BeforeMC {
     @EnumSource(value = classOf[Tier], names = Array("WOOD", "STONE", "IRON", "GOLD"))
     def filled(tier: Tier): Unit = {
       val stack = RecipeInventoryUtil.getFilledTankStack(tier, FluidAmountUtil.BUCKET_LAVA)
-      val tag = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag()
+      assertTrue(stack.has(DataComponents.BLOCK_ENTITY_DATA))
+      val tag = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTagWithoutId()
       assertNotNull(tag)
       val expected = Tank.apply(FluidAmountUtil.BUCKET_LAVA, GenericUnit(tier.getCapacity))
       val actual = TankUtil.load(tag.getCompoundOrEmpty(TileTank.KEY_TANK))
@@ -112,7 +114,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
 
       assertEquals(FluidVariant.of(Fluids.WATER), handler.getResource)
       assertEquals(3 * FluidConstants.BUCKET, handler.getAmount)
-      val tag = handler.getStack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag()
+      val tag = handler.getStack.get(DataComponents.BLOCK_ENTITY_DATA).copyTagWithoutId()
       assertNotNull(tag)
       val expected = Tank.apply(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(3000)), GenericUnit(tier.getCapacity))
       val actual = TankUtil.load(tag.getCompoundOrEmpty(TileTank.KEY_TANK))
@@ -123,7 +125,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
     def fillExecute2(): Unit = {
       val tier = Tier.WOOD
       val stack = RecipeInventoryUtil.getFilledTankStack(tier, FluidAmountUtil.BUCKET_WATER)
-      val before = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag()
+      val before = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTagWithoutId()
       val handler = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
       Using(Transaction.openOuter()) { transaction =>
         assertEquals(FluidVariant.of(Fluids.WATER), handler.getResource)
@@ -134,7 +136,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
         transaction.commit()
       }
 
-      val tag = handler.getStack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag()
+      val tag = handler.getStack.get(DataComponents.BLOCK_ENTITY_DATA).copyTagWithoutId()
       assertNotEquals(before, tag)
       assertNotNull(tag)
       val expected = Tank.apply(FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit.fromForge(4000)), GenericUnit(tier.getCapacity))
@@ -169,7 +171,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
     def fillSimulate2(): Unit = {
       val tier = Tier.WOOD
       val stack = RecipeInventoryUtil.getFilledTankStack(tier, FluidAmountUtil.BUCKET_WATER)
-      val before = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag()
+      val before = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTagWithoutId()
       val handler = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
       Using(Transaction.openOuter()) { transaction =>
         assertEquals(FluidVariant.of(Fluids.WATER), handler.getResource)
@@ -180,7 +182,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
         transaction.abort()
       }
 
-      assertEquals(before, handler.getStack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag())
+      assertEquals(before, handler.getStack.get(DataComponents.BLOCK_ENTITY_DATA).copyTagWithoutId())
     }
   }
 
@@ -190,8 +192,9 @@ final class FabricTankItemStorageTest extends BeforeMC {
     def unknownTagAdded(): Unit = {
       val tier = Tier.WOOD
       val stack = RecipeInventoryUtil.getFilledTankStack(tier, FluidAmountUtil.BUCKET_WATER)
-      CustomData.update(DataComponents.BLOCK_ENTITY_DATA, stack,
-        n => n.putString("unknownTagKey", "unknownTag"))
+      val component = stack.get(DataComponents.BLOCK_ENTITY_DATA)
+      assertNotNull(component)
+      stack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(component.`type`(), component.copyTagWithoutId().tap(n => n.putString("unknownTagKey", "unknownTag"))))
       val handler = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
       Using(Transaction.openOuter()) { transaction =>
         val drained = handler.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BUCKET, transaction)

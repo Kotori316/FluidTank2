@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.neoforge.test.fluid
 
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
-import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
+import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter
 import com.kotori316.fluidtank.neoforge.test.BeforeMC
 import net.minecraft.world.level.material.Fluids
 import net.neoforged.neoforge.fluids.{FluidStack, FluidType}
@@ -17,7 +17,7 @@ class NeoForgeConverterTest extends BeforeMC {
   @TestFactory
   def testToFluidStack(): Array[DynamicNode] = {
     conversion.map { case (amount, stack) => DynamicTest.dynamicTest(amount.toString, () => {
-      Assertions.assertTrue(FluidStack.matches(stack, amount.toStack))
+      Assertions.assertTrue(FluidStack.matches(stack, NeoForgeConverter.toStack(amount)))
     })
     }.toArray
   }
@@ -25,7 +25,7 @@ class NeoForgeConverterTest extends BeforeMC {
   @TestFactory
   def testToFluidAmount(): Array[DynamicNode] = {
     conversion.map { case (amount, stack) => DynamicTest.dynamicTest(stack.toString, () => {
-      Assertions.assertEquals(amount, stack.toAmount)
+      Assertions.assertEquals(amount, NeoForgeConverter.toAmount(stack))
     })
     }.toArray
   }

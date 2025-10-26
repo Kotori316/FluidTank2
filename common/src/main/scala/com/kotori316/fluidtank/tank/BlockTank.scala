@@ -52,7 +52,7 @@ abstract class BlockTank(val tier: Tier) extends Block(
   override def useWithoutItem(blockState: BlockState, level: Level, pos: BlockPos, player: Player, blockHitResult: BlockHitResult): InteractionResult = {
     level.getBlockEntity(pos) match {
       case tank: TileTank =>
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
           player.displayClientMessage(tank.getConnection.getTextComponent, true)
         }
         InteractionResult.SUCCESS
@@ -69,7 +69,7 @@ abstract class BlockTank(val tier: Tier) extends Block(
         if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
           // Move tank content
           if (PlatformFluidAccess.getInstance().isFluidContainer(stack)) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
               /*return*/
               TransferFluid.transferFluid(tank.getConnection, stack, player, hand)
                 .map { r => TransferFluid.setItem(player, hand, r, pos); InteractionResult.SUCCESS_SERVER }
@@ -94,7 +94,7 @@ abstract class BlockTank(val tier: Tier) extends Block(
   override def setPlacedBy(level: Level, pos: BlockPos, state: BlockState, @Nullable entity: LivingEntity, stack: ItemStack): Unit = {
     super.setPlacedBy(level, pos, state, entity, stack)
     level.getBlockEntity(pos) match {
-      case tank: TileTank => if (!level.isClientSide) tank.onBlockPlacedBy()
+      case tank: TileTank => if (!level.isClientSide()) tank.onBlockPlacedBy()
       case tile => FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {} in {}", pos.show, tile, getCallerMethod)
     }
   }
@@ -103,7 +103,7 @@ abstract class BlockTank(val tier: Tier) extends Block(
   override final def hasAnalogOutputSignal(state: BlockState): Boolean = true
 
   //noinspection ScalaDeprecation,deprecation
-  override final def getAnalogOutputSignal(blockState: BlockState, level: Level, pos: BlockPos): Int = {
+  override final def getAnalogOutputSignal(blockState: BlockState, level: Level, pos: BlockPos, direction: Direction): Int = {
     level.getBlockEntity(pos) match {
       case tileTank: TileTank => tileTank.getComparatorLevel
       case tile => FluidTankCommon.LOGGER.error(FluidTankCommon.MARKER_TANK, "There is not TileTank at {}, but {} in {}", pos.show, tile, getCallerMethod); 0
@@ -138,7 +138,7 @@ abstract class BlockTank(val tier: Tier) extends Block(
   }
 
   override def getTicker[T <: BlockEntity](level: Level, state: BlockState, blockEntityType: BlockEntityType[T]): BlockEntityTicker[T] = {
-    if (level.isClientSide) {
+    if (level.isClientSide()) {
       super.getTicker(level, state, blockEntityType)
     } else {
       if (PlatformTankAccess.isTankType(blockEntityType)) {

@@ -1,33 +1,42 @@
 package com.kotori316.fluidtank.neoforge.tank
 
-import com.kotori316.fluidtank.contents.GenericUnit
-import com.kotori316.fluidtank.fluids.{FluidAmountUtil, FluidConnection}
+import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, FluidConnection}
+import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
-import net.neoforged.neoforge.fluids.FluidStack
-import net.neoforged.neoforge.fluids.capability.IFluidHandler
+import net.neoforged.neoforge.transfer.ResourceHandler
+import net.neoforged.neoforge.transfer.fluid.FluidResource
+import net.neoforged.neoforge.transfer.transaction.{SnapshotJournal, TransactionContext}
 
-class ConnectionHandler(connection: FluidConnection) extends IFluidHandler {
-  override def getTanks: Int = 1
+class ConnectionHandler(connection: FluidConnection) extends SnapshotJournal[FluidAmount] with ResourceHandler[FluidResource] {
+  override def createSnapshot(): FluidAmount = connection.getContent.getOrElse(FluidAmountUtil.EMPTY)
 
-  override def getFluidInTank(i: Int): FluidStack = connection.getContent.map(_.toStack).getOrElse(FluidStack.EMPTY)
+  override def revertToSnapshot(snapshot: FluidAmount): Unit = connection.getHandler.set(snapshot)
 
-  override def getTankCapacity(i: Int): Int = connection.capacity.asForge
+  override def size: Int = 1
 
-  override def isFluidValid(i: Int, fluidStack: FluidStack): Boolean = true
+  override def getResource(i: Int): FluidResource = connection.getContent.map(_.asVariant).getOrElse(FluidResource.EMPTY)
 
-  override def fill(fluidStack: FluidStack, fluidAction: IFluidHandler.FluidAction): Int = {
-    val filled = connection.getHandler.fill(fluidStack.toAmount, fluidAction.execute())
+  override def getAmountAsLong(i: Int): Long = connection.getContent.map(_.amount.asNeoForge).getOrElse(0L)
+
+  override def getCapacityAsLong(index: Int, resource: FluidResource): Long = connection.capacity.asNeoForge
+
+  override def isValid(index: Int, resource: FluidResource): Boolean = true
+
+  override def insert(index: Int, resource: FluidResource, amount: Int, transaction: TransactionContext): Int = {
+    val toFill = NeoForgeConverter.toAmount(resource, amount)
+
+    updateSnapshots(transaction)
+
+    val filled = this.connection.getHandler.fill(toFill, execute = true)
     filled.amount.asForge
   }
 
-  override def drain(fluidStack: FluidStack, fluidAction: IFluidHandler.FluidAction): FluidStack = {
-    val drained = connection.getHandler.drain(fluidStack.toAmount, fluidAction.execute())
-    drained.toStack
-  }
+  override def extract(index: Int, resource: FluidResource, amount: Int, transaction: TransactionContext): Int = {
+    val toDrain = NeoForgeConverter.toAmount(resource, amount)
 
-  override def drain(amount: Int, fluidAction: IFluidHandler.FluidAction): FluidStack = {
-    val toDrain = connection.getContent.map(_.setAmount(GenericUnit.fromForge(amount))).getOrElse(FluidAmountUtil.EMPTY)
-    val drained = connection.getHandler.drain(toDrain, fluidAction.execute())
-    drained.toStack
+    updateSnapshots(transaction)
+
+    val drained = this.connection.getHandler.drain(toDrain, execute = true)
+    drained.amount.asForge
   }
 }

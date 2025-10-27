@@ -14,7 +14,6 @@ import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -290,13 +289,14 @@ final class StateAndModelProvider extends ModelProvider {
 
     void reservoirBase(ItemModelGenerators itemModels) {
         var template = ExtendedModelTemplateBuilder.builder()
-            .guiLight(BlockModel.GuiLight.FRONT)
+            /*.guiLight(BlockModel.GuiLight.FRONT)
             .transform(ItemDisplayContext.FIXED, b -> b.scale(1f).translation(0, 0, 0).rotation(0, 180, 0))
-            .transform(ItemDisplayContext.GROUND, b -> b.scale(0.5f).translation(0, 0, 0).rotation(0, 180, 0))
             .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, b -> b.scale(0.85f).translation(0f, 4.0f, 0.5f).rotation(0, 0, 0))
             .transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND, b -> b.scale(0.85f).translation(0f, 4.0f, 0.5f).rotation(0, 0, 0))
             .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, b -> b.scale(0.68f).translation(1.13f, 3.2f, -1.13f).rotation(0, -90, 0))
-            .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND, b -> b.scale(0.68f).translation(1.13f, 3.2f, -1.13f).rotation(0, 90, 0))
+            .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND, b -> b.scale(0.68f).translation(1.13f, 3.2f, -1.13f).rotation(0, 90, 0))*/
+            .parent(ResourceLocation.parse("minecraft:item/generated"))
+            .transform(ItemDisplayContext.GROUND, b -> b.scale(0.35f))
             .build();
         template.create(modLocation(ITEM_RESERVOIR_BASE), new TextureMapping(), itemModels.modelOutput);
     }

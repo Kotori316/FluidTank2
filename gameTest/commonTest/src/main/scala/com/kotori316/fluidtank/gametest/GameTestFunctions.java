@@ -11,6 +11,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 
 import java.lang.reflect.InvocationTargetException;
@@ -60,21 +61,7 @@ public final class GameTestFunctions {
             .map(m -> {
                 var formatted = "%s_%s".formatted(m.getDeclaringClass().getSimpleName(), m.getName());
                 var testName = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, formatted);
-                return TestFunction.createWithStructure(FluidTankCommon.modId, batchName, testName, structureName, g -> {
-                    try {
-                        m.setAccessible(true);
-                        m.invoke(null, g);
-                    } catch (InvocationTargetException e) {
-                        var cause = e.getCause() != null ? e.getCause() : e;
-                        var a = new TestFunctionException(testName, cause.getMessage());
-                        a.addSuppressed(cause);
-                        throw a;
-                    } catch (ReflectiveOperationException | AssertionError e) {
-                        var a = new TestFunctionException(testName, e.getMessage());
-                        a.addSuppressed(e);
-                        throw a;
-                    }
-                });
+                return TestFunction.createWithStructure(FluidTankCommon.modId, batchName, testName, structureName, wrapMethod(m, testName, null));
             });
     }
 
@@ -95,6 +82,24 @@ public final class GameTestFunctions {
             test.run();
             g.succeed();
         });
+    }
+
+    public static Consumer<GameTestHelper> wrapMethod(Method method, String testName, @Nullable Object obj) {
+        return g -> {
+            try {
+                method.setAccessible(true);
+                method.invoke(obj, g);
+            } catch (InvocationTargetException e) {
+                var cause = e.getCause() != null ? e.getCause() : e;
+                var a = new TestFunctionException(testName, cause.getMessage());
+                a.addSuppressed(cause);
+                throw a;
+            } catch (ReflectiveOperationException | AssertionError e) {
+                var a = new TestFunctionException(testName, e.getMessage());
+                a.addSuppressed(e);
+                throw a;
+            }
+        };
     }
 
     public static void assertEqualStack(ItemStack expected, ItemStack actual) {

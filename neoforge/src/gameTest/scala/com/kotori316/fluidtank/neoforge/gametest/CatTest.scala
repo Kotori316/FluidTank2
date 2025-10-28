@@ -61,7 +61,7 @@ class CatTest {
     val handler = getHandler(helper)
     val fluid = FluidAmountUtil.BUCKET_LAVA
     val filled: Int = Using.resource(Transaction.openRoot()) { tx =>
-      val d = getHandler(helper).extract(fluid.asVariant, fluid.amount.asForge, tx)
+      val d = handler.insert(fluid.asVariant, fluid.amount.asForge, tx)
       tx.commit()
       d
     }
@@ -79,7 +79,7 @@ class CatTest {
     val handler = getHandler(helper)
     val fluid = FluidAmountUtil.BUCKET_WATER
     val filled: Int = Using.resource(Transaction.openRoot()) { tx =>
-      val d = getHandler(helper).extract(fluid.asVariant, fluid.amount.asForge, tx)
+      val d = handler.insert(fluid.asVariant, fluid.amount.asForge, tx)
       tx.commit()
       d
     }
@@ -116,7 +116,7 @@ class CatTest {
     val handler = getHandler(helper)
 
     val filled: Int = Using.resource(Transaction.openRoot()) { tx =>
-      val d = getHandler(helper).extract(fluid.asVariant, fluid.amount.asForge, tx)
+      val d = handler.insert(fluid.asVariant, fluid.amount.asForge, tx)
       tx.commit()
       d
     }
@@ -146,7 +146,7 @@ class CatTest {
 
   private def fillFail(helper: GameTestHelper, amount: FluidAmount): Unit = {
     val filled: Int = Using.resource(Transaction.openRoot()) { tx =>
-      val d = getHandler(helper).extract(amount.asVariant, amount.amount.asForge, tx)
+      val d = getHandler(helper).insert(amount.asVariant, amount.amount.asForge, tx)
       tx.close()
       d
     }
@@ -159,7 +159,7 @@ class CatTest {
     val toFill = FluidAmountUtil.BUCKET_WATER
     val handler = getHandler(helper)
     val filled = Using.resource(Transaction.openRoot()) { tx =>
-      val d = handler.extract(toFill.asVariant, toFill.amount.asForge, tx)
+      val d = handler.insert(toFill.asVariant, toFill.amount.asForge, tx)
       tx.close()
       d
     }
@@ -227,9 +227,7 @@ class CatTest {
     val toDrain = FluidAmountUtil.BUCKET_LAVA
     val handler = getHandler(helper)
     val drained = Using.resource(Transaction.openRoot()) { tx =>
-      val d = handler.extract(toDrain.asVariant, toDrain.amount.asForge, tx)
-      tx.commit()
-      d
+      handler.extract(toDrain.asVariant, toDrain.amount.asForge, tx)
     }
     assertEquals(toDrain.amount.asForge, drained)
 

@@ -54,7 +54,7 @@ public class GetGameTestMethods {
         var withHelper = getHelperArgMethods(clazz)
             .map(m -> GameTestFunctions.create(batchName, TestFunction.EMPTY_STRUCTURE,
                 clazz.getSimpleName() + "_" + m.getName(),
-                g -> ReflectionSupport.invokeMethod(m, instance, g)));
+                GameTestFunctions.wrapMethod(m, clazz.getSimpleName() + "_" + m.getName(), instance)));
         return Stream.concat(noArgs, withHelper).toList();
     }
 
@@ -66,7 +66,7 @@ public class GetGameTestMethods {
         var withHelper = getHelperArgMethods(clazz)
             .map(m -> GameTestFunctions.create(batchName, structure,
                 clazz.getSimpleName() + "_" + m.getName(),
-                g -> ReflectionSupport.invokeMethod(m, instance, g)));
+                GameTestFunctions.wrapMethod(m, clazz.getSimpleName() + "_" + m.getName(), instance)));
         return Stream.concat(noArgs, withHelper).toList();
     }
 

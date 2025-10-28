@@ -18,7 +18,7 @@ import net.neoforged.neoforge.transfer.transaction.Transaction
 import org.junit.jupiter.api.Assertions.{assertDoesNotThrow, assertEquals, assertNotNull, assertTrue}
 
 import java.util.Locale
-import scala.jdk.CollectionConverters.ListHasAsScala
+import scala.jdk.CollectionConverters.{BufferHasAsJava, ListHasAsScala}
 import scala.jdk.OptionConverters.RichOptional
 import scala.util.Using
 
@@ -27,9 +27,8 @@ class CatTest {
   private final val BATCH = GetGameTestMethods.DEFAULT_BATCH
 
   def tests(): java.util.List[TestFunction] = {
-    /*val all = generator().asScala ++ fillMore() ++ fillFail() ++ drainWater()
-    all.asJava*/
-    java.util.List.of()
+    val all = generator().asScala ++ fillMore() ++ fillFail() ++ drainWater()
+    all.asJava
   }
 
   def generator(): java.util.List[TestFunction] = {
@@ -71,7 +70,7 @@ class CatTest {
     val chest = HopperBlockEntity.getContainerOrHandlerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)), Direction.UP)
     assertNotNull(chest.container())
 
-    assertEquals(4, chest.container().countItem(Items.LAVA_BUCKET))
+    assertEquals(4, chest.container().countItem(Items.LAVA_BUCKET), "Lava Bucket count")
 
     helper.succeed()
   }
@@ -114,27 +113,20 @@ class CatTest {
   }
 
   private def fillMore(helper: GameTestHelper, fluid: FluidAmount, expectItemCount: Int, expectItem: Item): Unit = {
-    try {
-      val handler = getHandler(helper)
+    val handler = getHandler(helper)
 
-      val filled: Int = Using.resource(Transaction.openRoot()) { tx =>
-        val d = getHandler(helper).extract(fluid.asVariant, fluid.amount.asForge, tx)
-        tx.commit()
-        d
-      }
-      assertEquals(2000, filled)
-
-      val chest = HopperBlockEntity.getContainerOrHandlerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)), Direction.UP)
-      assertNotNull(chest.container())
-
-      assertEquals(expectItemCount, chest.container().countItem(expectItem))
-      helper.succeed()
-    } catch {
-      case e: AssertionError =>
-        val ee = new RuntimeException(e.getMessage)
-        ee.addSuppressed(e)
-        throw ee
+    val filled: Int = Using.resource(Transaction.openRoot()) { tx =>
+      val d = getHandler(helper).extract(fluid.asVariant, fluid.amount.asForge, tx)
+      tx.commit()
+      d
     }
+    assertEquals(2000, filled, "Filled amount doesn't match to expectation")
+
+    val chest = HopperBlockEntity.getContainerOrHandlerAt(helper.getLevel, helper.absolutePos(new BlockPos(3, 1, 2)), Direction.UP)
+    assertNotNull(chest.container())
+
+    assertEquals(expectItemCount, chest.container().countItem(expectItem), "Item count")
+    helper.succeed()
   }
 
   private def fillFail(): Seq[TestFunction] = {

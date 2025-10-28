@@ -223,7 +223,7 @@ class CatTest {
     helper.succeed()
   }
 
-  def drain1000(helper: GameTestHelper): Unit = {
+  def drain1000Simulate(helper: GameTestHelper): Unit = {
     val toDrain = FluidAmountUtil.BUCKET_LAVA
     val handler = getHandler(helper)
     val drained = Using.resource(Transaction.openRoot()) { tx =>

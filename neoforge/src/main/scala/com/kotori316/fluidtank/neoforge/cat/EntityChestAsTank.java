@@ -2,7 +2,9 @@ package com.kotori316.fluidtank.neoforge.cat;
 
 import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.fluids.FluidLike;
+import com.kotori316.fluidtank.fluids.FluidLikeKey;
 import com.kotori316.fluidtank.neoforge.FluidTank;
+import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -12,16 +14,22 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
+import scala.math.BigInt;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class EntityChestAsTank extends BlockEntity {
     public EntityChestAsTank(BlockPos pos, BlockState state) {
@@ -48,14 +56,13 @@ public class EntityChestAsTank extends BlockEntity {
     }
 
     public Optional<List<GenericAmount<FluidLike>>> getFluids() {
-        return Optional.empty();
-        /*return Optional.ofNullable(getCapability(null))
+        return Optional.ofNullable(getCapability(null))
             .filter(FluidHandlerProxy.class::isInstance)
             .map(FluidHandlerProxy.class::cast)
             .map(FluidHandlerProxy::fluids)
             .map(m ->
                 m.entrySet().stream().map(e -> e.getKey().toAmount(e.getValue())).toList()
-            );*/
+            );
     }
 
     static class FluidHandlerProxy implements ResourceHandler<FluidResource> {
@@ -73,143 +80,58 @@ public class EntityChestAsTank extends BlockEntity {
 
         @Override
         public int size() {
-            return 0;
+            var inventory = cache.get();
+            if (inventory == null) return 0;
+            return inventory.size();
         }
 
         @Override
         public FluidResource getResource(int index) {
-            return null;
+            return getHandler(index).map(h -> h.getResource(0)).orElse(FluidResource.EMPTY);
         }
 
         @Override
         public long getAmountAsLong(int index) {
-            return 0;
+            return getHandler(index).map(h -> h.getAmountAsLong(0)).orElse(0L);
         }
 
         @Override
         public long getCapacityAsLong(int index, FluidResource resource) {
-            return 0;
+            return getHandler(index).map(h -> h.getCapacityAsLong(0, resource)).orElse(0L);
         }
 
         @Override
         public boolean isValid(int index, FluidResource resource) {
-            return false;
+            return getHandler(index).filter(h -> h.isValid(0, resource)).isPresent();
         }
 
         @Override
         public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
-            return 0;
+            return getHandler(index)
+                .map(h -> h.insert(resource, amount, transaction))
+                .orElse(0);
         }
 
         @Override
         public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
-            return 0;
+            return getHandler(index)
+                .map(h -> h.extract(resource, amount, transaction))
+                .orElse(0);
         }
 
-        /*Optional<IFluidHandlerItem> getHandler(int slot) {
+        Optional<ResourceHandler<FluidResource>> getHandler(int slot) {
             return Optional.ofNullable(cache.get())
-                .map(i -> i.getStackInSlot(slot))
-                .flatMap(FluidUtil::getFluidHandler);
-        }
-
-        @Override
-        public int getTanks() {
-            var inventory = cache.get();
-            if (inventory == null) return 0;
-            return inventory.getSlots();
-        }
-
-        @Override
-        public @NotNull FluidStack getFluidInTank(int i) {
-            return getHandler(i).map(h -> h.getFluidInTank(0)).orElse(FluidStack.EMPTY);
-        }
-
-        @Override
-        public int getTankCapacity(int i) {
-            return getHandler(i).map(h -> h.getTankCapacity(0)).orElse(0);
-        }
-
-        @Override
-        public boolean isFluidValid(int i, @NotNull FluidStack fluidStack) {
-            return getHandler(i).map(h -> h.isFluidValid(0, fluidStack)).orElse(false);
-        }
-
-        @Override
-        public int fill(@Nullable FluidStack resource, FluidAction fluidAction) {
-            if (resource == null || resource.isEmpty()) return 0;
-            var t = cache.get();
-            if (!(t instanceof IItemHandlerModifiable inventory)) return 0;
-            var rest = resource.copy();
-
-            for (int i = 0; i < getTanks(); i++) {
-                var stack = inventory.getStackInSlot(i);
-                if (stack.isEmpty() || stack.getCount() > 1) continue; // Don't fill to stacked item
-                var handlerO = FluidUtil.getFluidHandler(stack);
-                if (handlerO.isEmpty()) continue; // Not a fluid container
-
-                var handler = handlerO.orElseThrow(AssertionError::new);
-                var filled = handler.fill(rest, fluidAction);
-                rest.shrink(filled);
-                if (fluidAction.execute()) inventory.setStackInSlot(i, handler.getContainer());
-
-                if (rest.isEmpty()) {
-                    // Filled all resources, early return
-                    return resource.getAmount();
-                }
-            }
-            return resource.getAmount() - rest.getAmount();
-        }
-
-        @Override
-        public @NotNull FluidStack drain(@Nullable FluidStack resource, FluidAction fluidAction) {
-            if (resource == null || resource.isEmpty()) return FluidStack.EMPTY;
-            var t = cache.get();
-            if (!(t instanceof IItemHandlerModifiable inventory)) return FluidStack.EMPTY;
-            var rest = resource.copy();
-
-            for (int i = 0; i < getTanks(); i++) {
-                var stack = inventory.getStackInSlot(i);
-                if (stack.isEmpty() || stack.getCount() > 1) continue; // Don't drain from stacked item
-                var handlerO = FluidUtil.getFluidHandler(stack);
-                if (handlerO.isEmpty()) continue; // Not a fluid container
-
-                var handler = handlerO.orElseThrow(AssertionError::new);
-                var drained = handler.drain(rest, fluidAction);
-                rest.shrink(drained.getAmount());
-                if (fluidAction.execute()) inventory.setStackInSlot(i, handler.getContainer());
-
-                if (rest.isEmpty()) {
-                    // Drained all resources, early return
-                    return resource;
-                }
-            }
-            rest.setAmount(resource.getAmount() - rest.getAmount());
-            return rest;
-        }
-
-        @Override
-        public @NotNull FluidStack drain(int amount, FluidAction fluidAction) {
-            if (amount <= 0) return FluidStack.EMPTY;
-
-            var toDrain = IntStream.range(0, getTanks())
-                .mapToObj(this::getFluidInTank)
-                .filter(Predicate.not(FluidStack::isEmpty))
-                .findFirst()
-                .map(FluidStack::copy);
-
-            return toDrain.map(f -> {
-                f.setAmount(amount);
-                return this.drain(f, fluidAction);
-            }).orElse(FluidStack.EMPTY);
+                .map(i -> ItemAccess.forHandlerIndexStrict(i, slot))
+                .map(i -> i.getCapability(Capabilities.Fluid.ITEM));
         }
 
         Map<FluidLikeKey, BigInt> fluids() {
-            return IntStream.range(0, getTanks())
-                .mapToObj(this::getFluidInTank)
-                .filter(Predicate.not(FluidStack::isEmpty))
-                .collect(Collectors.groupingBy(f -> FluidLikeKey.apply(FluidLike.of(f.getFluid()), f.getComponentsPatch()),
-                    Collectors.reducing(BigInt.apply(0), f -> GenericUnit.asBigIntFromForge(f.getAmount()), BigInt::$plus)));
-        }*/
+            return IntStream.range(0, size())
+                .mapToObj(i -> NeoForgeConverter.toAmount(this.getResource(i), this.getAmountAsLong(i)))
+                .filter(Predicate.not(GenericAmount::isEmpty))
+                .collect(Collectors.groupingBy(f -> FluidLikeKey.apply(f.content(), f.componentPatch()),
+                    Collectors.reducing(BigInt.apply(0), GenericAmount::amount, BigInt::$plus)));
+        }
     }
 
     @VisibleForTesting

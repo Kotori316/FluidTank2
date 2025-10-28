@@ -20,22 +20,23 @@ import scala.util.Using
 class BlockChestAsTankNeoForge extends BlockChestAsTank {
 
   private def fillSimulate(storage: ResourceHandler[FluidResource], toFill: FluidAmount, stack: ItemStack, player: Player, hand: InteractionHand): Option[PlatformFluidAccess.TransferStack] = {
-    Using.resource(Transaction.openRoot()) { tx =>
-      val fillSimulate = storage.insert(toFill.asVariant, toFill.amount.asForge, tx)
-      if (fillSimulate > 0) {
-        Option(PlatformFluidAccess.getInstance().drainItem(toFill.setAmount(GenericUnit.fromForge(fillSimulate)), stack, player, hand, false))
-      } else {
-        Option.empty
-      }
+    val fillSimulate = Using.resource(Transaction.openRoot()) { tx =>
+      storage.insert(toFill.asVariant, toFill.amount.asForge, tx)
+    }
+    if (fillSimulate > 0) {
+      Option(PlatformFluidAccess.getInstance().drainItem(toFill.setAmount(GenericUnit.fromForge(fillSimulate)), stack, player, hand, false))
+    } else {
+      Option.empty
     }
   }
 
   private def fill(storage: ResourceHandler[FluidResource], toFill: FluidAmount, toDrain: FluidAmount, stack: ItemStack, player: Player, hand: InteractionHand): Option[PlatformFluidAccess.TransferStack] = {
-    Using.resource(Transaction.openRoot()) { tx =>
-      val filled = storage.insert(toFill.asVariant, toFill.amount.asForge, tx)
+    val filled = Using.resource(Transaction.openRoot()) { tx =>
+      val r = storage.insert(toFill.asVariant, toFill.amount.asForge, tx)
       tx.commit()
-      Option(PlatformFluidAccess.getInstance().drainItem(toDrain.setAmount(GenericUnit.fromForge(filled)), stack, player, hand, true))
+      r
     }
+    Option(PlatformFluidAccess.getInstance().drainItem(toDrain.setAmount(GenericUnit.fromForge(filled)), stack, player, hand, true))
   }
 
   private def drain(storage: ResourceHandler[FluidResource], toDrain: FluidAmount): Unit = {

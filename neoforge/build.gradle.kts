@@ -198,3 +198,5 @@ afterEvaluate {
         outputs.upToDateWhen { false }
     }
 }
+
+tasks.register("ideBeforeRun")

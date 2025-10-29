@@ -22,11 +22,11 @@ import java.util.Objects;
  * To client only.
  */
 public final class FluidTankContentMessageFabric extends FluidTankContentMessage {
-    static final CustomPacketPayload.Type<FluidTankContentMessageFabric> TYPE = new Type<>(IMessage.createIdentifier(FluidTankContentMessageFabric.class));
+    static final ResourceLocation NAME = IMessage.createIdentifier(FluidTankContentMessageFabric.class);
+    static final CustomPacketPayload.Type<FluidTankContentMessageFabric> TYPE = new Type<>(NAME);
     static final StreamCodec<FriendlyByteBuf, FluidTankContentMessageFabric> STREAM_CODEC = CustomPacketPayload.codec(
         IMessage::write, FluidTankContentMessageFabric::new
     );
-    static final ResourceLocation NAME = IMessage.createIdentifier(FluidTankContentMessageFabric.class);
 
     public FluidTankContentMessageFabric(BlockPos pos, ResourceKey<Level> dim, Tank<FluidLike> tank) {
         super(pos, dim, tank);

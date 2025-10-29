@@ -8,11 +8,10 @@ import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.{ItemStack, Items}
 import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
-import org.junit.jupiter.api.{Disabled, Test}
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.{Arguments, MethodSource}
 
-@Disabled("Implementing")
 class EntityChestAsTankTest extends BeforeMC {
 
   @Test
@@ -70,8 +69,7 @@ class EntityChestAsTankTest extends BeforeMC {
   @MethodSource(Array("com.kotori316.fluidtank.neoforge.test.cat.EntityChestAsTankTest#fluids"))
   def drainStackedBucket1(fluid: FluidAmount, filledItem: ItemStack): Unit = {
     val items = new SimpleContainer(2)
-    items.setItem(1, filledItem.copy())
-    items.getItem(1).setCount(2)
+    items.setItem(1, filledItem.copyWithCount(2))
     val handler = TestMod.getCatHandler(VanillaContainerWrapper.of(items))
 
     TestMod.inTransaction { tx =>

@@ -69,13 +69,13 @@ class EntityChestAsTankTest extends BeforeMC {
   @MethodSource(Array("com.kotori316.fluidtank.neoforge.test.cat.EntityChestAsTankTest#fluids"))
   def drainStackedBucket1(fluid: FluidAmount, filledItem: ItemStack): Unit = {
     val items = new SimpleContainer(2)
-    items.setItem(1, filledItem.copyWithCount(2))
+    items.setItem(1, filledItem)
     val handler = TestMod.getCatHandler(VanillaContainerWrapper.of(items))
 
     TestMod.inTransaction { tx =>
       val drained = handler.extract(fluid.asVariant, fluid.amount.asForge, tx)
-      assertEquals(0, drained)
-      assertEquals(0, items.countItem(Items.BUCKET))
+      assertEquals(filledItem.getCount * 1000, drained)
+      assertEquals(filledItem.getCount, items.countItem(Items.BUCKET))
     }
   }
 }

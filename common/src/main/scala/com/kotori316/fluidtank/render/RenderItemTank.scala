@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.render
 
-import com.kotori316.fluidtank.FluidTankCommon
+import com.kotori316.fluidtank.{DebugLogging, FluidTankCommon}
 import com.kotori316.fluidtank.contents.Tank
 import com.kotori316.fluidtank.fluids.FluidLike
 import com.kotori316.fluidtank.tank.{ItemBlockTank, PlatformTankAccess, Tier, TileTank, VisualTank}
@@ -34,10 +34,18 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
       tileTank.setLevel(level)
       tileTank.loadAdditional(TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), d))
       if (tileTank.getTank.hasContent) {
-        val stateForTile: TankRenderState = Minecraft.getInstance.getBlockEntityRenderDispatcher.tryExtractRenderState(tileTank, 0, null)
-        Minecraft.getInstance.getBlockEntityRenderDispatcher.submit(
-          stateForTile, poseStack, nodeCollector, new CameraRenderState()
-        )
+        val dispatcher = Minecraft.getInstance.getBlockEntityRenderDispatcher
+        val stateForTile: TankRenderState = dispatcher.tryExtractRenderState(tileTank, 0, null)
+        if (stateForTile != null) {
+          dispatcher.submit(
+            stateForTile, poseStack, nodeCollector, new CameraRenderState()
+          )
+        } else {
+          // Failed to extract the render state from the tank. Check the renderer.
+          val renderer = dispatcher.getRenderer(stateForTile)
+          val message = if (renderer == null) s"No renderer found for ${tileTank.getClass.getName}" else s"Out of rendering distance. Tile: ${tileTank.getBlockPos}, Player: ${Option(Minecraft.getInstance).map(_.player).map(_.blockPosition()).orNull}"
+          DebugLogging.LOGGER.warn(message)
+        }
       }
     }
   }
@@ -68,7 +76,7 @@ object RenderItemTank {
 
     override def setTank(tank: Tank[FluidLike]): Unit = {
       super.setTank(tank)
-      // In client side
+      // In the client side
       // If level is null, it is the instance in RenderItemTank
       getVisualTank.updateContent(tank.capacity, tank.amount, tank.content.isGaseous)
     }

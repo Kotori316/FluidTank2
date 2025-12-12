@@ -37,7 +37,7 @@ jobs:
       - run: ./gradlew checkReleaseVersion
       - run: ./gradlew publishMods
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: FluidTank2-${{ github.run_number }}
           path: "*/build/libs/*.jar"
@@ -109,7 +109,7 @@ jobs:
       - name: Check diff
         run: git diff --exit-code -- ./${{ matrix.platform }}/src/generated
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: FluidTank2-${{ github.run_number }}-test-${{ matrix.platform }}

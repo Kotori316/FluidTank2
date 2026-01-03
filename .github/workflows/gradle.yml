@@ -184,7 +184,7 @@ jobs:
       - name: Run client test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: ./gradlew runGameTestClient || ./gradlew runGameTestClient
+          run: ./gradlew runGameTestClient
       - run: ls -R "${SCREENSHOT_DIR}"
       - run: mkdir -p vrt/screenshots
       - name: Check screenshots

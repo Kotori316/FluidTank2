@@ -193,9 +193,23 @@ tasks.named("compileGameTestScala", ScalaCompile::class) {
     source(project(":gameTest:commonTest").layout.projectDirectory.file("src/main/scala"))
 }
 
+val commonDataGenNeoForgeToml = tasks.register("commonDataGenNeoForgeToml", Delete::class) {
+    dependsOn(
+        tasks.named("compileGameTestScala", ScalaCompile::class),
+    )
+    delete(
+        tasks.named("compileGameTestScala", ScalaCompile::class).flatMap { task ->
+            task.destinationDirectory.map { it.file("META-INF/neoforge.mods.toml") }
+        }
+    )
+}
+
 afterEvaluate {
     tasks.named("testJunit") {
         outputs.upToDateWhen { false }
+    }
+    tasks.named("runCommonData") {
+        dependsOn(commonDataGenNeoForgeToml)
     }
 }
 

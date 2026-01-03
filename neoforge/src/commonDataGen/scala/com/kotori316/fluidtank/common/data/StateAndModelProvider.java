@@ -12,8 +12,7 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.*;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -143,7 +142,7 @@ final class StateAndModelProvider extends ModelProvider {
         var tier = blockTank.tier();
         var blockModel = ExtendedModelTemplateBuilder.builder()
             .parent(templates.tankBlock())
-            .renderType(renderTypeName(RenderType.cutout()))
+            .renderType(renderTypeName(ChunkSectionLayer.CUTOUT))
             .build();
 
         var blockModelLocation = blockModel.create(ModelLocationUtils.getModelLocation(blockTank),
@@ -314,14 +313,8 @@ final class StateAndModelProvider extends ModelProvider {
         itemModels.itemModelOutput.accept(reservoirItem, unbaked);
     }
 
-    private static String renderTypeName(RenderStateShard type) {
-        try {
-            var field = RenderStateShard.class.getDeclaredField("name");
-            field.setAccessible(true);
-            return (String) field.get(type);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
+    private static String renderTypeName(ChunkSectionLayer layer) {
+        return layer.label();
     }
 
     record TankModelTemplates(Identifier tankBlock, Identifier tankItem, Identifier gasTankBlock) {

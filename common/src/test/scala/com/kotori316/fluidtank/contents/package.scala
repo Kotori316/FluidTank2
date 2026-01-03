@@ -3,7 +3,7 @@ package com.kotori316.fluidtank
 import cats.data.Chain
 import cats.{Monad, MonoidK}
 import net.minecraft.core.component.DataComponentPatch
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 import scala.reflect.ClassTag
 
@@ -22,9 +22,9 @@ package object contents {
 
     override def isGaseous(a: String): Boolean = a.contains("gas")
 
-    override def getKey(a: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, a)
+    override def getKey(a: String): Identifier = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, a)
 
-    override def fromKey(key: ResourceLocation): String = key.getPath
+    override def fromKey(key: Identifier): String = key.getPath
 
     override def asString(a: String): String = a
 

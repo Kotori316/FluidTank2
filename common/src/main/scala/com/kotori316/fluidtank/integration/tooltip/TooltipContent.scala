@@ -5,7 +5,7 @@ import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, PlatformFlu
 import com.kotori316.fluidtank.tank.{Tier, TileTank, TileVoidTank}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.level.block.entity.BlockEntity
 
 import java.math.RoundingMode
@@ -15,10 +15,10 @@ import scala.jdk.CollectionConverters.SeqHasAsJava
 import scala.util.chaining.scalaUtilChainingOps
 
 object TooltipContent {
-  final val JADE_TOOLTIP_UID = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "jade_plugin")
-  final val TOP_TOOLTIP_UID = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "top_plugin")
-  final val JADE_CONFIG_SHORT = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "short_info")
-  final val JADE_CONFIG_COMPACT = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "compact_number")
+  final val JADE_TOOLTIP_UID = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "jade_plugin")
+  final val TOP_TOOLTIP_UID = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "top_plugin")
+  final val JADE_CONFIG_SHORT = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "short_info")
+  final val JADE_CONFIG_COMPACT = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "compact_number")
   private final val KEY_TIER = TileTank.KEY_TIER
   private final val KEY_FLUID = "fluid"
   private final val KEY_CAPACITY = "capacity"

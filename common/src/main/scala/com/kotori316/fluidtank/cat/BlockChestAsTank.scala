@@ -6,7 +6,7 @@ import net.minecraft.ChatFormatting
 import net.minecraft.core.registries.Registries
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.{ResourceKey, ResourceLocation}
+import net.minecraft.resources.{Identifier, ResourceKey}
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.context.BlockPlaceContext
@@ -23,7 +23,7 @@ import scala.jdk.javaapi.CollectionConverters
 
 abstract class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
   .strength(0.7f).pushReaction(PushReaction.BLOCK).forceSolidOn()
-  .setId(ResourceKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME)))
+  .setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME)))
 )
   with EntityBlock {
 

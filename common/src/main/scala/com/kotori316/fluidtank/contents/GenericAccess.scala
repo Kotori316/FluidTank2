@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.contents
 import com.mojang.serialization.Codec
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.nbt.{CompoundTag, NbtOps}
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 import scala.reflect.ClassTag
 
@@ -20,9 +20,9 @@ trait GenericAccess[A] {
 
   def isGaseous(a: A): Boolean
 
-  def getKey(a: A): ResourceLocation
+  def getKey(a: A): Identifier
 
-  def fromKey(key: ResourceLocation): A
+  def fromKey(key: Identifier): A
 
   def asString(a: A): String = getKey(a).toString
 

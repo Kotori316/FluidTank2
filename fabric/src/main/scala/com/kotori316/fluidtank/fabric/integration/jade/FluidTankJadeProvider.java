@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.fabric.integration.jade;
 
 import com.kotori316.fluidtank.integration.tooltip.TooltipContent;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IServerDataProvider;
 import snownee.jade.api.TooltipPosition;
@@ -15,7 +15,7 @@ final class FluidTankJadeProvider implements IServerDataProvider<BlockAccessor> 
     }
 
     @Override
-    public ResourceLocation getUid() {
+    public Identifier getUid() {
         return TooltipContent.JADE_TOOLTIP_UID();
     }
 

@@ -10,7 +10,7 @@ import com.mojang.serialization.MapCodec
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.core.{BlockPos, Direction, HolderLookup}
-import net.minecraft.resources.{ResourceKey, ResourceLocation}
+import net.minecraft.resources.{Identifier, ResourceKey}
 import net.minecraft.util.ProblemReporter
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable
 
 abstract class BlockTank(val tier: Tier) extends Block(
   BlockBehaviour.Properties.of().strength(1f).dynamicShape().pushReaction(PushReaction.BLOCK).forceSolidOn()
-    .setId(ResourceKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, tier.getBlockName)))
+    .setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, tier.getBlockName)))
 ) with EntityBlock {
 
   registerDefaultState(this.getStateDefinition.any.setValue[TankPos, TankPos](TankPos.TANK_POS_PROPERTY, TankPos.SINGLE))

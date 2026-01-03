@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -14,8 +14,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class RenderItemCodecs {
-    public static final ResourceLocation RESERVOIR_MODEL = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir");
-    public static final ResourceLocation TANK_MODEL = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "tank");
+    public static final Identifier RESERVOIR_MODEL = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir");
+    public static final Identifier TANK_MODEL = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "tank");
 
     public static SpecialModelRenderer.Unbaked reservoirModelUnbaked(FluidRenderHelper helper) {
         return new RenderReservoirItemUnbaked(helper);
@@ -69,7 +69,7 @@ public final class RenderItemCodecs {
         }
     }
 
-    public static void registerSpecialModelRenderersCodec(FluidRenderHelper helper, BiConsumer<ResourceLocation, MapCodec<? extends SpecialModelRenderer.Unbaked>> registerFunction, Map<ResourceLocation, SpecialModelRenderer.Unbaked> predefined) {
+    public static void registerSpecialModelRenderersCodec(FluidRenderHelper helper, BiConsumer<Identifier, MapCodec<? extends SpecialModelRenderer.Unbaked>> registerFunction, Map<Identifier, SpecialModelRenderer.Unbaked> predefined) {
         // Reservoir
         {
             var unbaked = predefined.getOrDefault(RESERVOIR_MODEL, reservoirModelUnbaked(helper));

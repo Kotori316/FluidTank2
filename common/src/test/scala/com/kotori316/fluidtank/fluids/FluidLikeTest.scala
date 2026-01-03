@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.fluids
 
 import com.kotori316.fluidtank.{BeforeMC, FluidTankCommon}
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.level.material.Fluids
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -22,7 +22,7 @@ class FluidLikeTest extends BeforeMC {
 
       expected.map { case (str, like) =>
         DynamicTest.dynamicTest(str, () => {
-          val fromName = FluidLike.fromResourceLocation(ResourceLocation.parse(str))
+          val fromName = FluidLike.fromIdentifier(Identifier.parse(str))
           assertEquals(like, fromName)
         })
       }.toArray

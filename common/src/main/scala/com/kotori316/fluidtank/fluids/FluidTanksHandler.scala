@@ -24,7 +24,7 @@ class FluidTanksHandler(s: Seq[TileTank]) extends ChainTanksHandler[FluidLike](t
         ("Empty Pos", "Void")
       } else {
         val p = s.head.getBlockPos
-        val d = if (s.head.hasLevel) s.head.getLevel.dimension().location().getPath else "Void"
+        val d = if (s.head.hasLevel) s.head.getLevel.dimension().identifier().getPath else "Void"
         (s"${p.getX},${p.getY},${p.getZ}", d)
       }
       DebugLogging.LOGGER.debug("({},{}); {}", dim, pos, logs.mkString_("; "))

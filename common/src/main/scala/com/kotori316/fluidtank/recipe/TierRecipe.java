@@ -19,7 +19,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -187,7 +187,7 @@ public final class TierRecipe implements CraftingRecipe {
     public static final String KEY_SUB_ITEM = "sub_item";
 
     public static final class Serializer implements RecipeSerializer<TierRecipe> {
-        public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "crafting_grade_up");
+        public static final Identifier LOCATION = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "crafting_grade_up");
         private final MapCodec<TierRecipe> codec;
         private final StreamCodec<RegistryFriendlyByteBuf, TierRecipe> streamCodec;
 

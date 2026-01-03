@@ -5,7 +5,7 @@ import com.kotori316.fluidtank.connection.ConnectionHelper
 import com.kotori316.fluidtank.contents.{GenericAccess, GenericAmount, GenericUnit}
 import com.kotori316.fluidtank.tank.TileTank
 import net.minecraft.core.component.DataComponentPatch
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.level.material.Fluid
 
 import scala.reflect.ClassTag
@@ -22,9 +22,9 @@ package object fluids {
 
     override def isGaseous(a: FluidLike): Boolean = a.isGaseous
 
-    override def getKey(a: FluidLike): ResourceLocation = a.getKey
+    override def getKey(a: FluidLike): Identifier = a.getKey
 
-    override def fromKey(key: ResourceLocation): FluidLike = FluidLike.fromResourceLocation(key)
+    override def fromKey(key: Identifier): FluidLike = FluidLike.fromIdentifier(key)
 
     override def empty: FluidLike = FluidLike.FLUID_EMPTY
 

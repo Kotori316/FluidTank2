@@ -12,8 +12,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 import java.util.Objects;
@@ -22,7 +22,7 @@ import java.util.Objects;
  * To client only.
  */
 public final class FluidTankContentMessageFabric extends FluidTankContentMessage {
-    static final ResourceLocation NAME = IMessage.createIdentifier(FluidTankContentMessageFabric.class);
+    static final Identifier NAME = IMessage.createIdentifier(FluidTankContentMessageFabric.class);
     static final CustomPacketPayload.Type<FluidTankContentMessageFabric> TYPE = new Type<>(NAME);
     static final StreamCodec<FriendlyByteBuf, FluidTankContentMessageFabric> STREAM_CODEC = CustomPacketPayload.codec(
         IMessage::write, FluidTankContentMessageFabric::new

@@ -8,7 +8,7 @@ import com.kotori316.fluidtank.gametest.tank.TankTest;
 import com.kotori316.testutil.common.TestFunction;
 import com.kotori316.testutil.common.TestFunctionException;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +27,7 @@ public final class GameTestFunctions {
     public static final String BATCH = "from_common";
 
     public static List<TestFunction> createTestFunctionsNoPlace(String batchName, String structureName) {
-        ResourceLocation.parse(structureName);
+        Identifier.parse(structureName);
         List<Class<?>> classes = List.of(
         );
         var fromClass = getTestFunctionStream(batchName, structureName, classes, 3);
@@ -37,7 +37,7 @@ public final class GameTestFunctions {
     }
 
     public static List<TestFunction> createTestFunctionsPlace(String batchName, String structureName, boolean includeCat) {
-        ResourceLocation.parse(structureName);
+        Identifier.parse(structureName);
         List<Class<?>> classes = List.of(
         );
         var fromClass = getTestFunctionStream(batchName, structureName, classes, 100);
@@ -73,7 +73,7 @@ public final class GameTestFunctions {
         } else {
             namespacedStructureName = "%s:%s".formatted(FluidTankCommon.modId, structureName);
         }
-        String namespacedBatchName = "%s:%s".formatted(FluidTankCommon.modId, ResourceLocation.parse(batchName).getPath());
+        String namespacedBatchName = "%s:%s".formatted(FluidTankCommon.modId, Identifier.parse(batchName).getPath());
         return TestFunction.createWithStructure(FluidTankCommon.modId, namespacedBatchName, formatted, namespacedStructureName, test);
     }
 

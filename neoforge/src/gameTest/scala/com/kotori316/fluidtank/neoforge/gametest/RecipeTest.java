@@ -17,8 +17,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -185,7 +185,7 @@ final class RecipeTest {
 
     void serializeJson(GameTestHelper helper, Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
-        var id = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_" + tier.name().toLowerCase(Locale.ROOT));
+        var id = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "test_" + tier.name().toLowerCase(Locale.ROOT));
         var recipe = new TierRecipe(
             tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
         String expected = """
@@ -237,7 +237,7 @@ final class RecipeTest {
               "sub_item": "minecraft:diamond"
             }
             """.formatted(TierRecipe.Serializer.LOCATION.toString());
-        var read = assertInstanceOf(TierRecipe.class, managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()).orElseThrow());
+        var read = assertInstanceOf(TierRecipe.class, managerFromJson(Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()).orElseThrow());
         var recipe = new TierRecipe(
             Tier.STONE, TierRecipe.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
@@ -270,13 +270,13 @@ final class RecipeTest {
     static Optional<Recipe<?>> loadFromFile(GameTestHelper helper, Path path) {
         try {
             var json = GsonHelper.parse(Files.newBufferedReader(path));
-            return assertDoesNotThrow(() -> managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_load"), json, helper.getLevel().registryAccess()));
+            return assertDoesNotThrow(() -> managerFromJson(Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "test_load"), json, helper.getLevel().registryAccess()));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private static Optional<Recipe<?>> managerFromJson(ResourceLocation location, JsonObject jsonObject, HolderLookup.Provider provider) {
+    private static Optional<Recipe<?>> managerFromJson(Identifier location, JsonObject jsonObject, HolderLookup.Provider provider) {
         return Recipe.CONDITIONAL_CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, provider), jsonObject)
             .getOrThrow()
             .map(WithConditions::carrier);

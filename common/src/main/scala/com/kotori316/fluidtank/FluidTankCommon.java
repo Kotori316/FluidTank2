@@ -32,7 +32,7 @@ public final class FluidTankCommon {
         .build();
 
     /**
-     * Log given message once in a minute.
+     * Log the given message once in a minute.
      */
     public static void logOnceInMinute(String key, Supplier<String> message, @Nullable Supplier<? extends Throwable> error) {
         if (knownKeys.getIfPresent(key) == null) {

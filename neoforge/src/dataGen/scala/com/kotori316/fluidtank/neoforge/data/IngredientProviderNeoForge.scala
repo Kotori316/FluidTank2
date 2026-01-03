@@ -5,7 +5,7 @@ import com.kotori316.fluidtank.tank.Tier
 import net.minecraft.core.registries.Registries
 import net.minecraft.core.{HolderGetter, HolderLookup}
 import net.minecraft.data.recipes.RecipeOutput
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.tags.{ItemTags, TagKey}
 import net.minecraft.world.item.Item
 import net.neoforged.neoforge.common.Tags
@@ -36,10 +36,10 @@ class IngredientProviderNeoForge(provider: HolderLookup.Provider) extends Ingred
       case Tier.STAR => TankSubitem(Tags.Items.NETHER_STARS)
       case Tier.VOID => TankSubitem(obsidianTag)
       case Tier.COPPER => TankSubitem(Tags.Items.INGOTS_COPPER)
-      case Tier.TIN => TankSubitem(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(C_TAG_NAMESPACE, "ingots/tin")))
-      case Tier.BRONZE => TankSubitem(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(C_TAG_NAMESPACE, "ingots/bronze")))
-      case Tier.LEAD => TankSubitem(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(C_TAG_NAMESPACE, "ingots/lead")))
-      case Tier.SILVER => TankSubitem(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(C_TAG_NAMESPACE, "ingots/silver")))
+      case Tier.TIN => TankSubitem(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(C_TAG_NAMESPACE, "ingots/tin")))
+      case Tier.BRONZE => TankSubitem(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(C_TAG_NAMESPACE, "ingots/bronze")))
+      case Tier.LEAD => TankSubitem(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(C_TAG_NAMESPACE, "ingots/lead")))
+      case Tier.SILVER => TankSubitem(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(C_TAG_NAMESPACE, "ingots/silver")))
       case _ => throw new IllegalArgumentException("Sub item of %s is not found".formatted(tier))
     }
   }

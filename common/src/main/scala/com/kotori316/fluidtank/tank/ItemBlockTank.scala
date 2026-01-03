@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.fluids.{FluidAmountUtil, PlatformFluidAccess}
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.{ResourceKey, ResourceLocation}
+import net.minecraft.resources.{Identifier, ResourceKey}
 import net.minecraft.world.item.Item.TooltipContext
 import net.minecraft.world.item.component.TooltipDisplay
 import net.minecraft.world.item.{BlockItem, Item, ItemStack, TooltipFlag}
@@ -15,7 +15,7 @@ import java.util.function.Consumer
 
 class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, new Item.Properties()
   .useBlockDescriptionPrefix()
-  .setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, blockTank.tier.getBlockName)))
+  .setId(ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, blockTank.tier.getBlockName)))
 ) {
   override def toString: String = blockTank.tier.getBlockName
 

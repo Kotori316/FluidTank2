@@ -18,7 +18,7 @@ import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.Block;
@@ -50,7 +50,7 @@ final class StateAndModelProvider extends ModelProvider {
         return Stream.of();
     }
 
-    private ResourceLocation blockTexture(String name) {
+    private Identifier blockTexture(String name) {
         return modLocation("block/" + name);
     }
 
@@ -86,15 +86,15 @@ final class StateAndModelProvider extends ModelProvider {
             new ConfiguredModel(models().cubeColumn(FluidSourceBlock.NAME(), blockTexture("fluid_source"), blockTexture("white"))));
         builder.setModels(builder.partialState().with(FluidSourceBlock.CHEAT_MODE(), true),
             new ConfiguredModel(models().cubeColumn(FluidSourceBlock.NAME() + "_inf", blockTexture("fluid_source_inf"), blockTexture("pink"))));
-        ResourceLocation cheat = ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "source_cheat");
+        Identifier cheat = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "source_cheat");
         itemModels().getBuilder(ModObjects.blockSource().registryName().getPath())
             .override()
             .predicate(cheat, 0)
-            .model(models().getExistingFile(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/" + FluidSourceBlock.NAME())))
+            .model(models().getExistingFile(Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "block/" + FluidSourceBlock.NAME())))
             .end()
             .override()
             .predicate(cheat, 1)
-            .model(models().getExistingFile(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/" + FluidSourceBlock.NAME() + "_inf")))
+            .model(models().getExistingFile(Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "block/" + FluidSourceBlock.NAME() + "_inf")))
             .end();
     }*/
 
@@ -178,14 +178,14 @@ final class StateAndModelProvider extends ModelProvider {
         var tier = blockGasTank.tier();
         getVariantBuilder(blockGasTank)
             .forAllStates(blockState -> new ConfiguredModel[]{
-                new ConfiguredModel(models().withExistingParent("gas_" + tier.getBlockName(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/tanks"))
+                new ConfiguredModel(models().withExistingParent("gas_" + tier.getBlockName(), Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "block/tanks"))
                     .texture("particle", blockTexture("gas_%s1".formatted(tier.name().toLowerCase(Locale.ROOT))))
                     .texture("side", blockTexture("gas_%s1".formatted(tier.name().toLowerCase(Locale.ROOT))))
                     .texture("top", blockTexture("gas_%s2".formatted(tier.name().toLowerCase(Locale.ROOT))))
                     .renderType(renderTypeName(RenderType.cutout()))
                 )
             });
-        itemModels().withExistingParent(blockGasTank.registryName().getPath(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, ITEM_GAS_TANK_BASE))
+        itemModels().withExistingParent(blockGasTank.registryName().getPath(), Identifier.fromNamespaceAndPath(FluidTankCommon.modId, ITEM_GAS_TANK_BASE))
             .texture("1", blockTexture("gas_%s1".formatted(tier.name().toLowerCase(Locale.ROOT))))
             .texture("2", blockTexture("gas_%s2".formatted(tier.name().toLowerCase(Locale.ROOT))));
     }*/
@@ -243,18 +243,18 @@ final class StateAndModelProvider extends ModelProvider {
 
     /*void pipe(PipeBlock pipeBlock, String modelBaseName) {
         String prefix = pipeBlock.registryName.getPath().replace("pipe", "");
-        ResourceLocation frameTexture = blockTexture(prefix + "frame");
-        var centerModel = models().withExistingParent("block/" + modelBaseName + "_center", ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_center"))
+        Identifier frameTexture = blockTexture(prefix + "frame");
+        var centerModel = models().withExistingParent("block/" + modelBaseName + "_center", Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_center"))
             .texture("particle", frameTexture)
             .texture("texture", frameTexture);
-        var sideModel = models().withExistingParent("block/" + modelBaseName + "_side", ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_side"))
+        var sideModel = models().withExistingParent("block/" + modelBaseName + "_side", Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_side"))
             .texture("particle", frameTexture)
             .texture("texture", frameTexture);
-        var outModel = models().withExistingParent("block/" + modelBaseName + "_output", ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_in_out"))
+        var outModel = models().withExistingParent("block/" + modelBaseName + "_output", Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_in_out"))
             .texture("particle", frameTexture)
             .texture("texture", frameTexture)
             .texture("side", blockTexture(prefix + "frame_output"));
-        var inModel = models().withExistingParent("block/" + modelBaseName + "_input", ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_in_out"))
+        var inModel = models().withExistingParent("block/" + modelBaseName + "_input", Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "block/pipe_in_out"))
             .texture("particle", frameTexture)
             .texture("texture", frameTexture)
             .texture("side", blockTexture(prefix + "frame_input"));
@@ -283,7 +283,7 @@ final class StateAndModelProvider extends ModelProvider {
             .modelFile(inModel).uvLock(true).rotationX(90).addModel().condition(PipeBlock.DOWN, PipeBlock.Connection.INPUT).end()
         ;
 
-        itemModels().withExistingParent("item/" + pipeBlock.registryName.getPath(), ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "item/pipe_base"))
+        itemModels().withExistingParent("item/" + pipeBlock.registryName.getPath(), Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "item/pipe_base"))
             .texture("texture", frameTexture);
     }*/
 
@@ -295,7 +295,7 @@ final class StateAndModelProvider extends ModelProvider {
             .transform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND, b -> b.scale(0.85f).translation(0f, 4.0f, 0.5f).rotation(0, 0, 0))
             .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, b -> b.scale(0.68f).translation(1.13f, 3.2f, -1.13f).rotation(0, -90, 0))
             .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND, b -> b.scale(0.68f).translation(1.13f, 3.2f, -1.13f).rotation(0, 90, 0))*/
-            .parent(ResourceLocation.parse("minecraft:item/generated"))
+            .parent(Identifier.parse("minecraft:item/generated"))
             .transform(ItemDisplayContext.GROUND, b -> b.scale(0.35f))
             .build();
         template.create(modLocation(ITEM_RESERVOIR_BASE), new TextureMapping(), itemModels.modelOutput);
@@ -324,6 +324,6 @@ final class StateAndModelProvider extends ModelProvider {
         }
     }
 
-    record TankModelTemplates(ResourceLocation tankBlock, ResourceLocation tankItem, ResourceLocation gasTankBlock) {
+    record TankModelTemplates(Identifier tankBlock, Identifier tankItem, Identifier gasTankBlock) {
     }
 }

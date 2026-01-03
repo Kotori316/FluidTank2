@@ -9,15 +9,15 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
 
 public final class ReservoirModel extends Model<Unit> {
-    public static final ModelLayerLocation LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir"), "main");
+    public static final ModelLayerLocation LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir"), "main");
 
     public ReservoirModel(ModelPart root) {
-        super(root, RenderType::entityCutout);
+        super(root, RenderTypes::entityCutout);
     }
 
     public static LayerDefinition createDefinition() {

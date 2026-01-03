@@ -27,7 +27,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -85,19 +85,19 @@ public final class FluidTank implements ModInitializer {
 
     private static void registerObjects() {
         Stream.concat(TANK_MAP.entrySet().stream(), Stream.of(Map.entry(Tier.CREATIVE, BLOCK_CREATIVE_TANK), Map.entry(Tier.VOID, BLOCK_VOID_TANK)))
-            .forEach(e -> Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, e.getKey().getBlockName()), e.getValue()));
-        TANK_ITEM_MAP.forEach((tier, itemBlockTank) -> Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, tier.getBlockName()), itemBlockTank));
+            .forEach(e -> Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, e.getKey().getBlockName()), e.getValue()));
+        TANK_ITEM_MAP.forEach((tier, itemBlockTank) -> Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, tier.getBlockName()), itemBlockTank));
         Map.of(TileTank.class, TILE_TANK_TYPE, TileCreativeTank.class, TILE_CREATIVE_TANK_TYPE, TileVoidTank.class, TILE_VOID_TANK_TYPE)
-            .forEach((c, t) -> Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, c.getSimpleName().toLowerCase(Locale.ROOT)), t));
-        Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, TankLootFunction.NAME), TANK_LOOT_FUNCTION);
+            .forEach((c, t) -> Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, c.getSimpleName().toLowerCase(Locale.ROOT)), t));
+        Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, TankLootFunction.NAME), TANK_LOOT_FUNCTION);
         Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, TierRecipe.Serializer.LOCATION, TIER_RECIPE_SERIALIZER);
-        Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME()), BLOCK_CAT);
-        Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME()), ITEM_CAT);
-        RESERVOIR_MAP.values().forEach(e -> Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir_" + e.tier().name().toLowerCase(Locale.ROOT)), e));
+        Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME()), BLOCK_CAT);
+        Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME()), ITEM_CAT);
+        RESERVOIR_MAP.values().forEach(e -> Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir_" + e.tier().name().toLowerCase(Locale.ROOT)), e));
         var builder = FabricItemGroup.builder();
         createTab(builder);
-        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, FluidTankCommon.modId), builder.build());
-        Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, Tank.COMPONENT_NAME()), FLUID_TANK_DATA_COMPONENT);
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, FluidTankCommon.modId), builder.build());
+        Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, Tank.COMPONENT_NAME()), FLUID_TANK_DATA_COMPONENT);
     }
 
     private static void createTab(CreativeModeTab.Builder builder) {

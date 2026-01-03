@@ -4,16 +4,16 @@ import com.google.common.base.CaseFormat;
 import com.kotori316.fluidtank.FluidTankCommon;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface IMessage<T extends IMessage<T>> extends CustomPacketPayload {
     void write(FriendlyByteBuf buffer);
 
-    default ResourceLocation getIdentifier() {
+    default Identifier getIdentifier() {
         return createIdentifier(getClass());
     }
 
-    static ResourceLocation createIdentifier(Class<?> clazz) {
-        return ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, clazz.getSimpleName()));
+    static Identifier createIdentifier(Class<?> clazz) {
+        return Identifier.fromNamespaceAndPath(FluidTankCommon.modId, CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, clazz.getSimpleName()));
     }
 }

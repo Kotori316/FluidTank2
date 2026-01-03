@@ -46,7 +46,7 @@ object DebugLogging {
     // Recipes fo FluidTank
     val noPretty = new GsonBuilder().disableHtmlEscaping().create()
     server.getRecipeManager.getRecipes.asScala
-      .filter(_.id().location().getNamespace === FluidTankCommon.modId)
+      .filter(_.id().identifier().getNamespace === FluidTankCommon.modId)
       .map(h => (h.id(), h.value().asInstanceOf[Recipe[?]]))
       .map { case (id, r) => (id, getResultItem(r, server), ingredientAsMap(r.placementInfo().ingredients().asScala)) }
       .map { case (id, stack, value) =>

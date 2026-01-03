@@ -6,13 +6,14 @@ import com.kotori316.fluidtank.fluids.FluidLike
 import com.kotori316.fluidtank.reservoir.ItemReservoir
 import com.kotori316.fluidtank.tank.Tier
 import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.renderer.SubmitNodeCollector
+import net.minecraft.client.renderer.rendertype.RenderTypes
 import net.minecraft.client.renderer.special.SpecialModelRenderer
-import net.minecraft.client.renderer.{RenderType, SubmitNodeCollector}
 import net.minecraft.client.resources.model.MaterialSet
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.util.{Mth, Unit as UtilUnit}
 import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
-import org.joml.Vector3f
+import org.joml.{Vector3f, Vector3fc}
 
 import java.util.Locale
 
@@ -40,7 +41,7 @@ final class RenderReservoirItem(protected val model: ReservoirModel, protected v
       val texture = renderHelper.getFluidTexture(tank, materialSet)
       val color = renderHelper.getFluidColor(tank)
       val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
-      nodeCollector.submitCustomGeometry(poseStack, RenderType.translucentMovingBlock(), (pose, buffer) => {
+      nodeCollector.submitCustomGeometry(poseStack, RenderTypes.translucentMovingBlock(), (pose, buffer) => {
         box.render(
           buffer = buffer,
           matrix = pose, sprite = texture,
@@ -52,7 +53,7 @@ final class RenderReservoirItem(protected val model: ReservoirModel, protected v
     poseStack.popPose()
   }
 
-  override def getExtents(output: java.util.Set[Vector3f]): Unit = {
+  override def getExtents(output: java.util.function.Consumer[Vector3fc]): Unit = {
     val pose = new PoseStack()
     pose.translate(0.5F, 0.0F, 0.5F)
     pose.scale(-1.0F, -1.0F, 1.0F)
@@ -67,8 +68,8 @@ final class RenderReservoirItem(protected val model: ReservoirModel, protected v
 }
 
 object RenderReservoirItem {
-  private final val textureNameMap: Map[Tier, ResourceLocation] = Tier.values().map(t =>
-      (t, ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, s"textures/item/reservoir_${t.name().toLowerCase(Locale.ROOT)}.png")))
+  private final val textureNameMap: Map[Tier, Identifier] = Tier.values().map(t =>
+      (t, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, s"textures/item/reservoir_${t.name().toLowerCase(Locale.ROOT)}.png")))
     .toMap
 
   case class RenderContext(tier: Tier, hasFoil: Boolean, tank: Tank[FluidLike])

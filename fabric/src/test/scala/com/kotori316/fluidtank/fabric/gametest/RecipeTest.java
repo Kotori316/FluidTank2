@@ -22,9 +22,9 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -266,7 +266,7 @@ public final class RecipeTest {
               "sub_item": "minecraft:diamond"
             }
             """.formatted(TierRecipe.Serializer.LOCATION.toString());
-        var read = assertInstanceOf(TierRecipe.class, managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()));
+        var read = assertInstanceOf(TierRecipe.class, managerFromJson(Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()));
         var recipe = new TierRecipe(
             Tier.STONE, TierRecipe.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
@@ -298,7 +298,7 @@ public final class RecipeTest {
     // just for test
     @SuppressWarnings("UnstableApiUsage")
     private static boolean checkCondition(GameTestHelper helper, JsonObject read) {
-        return ResourceConditionsImpl.applyResourceConditions(read, "TEST", ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "checkCondition")),
+        return ResourceConditionsImpl.applyResourceConditions(read, "TEST", Identifier.fromNamespaceAndPath(FluidTankCommon.modId, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "checkCondition")),
             new RegistryOps.RegistryInfoLookup() {
                 @Override
                 public <T> Optional<RegistryOps.RegistryInfo<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
@@ -316,14 +316,14 @@ public final class RecipeTest {
         }
         try {
             var json = GsonHelper.parse(Files.newBufferedReader(path));
-            assertDoesNotThrow(() -> managerFromJson(ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, "test_load"), json, helper.getLevel().registryAccess()));
+            assertDoesNotThrow(() -> managerFromJson(Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "test_load"), json, helper.getLevel().registryAccess()));
             helper.succeed();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private static Recipe<?> managerFromJson(ResourceLocation location, JsonObject jsonObject, HolderLookup.Provider provider) {
+    private static Recipe<?> managerFromJson(Identifier location, JsonObject jsonObject, HolderLookup.Provider provider) {
         return Try.call(() -> RecipeManager.class.getDeclaredMethod("fromJson", ResourceKey.class, JsonObject.class, HolderLookup.Provider.class))
             .andThenTry(m -> ReflectionSupport.invokeMethod(m, null, ResourceKey.create(Registries.RECIPE, location), jsonObject, provider))
             .andThenTry(RecipeHolder.class::cast)

@@ -5,11 +5,12 @@ import com.kotori316.fluidtank.fluids.FluidLike
 import com.kotori316.fluidtank.tank.TileTank
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.blockentity.{BlockEntityRenderer, BlockEntityRendererProvider}
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer
+import net.minecraft.client.renderer.rendertype.RenderTypes
 import net.minecraft.client.renderer.state.CameraRenderState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.{RenderType, SubmitNodeCollector}
 import net.minecraft.core.BlockPos
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.level.Level
@@ -30,7 +31,7 @@ abstract class RenderTank(val context: BlockEntityRendererProvider.Context) exte
 
         val value = Box.LightValue(renderState.lightCoords).overrideBlock(getLuminance(renderState.tank))
         val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
-        nodeCollector.submitCustomGeometry(matrix, RenderType.translucentMovingBlock(), (pose, buffer) => {
+        nodeCollector.submitCustomGeometry(matrix, RenderTypes.translucentMovingBlock(), (pose, buffer) => {
           tank.box.render(buffer, pose, texture, alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
         })
       }

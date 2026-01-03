@@ -20,7 +20,7 @@ public final class FluidTankClient implements ClientModInitializer {
         FluidTankCommon.LOGGER.info(FluidTankCommon.INITIALIZATION, "Client Initialize {}", FluidTankCommon.modId);
         PacketHandler.Client.initClient();
 
-        var renderType = ChunkSectionLayer.CUTOUT_MIPPED;
+        var renderType = ChunkSectionLayer.CUTOUT;
         FluidTank.TANK_MAP.values().forEach(b -> BlockRenderLayerMap.putBlock(b, renderType));
         BlockRenderLayerMap.putBlock(FluidTank.BLOCK_CREATIVE_TANK, renderType);
         BlockRenderLayerMap.putBlock(FluidTank.BLOCK_VOID_TANK, renderType);

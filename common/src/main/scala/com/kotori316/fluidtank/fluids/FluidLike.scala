@@ -5,7 +5,7 @@ import com.kotori316.fluidtank.FluidTankCommon
 import net.minecraft.core.component.{DataComponentPatch, DataComponents}
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.level.material.{Fluid, Fluids}
 
@@ -16,20 +16,20 @@ import scala.util.Try
 sealed trait FluidLike {
   def isGaseous: Boolean
 
-  def getKey: ResourceLocation
+  def getKey: Identifier
 }
 
 case class VanillaFluid(fluid: Fluid) extends FluidLike {
   override def isGaseous: Boolean = PlatformFluidAccess.getInstance().isGaseous(fluid)
 
-  override def getKey: ResourceLocation = BuiltInRegistries.FLUID.getKey(fluid)
+  override def getKey: Identifier = BuiltInRegistries.FLUID.getKey(fluid)
 }
 
 case class VanillaPotion(potionType: PotionType) extends FluidLike {
   override def isGaseous: Boolean = false
 
-  override def getKey: ResourceLocation = {
-    ResourceLocation.fromNamespaceAndPath(FluidTankCommon.modId, ("potion_" + potionType.name()).toLowerCase(Locale.ROOT))
+  override def getKey: Identifier = {
+    Identifier.fromNamespaceAndPath(FluidTankCommon.modId, ("potion_" + potionType.name()).toLowerCase(Locale.ROOT))
   }
 
   def getVanillaPotionName(nbt: Option[DataComponentPatch]): Component = {
@@ -76,7 +76,7 @@ object FluidLike {
     }
   }
 
-  def fromResourceLocation(key: ResourceLocation): FluidLike = {
+  def fromIdentifier(key: Identifier): FluidLike = {
     if (key.getNamespace == FluidTankCommon.modId && key.getPath.startsWith("potion_")) {
       val potionType = Try(PotionType.valueOf(key.getPath.substring(7).toUpperCase(Locale.ROOT)))
       potionType.map(FluidLike.of).getOrElse {

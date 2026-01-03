@@ -15,7 +15,7 @@ The main parts of code are shared between platforms.
 [Modrinth]: https://modrinth.com/mod/large-fluid-tank
 
 Source code LICENSE: MIT License  
-Copyright (c) 2019-2024 Kotori316
+Copyright (c) 2019-2026 Kotori316
 
 ![](https://gist.githubusercontent.com/Kotori316/8c426c7e1ea70856bf5f2545048c49a9/raw/aa04a21f3c5d2fec496dc73e3531b099ec33220c/2023-07-23_18.11.40.png)
 
@@ -23,7 +23,7 @@ Copyright (c) 2019-2024 Kotori316
 
 You need Scalable Cat's
 Force([CurseForge](https://www.curseforge.com/minecraft/mc-mods/scalable-cats-force), [Modrinth](https://modrinth.com/mod/scalable-cats-force))
-to run this mod. All platform require this dependency.
+to run this mod. All platforms require this dependency.
 
 * CurseForge
   * [Forge][CurseForge Forge]

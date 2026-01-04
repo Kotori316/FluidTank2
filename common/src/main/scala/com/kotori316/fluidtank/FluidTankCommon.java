@@ -39,10 +39,10 @@ public final class FluidTankCommon {
             var msg = "[" + key + "] " + message.get();
             if (error == null) {
                 LOGGER.warn(msg);
-                DebugLogging.LOGGER().fatal(msg);
+                DebugLogging.LOGGER().error(msg);
             } else {
                 LOGGER.error(msg, error.get());
-                DebugLogging.LOGGER().fatal(msg, error.get());
+                DebugLogging.LOGGER().error(msg, error.get());
             }
         }
     }

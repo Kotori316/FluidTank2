@@ -3,6 +3,7 @@ plugins {
     id("architectury-plugin").version("3.4-SNAPSHOT")
     id("dev.architectury.loom").version("1.13.463")
     id("com.kotori316.plugin.cf").version("3.+")
+    id("idea")
 }
 
 architectury {
@@ -47,4 +48,10 @@ publishing {
 
 afterEvaluate {
     tasks.remapJar.mustRunAfter(tasks.compileTestScala)
+}
+
+idea {
+    module {
+        downloadSources = true
+    }
 }

@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - run: chmod +x ./gradlew
       - name: Tool chain check
         run: ./gradlew javaToolchains
@@ -51,7 +51,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - run: chmod +x ./gradlew
       - name: Common JUnit
         run: ./gradlew :common:test
@@ -72,7 +72,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - run: chmod +x ./gradlew
       - name: ${{ matrix.platform }} JUnit
         run: ./gradlew :${{ matrix.platform }}:test
@@ -91,7 +91,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - run: chmod +x ./gradlew
       - name: Compile
         run: ./gradlew :forge:genDataClasses

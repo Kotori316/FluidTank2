@@ -357,10 +357,12 @@ tasks.withType(AbstractPublishToMaven).configureEach {
 
 tasks.register("registerVersion", CallVersionFunctionTask.class) {
     functionEndpoint = readVersionFunctionEndpoint(project)
-    gameVersion = project.findProperty("minecraft_version")
+    gameVersion = project.findProperty("minecraft_version").toString()
     platform = "forge"
-    modName = project.findProperty("maven_base_name")
+    platformVersion = project.findProperty("forge_version").toString()
+    modName = project.findProperty("maven_base_name").toString()
     changelog = noHeaderChangelog()
+    homepage = "https://modrinth.com/mod/large-fluid-tank"
 }
 
 tasks.register("checkReleaseVersion", CallVersionCheckFunctionTask.class) {

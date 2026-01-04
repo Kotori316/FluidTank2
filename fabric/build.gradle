@@ -166,15 +166,18 @@ publishing {
         }
     }
 
+    def u = project.findProperty("maven_username") as String ?: System.getenv("MAVEN_USERNAME") ?: ""
+    def p = project.findProperty("maven_password") as String ?: System.getenv("MAVEN_PASSWORD") ?: ""
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
-        if (!Boolean.parseBoolean(System.getenv("CI")) || !RELEASE_DEBUG) {
+        if (!RELEASE_DEBUG && u != "" && p != "") {
             maven {
-                name = "AzureRepository"
-                url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
+                name = "kotori316-maven"
+                // For users: Use https://maven.kotori316.com to get artifacts
+                url = uri("https://maven2.kotori316.com/production/maven")
                 credentials {
-                    username = project.findProperty("azureUserName") ?: System.getenv("AZURE_USER_NAME") ?: ""
-                    password = project.findProperty("azureToken") ?: System.getenv("AZURE_TOKEN") ?: "TOKEN"
+                    username = u
+                    password = p
                 }
             }
         }

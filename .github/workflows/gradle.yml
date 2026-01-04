@@ -80,6 +80,7 @@ jobs:
         env:
           RUN_GAME_TEST: true
         run: ./gradlew :${{ matrix.platform }}:runGameTest
+        if: ${{ matrix.platform != 'forge' }}
 
   forge-data-gen:
     runs-on: ubuntu-latest

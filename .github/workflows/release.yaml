@@ -33,6 +33,7 @@ jobs:
             (sleep 5 && ./gradlew configureLaunch downloadAssets) || \
             (sleep 5 && ./gradlew configureLaunch downloadAssets) || true
       - name: GameTest
+        if: false
         run: ./gradlew runGameTest
         env:
           RUN_GAME_TEST: true

@@ -65,6 +65,10 @@ class ConnectionStorage(private val connection: FluidConnection) extends Snapsho
     drained.amount.asFabric
   }
 
+  override def onFinalCommit(): Unit = {
+    super.onFinalCommit()
+    connection.getTiles.foreach(_.setChanged())
+  }
 }
 
 //noinspection UnstableApiUsage

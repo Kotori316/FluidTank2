@@ -32,6 +32,7 @@ includeBuild("gradle-plugins")
 include("common")
 include("dependency-check")
 include("gameTest:commonTest")
+include("publish-all")
 if (!System.getenv("DISABLE_FABRIC").toBoolean()) {
     include("fabric")
 }

@@ -1,9 +1,9 @@
 package com.kotori316.fluidtank.render
 
-import com.kotori316.fluidtank.{DebugLogging, FluidTankCommon}
 import com.kotori316.fluidtank.contents.Tank
 import com.kotori316.fluidtank.fluids.FluidLike
 import com.kotori316.fluidtank.tank.{ItemBlockTank, PlatformTankAccess, Tier, TileTank, VisualTank}
+import com.kotori316.fluidtank.{DebugLogging, FluidTankCommon}
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.SubmitNodeCollector
@@ -20,6 +20,7 @@ import org.joml.Vector3f
 
 import java.util
 import java.util.Locale
+import scala.util.Try
 
 class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends SpecialModelRenderer[RenderItemTank.RenderContext] {
   private lazy val tileTank: TileTank = new RenderItemTank.TileTankForRender
@@ -42,8 +43,13 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
           )
         } else {
           // Failed to extract the render state from the tank. Check the renderer.
-          val renderer = dispatcher.getRenderer(stateForTile)
-          val message = if (renderer == null) s"No renderer found for ${tileTank.getClass.getName}" else s"Out of rendering distance. Tile: ${tileTank.getBlockPos}, Player: ${Option(Minecraft.getInstance).map(_.player).map(_.blockPosition()).orNull}"
+          val message = Try(dispatcher.getRenderer(tileTank))
+            .map { renderer =>
+              if (renderer == null) s"No renderer found for ${tileTank.getClass.getName}"
+              else s"Out of rendering distance. Tile: ${tileTank.getBlockPos}, Player: ${Option(Minecraft.getInstance).map(_.player).map(_.blockPosition()).orNull}"
+            }
+            .recover(t => s"Failed to get renderer: ${t.getMessage}")
+            .getOrElse("Unknown error")
           DebugLogging.LOGGER.warn(message)
         }
       }

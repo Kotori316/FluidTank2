@@ -43,13 +43,14 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
           )
         } else {
           // Failed to extract the render state from the tank. Check the renderer.
-          val message = Try(dispatcher.getRenderer(tileTank))
-            .map { renderer =>
-              if (renderer == null) s"No renderer found for ${tileTank.getClass.getName}"
-              else s"Out of rendering distance. Tile: ${tileTank.getBlockPos}, Player: ${Option(Minecraft.getInstance).map(_.player).map(_.blockPosition()).orNull}"
-            }
-            .recover(t => s"Failed to get renderer: ${t.getMessage}")
-            .getOrElse("Unknown error")
+          val message: String = Try(dispatcher.getRenderer(tileTank))
+            .fold(
+              t => s"Failed to get renderer: ${t.getMessage}",
+              { renderer =>
+                if (renderer == null) s"No renderer found for ${tileTank.getClass.getName}"
+                else s"Out of rendering distance. Tile: ${tileTank.getBlockPos}, Player: ${Option(Minecraft.getInstance).map(_.player).map(_.blockPosition()).orNull}"
+              }
+            )
           DebugLogging.LOGGER.warn(message)
         }
       }

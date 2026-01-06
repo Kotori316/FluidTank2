@@ -183,10 +183,6 @@ publishMods {
             }
         }
     }
-    github {
-        accessToken = project.findProperty("githubToken") as? String ?: System.getenv("REPO_TOKEN") ?: ""
-        parent(rootProject.tasks.named("publishGithub"))
-    }
 }
 
 tasks.register("checkChangelog") {

@@ -5,6 +5,6 @@ plugins {
 version = project.findProperty("mod_version") as String
 
 tasks.named("wrapper", Wrapper::class) {
-    gradleVersion = "9.2.1"
+    gradleVersion = "9.3.0"
     distributionType = Wrapper.DistributionType.BIN
 }

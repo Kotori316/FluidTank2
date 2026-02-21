@@ -18,7 +18,6 @@ import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.*;
-import com.mojang.datafixers.DSL;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -68,11 +67,11 @@ public final class FluidTank implements ModInitializer {
         Stream.concat(TANK_MAP.entrySet().stream(), Stream.of(Map.entry(Tier.CREATIVE, BLOCK_CREATIVE_TANK), Map.entry(Tier.VOID, BLOCK_VOID_TANK)))
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().itemBlock()));
     public static final BlockEntityType<TileTankFabric> TILE_TANK_TYPE =
-        FabricBlockEntityTypeBuilder.create(TileTankFabric::new, TANK_MAP.values().toArray(BlockTank[]::new)).build(DSL.emptyPartType());
+        FabricBlockEntityTypeBuilder.create(TileTankFabric::new, TANK_MAP.values().toArray(BlockTank[]::new)).build();
     public static final BlockEntityType<TileCreativeTankFabric> TILE_CREATIVE_TANK_TYPE =
-        FabricBlockEntityTypeBuilder.create(TileCreativeTankFabric::new, BLOCK_CREATIVE_TANK).build(DSL.emptyPartType());
+        FabricBlockEntityTypeBuilder.create(TileCreativeTankFabric::new, BLOCK_CREATIVE_TANK).build();
     public static final BlockEntityType<TileVoidTank> TILE_VOID_TANK_TYPE =
-        FabricBlockEntityTypeBuilder.create(TileVoidTank::new, BLOCK_VOID_TANK).build(DSL.emptyPartType());
+        FabricBlockEntityTypeBuilder.create(TileVoidTank::new, BLOCK_VOID_TANK).build();
     public static final LootItemFunctionType<TankLootFunction> TANK_LOOT_FUNCTION = new LootItemFunctionType<>(TankLootFunction.CODEC);
     public static final RecipeSerializer<TierRecipe> TIER_RECIPE_SERIALIZER = TierRecipe.SERIALIZER;
     public static final BlockChestAsTank BLOCK_CAT = new BlockChestAsTankFabric();

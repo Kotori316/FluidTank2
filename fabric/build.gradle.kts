@@ -66,6 +66,7 @@ loom {
             client()
             name("Fabric Client GameTest")
             property("fabric.client.gametest")
+            property("fabric.client.gametest.disableNetworkSynchronizer", "true")
             runDir = "run-client"
             source(sourceSets["clientTest"])
         }

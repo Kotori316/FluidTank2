@@ -6,6 +6,7 @@
   "entrypoints": {
     "fabric-client-gametest": [
       "com.kotori316.fluidtank.fabric.client.test.DemoTest",
+      "com.kotori316.fluidtank.fabric.client.test.DemoStoneTest",
       "com.kotori316.fluidtank.fabric.client.test.WaterTankTest",
       "com.kotori316.fluidtank.fabric.client.test.LavaTankTest",
       "com.kotori316.fluidtank.fabric.client.test.FluidLevelTest",

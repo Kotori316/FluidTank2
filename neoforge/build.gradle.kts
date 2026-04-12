@@ -156,7 +156,7 @@ dependencies {
         name = "appliedenergistics2",
         version = project.property("ae2_neoforge_version").toString()
     ) { isTransitive = false }
-    /*modLocalRuntime(
+    /*implementation(
         group = "mezz.jei",
         name = "jei-${project.property("jei_neoforge_repo_version")}-neoforge",
         version = project.property("jei_neoforge_version").toString()

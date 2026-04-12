@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.data
 import com.kotori316.fluidtank.PlatformBaseAccess
 import com.kotori316.fluidtank.cat.PlatformChestAsTankAccess
 import com.kotori316.fluidtank.recipe.{TierRecipe, TierRecipeBuilder}
+import com.kotori316.fluidtank.reservoir.ReservoirRecipeConstant
 import com.kotori316.fluidtank.tank.{PlatformTankAccess, Tier}
 import net.minecraft.advancements.critereon.InventoryChangeTrigger
 import net.minecraft.core.HolderLookup
@@ -33,6 +34,7 @@ class Recipe(ip: IngredientProvider, recipeOutput: RecipeOutput, registries: Hol
       .pattern("xpx")
       .pattern("xxx")
       .unlockedBy(ip.glassTag)
+      .group(TierRecipe.TANK_RECIPE_GROUP)
       .save(ip.tagCondition(recipeOutput, ip.glassTag))
 
     ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, voidTankBlock)
@@ -43,6 +45,7 @@ class Recipe(ip: IngredientProvider, recipeOutput: RecipeOutput, registries: Hol
       .pattern("ooo")
       .unlockedBy(woodTankBlock)
       .unlockedBy(ip.obsidianTag)
+      .group(TierRecipe.TANK_RECIPE_GROUP)
       .save(ip.tagCondition(recipeOutput, ip.obsidianTag))
 
     for {
@@ -66,6 +69,7 @@ class Recipe(ip: IngredientProvider, recipeOutput: RecipeOutput, registries: Hol
         .requires(Items.BUCKET)
         .requires(Items.BUCKET)
         .unlockedBy(tank.get())
+        .group(ReservoirRecipeConstant.RESERVOIR_RECIPE_GROUP)
         .save(recipeOutput)
     }
 

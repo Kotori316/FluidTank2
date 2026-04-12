@@ -22,15 +22,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.item.crafting.*;
-import net.minecraft.world.item.crafting.display.RecipeDisplay;
-import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.TagValueOutput;
-import org.apache.logging.log4j.util.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -44,40 +39,40 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public final class TierRecipe implements CraftingRecipe {
+public final class TierRecipe extends ShapedRecipe implements CraftingRecipe {
     private static final Logger LOGGER = LoggerFactory.getLogger(TierRecipe.class);
     public static final Serializer SERIALIZER = new Serializer();
+    public static final String TANK_RECIPE_GROUP = FluidTankCommon.modId + "_" + "tank";
 
     final Tier tier;
     final Ingredient tankItem;
     final Ingredient subItem;
     final ItemStack result;
-    final ShapedRecipePattern pattern;
-    /**
-     * Wrapped with lazy, as it throws error in data generation
-     */
-    final Lazy<PlacementInfo> placementInfo;
 
     public TierRecipe(Tier tier, Ingredient tankItem, Ingredient subItem) {
+        super(
+            TANK_RECIPE_GROUP,
+            CraftingBookCategory.MISC,
+            ShapedRecipePattern.of(Map.of('t', tankItem, 's', subItem),
+                List.of(
+                    "tst",
+                    "s s",
+                    "tst"
+                )
+            ),
+            new ItemStack(PlatformTankAccess.getInstance().getTankBlockMap().get(tier).get())
+        );
         this.tier = tier;
         this.tankItem = tankItem;
         this.subItem = subItem;
         this.result = new ItemStack(PlatformTankAccess.getInstance().getTankBlockMap().get(tier).get());
-        this.pattern = ShapedRecipePattern.of(Map.of('t', tankItem, 's', subItem),
-            List.of(
-                "tst",
-                "s s",
-                "tst"
-            )
-        );
-        this.placementInfo = Lazy.lazy(() -> PlacementInfo.createFromOptionals(this.pattern.ingredients()));
 
         DebugLogging.LOGGER().debug("{} instance created for Tier {}({}).", getClass().getSimpleName(), tier, result);
     }
 
     @Override
     public boolean matches(CraftingInput input, @Nullable Level worldIn) {
-        if (!this.pattern.matches(input)) {
+        if (!super.matches(input, worldIn)) {
             return false;
         }
         // Items are placed correctly.
@@ -106,7 +101,7 @@ public final class TierRecipe implements CraftingRecipe {
             DebugLogging.LOGGER().error("Requested to return crafting result for invalid inventory. {}", stacks);
             return ItemStack.EMPTY;
         }
-        ItemStack result = this.result.copy();
+        ItemStack result = super.assemble(inv, access);
         GenericAmount<FluidLike> fluidAmount = IntStream.range(0, inv.size()).mapToObj(inv::getItem)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
             .map(s -> s.get(DataComponents.BLOCK_ENTITY_DATA))
@@ -138,21 +133,6 @@ public final class TierRecipe implements CraftingRecipe {
         return SERIALIZER;
     }
 
-    @Override
-    public PlacementInfo placementInfo() {
-        return placementInfo.get();
-    }
-
-    @Override
-    public List<RecipeDisplay> display() {
-        return List.of(new ShapedCraftingRecipeDisplay(
-            this.pattern.width(), this.pattern.height(),
-            this.pattern.ingredients().stream().map((optional) -> optional.map(Ingredient::display).orElse(SlotDisplay.Empty.INSTANCE)).toList(),
-            new SlotDisplay.ItemStackSlotDisplay(this.result),
-            new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)
-        ));
-    }
-
     @NotNull
     @Override
     public NonNullList<ItemStack> getRemainingItems(CraftingInput inv) {
@@ -175,12 +155,6 @@ public final class TierRecipe implements CraftingRecipe {
 
     public ItemStack getResult() {
         return result.copy();
-    }
-
-    @NotNull
-    @Override
-    public CraftingBookCategory category() {
-        return CraftingBookCategory.MISC;
     }
 
     public static final String KEY_TIER = "tier";

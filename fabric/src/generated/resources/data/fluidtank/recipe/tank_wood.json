@@ -10,6 +10,7 @@
   ],
   "type": "minecraft:crafting_shaped",
   "category": "misc",
+  "group": "fluidtank_tank",
   "key": {
     "p": "#minecraft:logs",
     "x": "#c:glass_blocks"

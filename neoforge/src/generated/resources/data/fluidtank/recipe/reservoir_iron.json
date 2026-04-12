@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "equipment",
+  "group": "fluidtank_reservoir",
   "ingredients": [
     "fluidtank:tank_iron",
     "minecraft:bucket",

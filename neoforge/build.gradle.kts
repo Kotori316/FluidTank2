@@ -133,46 +133,31 @@ dependencies {
     implementation("net.neoforged:neoforge:${project.property("neoforge_version")}")
 
     runtimeOnly(
-        group = "com.kotori316",
-        name = "ScalableCatsForce-NeoForge".lowercase(),
-        version = project.property("slp_neoforge_version").toString(),
-        classifier = "with-library"
+        "com.kotori316:${"ScalableCatsForce-NeoForge".lowercase()}:${project.property("slp_neoforge_version")}:with-library"
     ) {
         isTransitive = false
     }
 
     implementation(
-        group = "curse.maven",
-        name = "jade-324717",
-        version = project.property("jade_neoforge_id").toString()
+        "curse.maven:jade-324717:${project.property("jade_neoforge_id")}"
     )
     compileOnly(
-        group = "curse.maven",
-        name = "the-one-probe-245211",
-        version = project.property("top_neoforge_id").toString()
+        "curse.maven:the-one-probe-245211:${project.property("top_neoforge_id")}"
     )
     compileOnly(
-        group = "appeng",
-        name = "appliedenergistics2",
-        version = project.property("ae2_neoforge_version").toString()
+        "appeng:appliedenergistics2:${project.property("ae2_neoforge_version")}"
     ) { isTransitive = false }
-    /*modLocalRuntime(
-        group = "mezz.jei",
-        name = "jei-${project.property("jei_neoforge_repo_version")}-neoforge",
-        version = project.property("jei_neoforge_version").toString()
+    /*implementation(
+        "mezz.jei:jei-${project.property("jei_neoforge_repo_version")}-neoforge:${project.property("jei_neoforge_version")}"
     ) { isTransitive = false }*/
     // Test Dependencies.
     // Required these libraries to execute the tests.
     // The library will avoid errors of ForgeRegistry and Capability.
     testImplementation(
-        group = "org.mockito",
-        name = "mockito-core",
-        version = project.property("mockitoCoreVersion").toString()
+        "org.mockito:mockito-core:${project.property("mockitoCoreVersion")}"
     )
     testImplementation(
-        group = "org.mockito",
-        name = "mockito-inline",
-        version = project.property("mockitoInlineVersion").toString()
+        "org.mockito:mockito-inline:${project.property("mockitoInlineVersion")}"
     )
     implementation("com.kotori316:debug-utility-neoforge:${project.property("debug_util_version")}") {
         exclude(group = "org.mockito")

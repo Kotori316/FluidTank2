@@ -91,28 +91,19 @@ dependencies {
     })
 
     modImplementation(
-        group = "net.fabricmc",
-        name = "fabric-loader",
-        version = project.property("fabric_loader_version").toString()
+        "net.fabricmc:fabric-loader:${project.property("fabric_loader_version")}"
     )
     modApi(
-        group = "net.fabricmc.fabric-api",
-        name = "fabric-api",
-        version = project.property("fabric_api_version").toString()
+        "net.fabricmc.fabric-api:fabric-api:${project.property("fabric_api_version")}"
     )
 
     modRuntimeOnly(
-        group = "com.kotori316",
-        name = "scalable-cats-force-fabric",
-        version = project.property("slp_fabric_version").toString(),
-        classifier = "dev"
+        "com.kotori316:scalable-cats-force-fabric:${project.property("slp_fabric_version")}:dev"
     ) { isTransitive = false }
 
     // Other mods
     modImplementation(
-        group = "curse.maven",
-        name = "jade-324717",
-        version = project.property("jade_fabric_id").toString()
+        "curse.maven:jade-324717:${project.property("jade_fabric_id")}"
     )
     /*modRuntimeOnly(
         group = "mezz.jei",
@@ -121,9 +112,7 @@ dependencies {
     )*/
     //noinspection SpellCheckingInspection
     modImplementation(
-        group = "teamreborn",
-        name = "energy",
-        version = project.property("fabric_energy_version").toString()
+        "teamreborn:energy:${project.property("fabric_energy_version")}"
     )
     modImplementation("com.kotori316:debug-utility-fabric:${project.property("debug_util_version")}") {
         exclude("net.fabricmc.fabric-api", "fabric-api")

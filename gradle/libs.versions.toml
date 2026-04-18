@@ -1,5 +1,5 @@
 [versions]
-plugin_cf = "3.5"
+plugin_cf = "4.0"
 plugin_shadow = "8.+"
 plugin_publish_all = "1.1.0"
 plugin_idea_ext = "1.4.1"

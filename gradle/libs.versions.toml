@@ -1,6 +1,5 @@
 [versions]
 plugin_cf = "4.0"
-plugin_shadow = "8.+"
 plugin_publish_all = "1.1.0"
 plugin_idea_ext = "1.4.1"
 
@@ -12,10 +11,8 @@ plugin_neoforge_gradle = "7.1.26"
 [plugins]
 cf = { id = "com.kotori316.plugin.cf", version.ref = "plugin_cf" }
 publish-all = { id = "me.modmuss50.mod-publish-plugin", version.ref = "plugin_publish_all" }
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "plugin_shadow" }
 idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "plugin_idea_ext" }
 
-fabric-loom = { id = "fabric-loom", version.ref = "plugin_fabric_loom" }
+fabric-loom = { id = "net.fabricmc.fabric-loom", version.ref = "plugin_fabric_loom" }
 forge-gradle = { id = "net.minecraftforge.gradle", version.ref = "plugin_forge_gradle" }
-forge-parchment = { id = "org.parchmentmc.librarian.forgegradle", version.ref = "plugin_forge_parchment" }
 neoforge-gradle = { id = "net.neoforged.gradle.userdev", version.ref = "plugin_neoforge_gradle" }

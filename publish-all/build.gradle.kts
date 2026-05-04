@@ -17,7 +17,7 @@ publishMods {
         type = if (project.version.toString().contains("SNAPSHOT")) BETA else STABLE
         allowEmptyFiles = false
 
-        file = rootProject.layout.projectDirectory.file(provider { "changelog/1.21.md" })
+        file = rootProject.layout.projectDirectory.file(provider { project.property("changelog_file").toString() })
         additionalFiles.from(gatherArtifacts())
     }
 }
@@ -41,7 +41,7 @@ fun createChangelog(): String {
 fun gatherArtifacts(): List<Provider<RegularFile>> {
     val list = mutableListOf<Provider<RegularFile>>()
     if (!System.getenv("DISABLE_FABRIC").toBoolean()) {
-        list.add(project(":fabric").tasks.named("remapJar", org.gradle.jvm.tasks.Jar::class).flatMap { it.archiveFile })
+        list.add(project(":fabric").tasks.named("jar", org.gradle.jvm.tasks.Jar::class).flatMap { it.archiveFile })
     }
     if (!System.getenv("DISABLE_NEOFORGE").toBoolean()) {
         list.add(project(":neoforge").tasks.named("jar", org.gradle.jvm.tasks.Jar::class).flatMap { it.archiveFile })

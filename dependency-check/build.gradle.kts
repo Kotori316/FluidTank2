@@ -19,13 +19,6 @@ dependencies {
         name = "jei-${project.property("jei_neoforge_repo_version")}-neoforge",
         version = project.property("jei_neoforge_version").toString()
     )
-    // Parchment
-    implementation(
-        group = "org.parchmentmc.data",
-        name = "parchment-${project.property("parchment_mapping_mc")}",
-        version = project.property("parchment_mapping_version").toString(),
-        ext = "zip"
-    )
     // Scala 3
     implementation(
         group = "org.scala-lang",

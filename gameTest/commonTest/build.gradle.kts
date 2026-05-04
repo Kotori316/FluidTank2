@@ -6,12 +6,6 @@ plugins {
 
 dependencies {
     minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
-    mappings(loom.layered {
-        officialMojangMappings()
-        val parchmentMC = project.property("parchment_mapping_mc")
-        val parchmentDate = project.property("parchment_mapping_version")
-        parchment("org.parchmentmc.data:parchment-$parchmentMC:$parchmentDate@zip")
-    })
 
     compileOnly("com.kotori316:debug-utility-common:${project.property("debug_util_version")}") {
         isTransitive = false
@@ -30,9 +24,6 @@ signing {
 }
 
 tasks {
-    remapJar {
-        enabled = false
-    }
     val jksSignJar = register("jksSignJar", JarSignTask::class) {
         jarTask = jar
     }

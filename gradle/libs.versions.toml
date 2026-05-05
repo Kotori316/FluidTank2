@@ -5,7 +5,6 @@ plugin_idea_ext = "1.4.1"
 
 plugin_fabric_loom = "1.16.1"
 plugin_forge_gradle = "[6.0,8.0)"
-plugin_forge_parchment = "1.+"
 plugin_neoforge_gradle = "7.1.26"
 
 [plugins]

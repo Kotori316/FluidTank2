@@ -69,11 +69,11 @@ loom {
             property("fabric.client.gametest.disableNetworkSynchronizer", "true")
             runDir = "run-client"
             source(sourceSets["clientTest"])
-            val openalLib = System.getenv("OPENAL_LIB")
-            if (!openalLib.isNullOrEmpty()) {
-                property("org.lwjgl.openal.libname", openalLib)
-                environmentVariables["LD_PRELOAD"] = openalLib
-            }
+            // val openalLib = System.getenv("OPENAL_LIB")
+            // if (!openalLib.isNullOrEmpty()) {
+            //     property("org.lwjgl.openal.libname", openalLib)
+            //     environmentVariables["LD_PRELOAD"] = openalLib
+            // }
         }
     }
 }

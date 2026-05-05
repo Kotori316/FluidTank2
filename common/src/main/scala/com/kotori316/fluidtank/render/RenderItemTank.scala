@@ -1,9 +1,9 @@
 package com.kotori316.fluidtank.render
 
+import com.kotori316.fluidtank.DebugLogging
 import com.kotori316.fluidtank.contents.Tank
 import com.kotori316.fluidtank.fluids.FluidLike
 import com.kotori316.fluidtank.tank.{ItemBlockTank, PlatformTankAccess, Tier, TileTank, VisualTank}
-import com.kotori316.fluidtank.{DebugLogging, FluidTankCommon}
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.SubmitNodeCollector
@@ -12,22 +12,23 @@ import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.core.BlockPos
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.Identifier
-import net.minecraft.util.{ProblemReporter, Unit as UtilUnit}
+import net.minecraft.util.ProblemReporter
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.storage.TagValueInput
 import org.joml.Vector3fc
 
-import java.util.Locale
 import scala.util.Try
 
 class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends SpecialModelRenderer[RenderItemTank.RenderContext] {
   private lazy val tileTank: TileTank = new RenderItemTank.TileTankForRender
 
+  /**
+   * Render the tank content.
+   * The rendering implementation is delegated to the tile renderer([[RenderTank]]).
+   *
+   * The tank block texture is rendered via a normal renderer, not the special renderer.
+   */
   override def submit(patterns: RenderItemTank.RenderContext, poseStack: PoseStack, nodeCollector: SubmitNodeCollector, packedLight: Int, packedOverlay: Int, hasFoil: Boolean, outlineColor: Int): Unit = {
-    val textureLocation = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, s"textures/block/${patterns.tier.toString}.png".toLowerCase(Locale.ROOT))
-    nodeCollector.submitModel(this.model, UtilUnit.INSTANCE, poseStack, this.model.renderType(textureLocation), packedLight, packedOverlay, outlineColor, null)
-
     tileTank.tier = patterns.tier
     for (d <- patterns.data if !d.isEmpty) {
       val level = Minecraft.getInstance.level

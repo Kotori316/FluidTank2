@@ -1,9 +1,18 @@
 {
   "model": {
-    "type": "minecraft:special",
-    "base": "fluidtank:item/tank_silver",
-    "model": {
-      "type": "fluidtank:tank"
-    }
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:special",
+        "base": "fluidtank:block/tank_silver",
+        "model": {
+          "type": "fluidtank:tank"
+        }
+      },
+      {
+        "type": "minecraft:model",
+        "model": "fluidtank:block/tank_silver"
+      }
+    ]
   }
 }

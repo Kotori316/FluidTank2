@@ -6,6 +6,7 @@ import com.kotori316.fluidtank.neoforge.render.FluidRenderHelperNeoForge;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
 import com.kotori316.fluidtank.tank.TankPos;
+import com.kotori316.fluidtank.tank.Tier;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
@@ -52,6 +53,10 @@ final class StateAndModelProvider extends ModelProvider {
 
     private Material blockTexture(String name) {
         return new Material(modLocation("block/" + name));
+    }
+
+    private Material tankTexture(Tier tier, String suffix) {
+        return new Material(modLocation("block/" + tier.name().toLowerCase(Locale.ROOT) + suffix), false);
     }
 
     @Override
@@ -147,30 +152,23 @@ final class StateAndModelProvider extends ModelProvider {
 
         var blockModelLocation = blockModel.create(ModelLocationUtils.getModelLocation(blockTank),
             new TextureMapping()
-                .putForced(TextureSlot.PARTICLE, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
-                .putForced(TextureSlot.SIDE, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
-                .putForced(TextureSlot.TOP, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"))
+                .putForced(TextureSlot.PARTICLE, tankTexture(tier, "1"))
+                .putForced(TextureSlot.SIDE, tankTexture(tier, "1"))
+                .putForced(TextureSlot.TOP, tankTexture(tier, "2"))
             ,
             blockModels.modelOutput
         );
         var tankPosProperty = PropertyDispatch.initial(TankPos.TANK_POS_PROPERTY)
-            .generate(tankPos -> BlockModelGenerators.plainVariant(blockModelLocation));
+            .generate(_ -> BlockModelGenerators.plainVariant(blockModelLocation));
         blockModels.blockStateOutput.accept(
             MultiVariantGenerator.dispatch(blockTank).with(tankPosProperty)
         );
 
-        var itemModel = ExtendedModelTemplateBuilder.builder()
-            .parent(templates.tankItem())
-            .build();
-        var itemModelLocation = itemModel.create(ModelLocationUtils.getModelLocation(blockTank.asItem()),
-            new TextureMapping()
-                .putForced(TextureSlot.PARTICLE, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
-                .putForced(TextureSlot.SIDE, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "1"))
-                .putForced(TextureSlot.TOP, blockTexture(tier.name().toLowerCase(Locale.ROOT) + "2"))
-            ,
-            itemModels.modelOutput
-        );
-        itemModels.itemModelOutput.accept(blockTank.asItem(), ItemModelUtils.specialModel(itemModelLocation, FluidRenderHelperNeoForge.tankUnbaked()));
+        // Combine special render for tank content and normal renderer for block itself
+        itemModels.itemModelOutput.accept(blockTank.asItem(), ItemModelUtils.composite(
+            ItemModelUtils.specialModel(blockModelLocation, FluidRenderHelperNeoForge.tankUnbaked()),
+            ItemModelUtils.plainModel(blockModelLocation)
+        ));
     }
 
     /*void gasTank(BlockGasTank blockGasTank) {

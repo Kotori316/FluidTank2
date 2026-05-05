@@ -53,7 +53,7 @@ abstract class BlockTank(val tier: Tier) extends Block(
     level.getBlockEntity(pos) match {
       case tank: TileTank =>
         if (!level.isClientSide()) {
-          player.displayClientMessage(tank.getConnection.getTextComponent, true)
+          player.sendOverlayMessage(tank.getConnection.getTextComponent)
         }
         InteractionResult.SUCCESS
       case tile =>

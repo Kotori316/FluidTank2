@@ -9,17 +9,17 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.rendertype.RenderTypes
 import net.minecraft.client.renderer.special.SpecialModelRenderer
-import net.minecraft.client.resources.model.MaterialSet
+import net.minecraft.client.resources.model.sprite.SpriteGetter
 import net.minecraft.resources.Identifier
 import net.minecraft.util.{Mth, Unit as UtilUnit}
-import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
+import net.minecraft.world.item.ItemStack
 import org.joml.{Vector3f, Vector3fc}
 
 import java.util.Locale
 
-final class RenderReservoirItem(protected val model: ReservoirModel, protected val materialSet: MaterialSet, renderHelper: FluidRenderHelper) extends SpecialModelRenderer[RenderReservoirItem.RenderContext] {
+final class RenderReservoirItem(protected val model: ReservoirModel, protected val materialSet: SpriteGetter, renderHelper: FluidRenderHelper) extends SpecialModelRenderer[RenderReservoirItem.RenderContext] {
 
-  override def submit(patterns: RenderReservoirItem.RenderContext, displayContext: ItemDisplayContext, poseStack: PoseStack, nodeCollector: SubmitNodeCollector, packedLight: Int, packedOverlay: Int, hasFoilType: Boolean, outlineColor: Int): Unit = {
+  override def submit(patterns: RenderReservoirItem.RenderContext, poseStack: PoseStack, nodeCollector: SubmitNodeCollector, packedLight: Int, packedOverlay: Int, hasFoilType: Boolean, outlineColor: Int): Unit = {
     poseStack.pushPose()
     poseStack.scale(1.0F, 1.0F, 1.0F)
     poseStack.translate(0, 0, 0.5f)

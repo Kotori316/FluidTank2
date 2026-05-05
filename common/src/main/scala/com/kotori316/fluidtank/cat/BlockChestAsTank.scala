@@ -46,16 +46,16 @@ abstract class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
       if (!level.isClientSide()) {
         val fluids = PlatformChestAsTankAccess.getInstance().getCATFluids(level, pos)
         if (fluids.isEmpty) {
-          player.displayClientMessage(Component.translatable("chat.fluidtank.cat_empty"), false)
+          player.sendSystemMessage(Component.translatable("chat.fluidtank.cat_empty"))
         } else {
-          player.displayClientMessage(Component.translatable("chat.fluidtank.cat_fluid"), false)
+          player.sendSystemMessage(Component.translatable("chat.fluidtank.cat_fluid"))
         }
         for (f <- CollectionConverters.asScala(fluids)) {
           val message = Component.literal("[")
             .append(PlatformFluidAccess.getInstance().getDisplayName(f).copy().withStyle(ChatFormatting.AQUA))
             .append("]")
             .append(" " + f.amount.asDisplay + " mB")
-          player.displayClientMessage(message, false)
+          player.sendSystemMessage(message)
         }
       }
       InteractionResult.SUCCESS

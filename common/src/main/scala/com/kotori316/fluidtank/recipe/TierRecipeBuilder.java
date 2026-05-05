@@ -39,6 +39,10 @@ public final class TierRecipeBuilder implements RecipeBuilder {
     }
 
     @Override
+    public ResourceKey<Recipe<?>> defaultId() {
+        return RecipeBuilder.getDefaultRecipeId(recipe.result);
+    }
+
     public Item getResult() {
         return recipe.result.getItem();
     }

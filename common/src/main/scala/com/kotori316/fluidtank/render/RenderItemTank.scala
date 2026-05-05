@@ -8,13 +8,13 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.special.SpecialModelRenderer
-import net.minecraft.client.renderer.state.CameraRenderState
+import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.core.BlockPos
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.Identifier
 import net.minecraft.util.{ProblemReporter, Unit as UtilUnit}
-import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.storage.TagValueInput
 import org.joml.Vector3fc
 
@@ -24,7 +24,7 @@ import scala.util.Try
 class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends SpecialModelRenderer[RenderItemTank.RenderContext] {
   private lazy val tileTank: TileTank = new RenderItemTank.TileTankForRender
 
-  override def submit(patterns: RenderItemTank.RenderContext, displayContext: ItemDisplayContext, poseStack: PoseStack, nodeCollector: SubmitNodeCollector, packedLight: Int, packedOverlay: Int, hasFoil: Boolean, outlineColor: Int): Unit = {
+  override def submit(patterns: RenderItemTank.RenderContext, poseStack: PoseStack, nodeCollector: SubmitNodeCollector, packedLight: Int, packedOverlay: Int, hasFoil: Boolean, outlineColor: Int): Unit = {
     val textureLocation = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, s"textures/block/${patterns.tier.toString}.png".toLowerCase(Locale.ROOT))
     nodeCollector.submitModel(this.model, UtilUnit.INSTANCE, poseStack, this.model.renderType(textureLocation), packedLight, packedOverlay, outlineColor, null)
 

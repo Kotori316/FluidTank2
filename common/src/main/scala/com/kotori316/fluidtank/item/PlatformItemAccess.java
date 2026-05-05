@@ -57,7 +57,11 @@ class PlatformItemAccessHolder {
 
         @Override
         public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
-            return stack.getItem().getCraftingRemainder();
+            var template = stack.getItem().getCraftingRemainder();
+            if(template == null) {
+                return ItemStack.EMPTY;
+            }
+            return template.create();
         }
 
         @Override

@@ -2,7 +2,6 @@ package com.kotori316.fluidtank.tank;
 
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,8 +29,6 @@ public interface PlatformTankAccess {
         return entityType == i.getNormalType() || entityType == i.getCreativeType() || entityType == i.getVoidType();
     }
 
-    LootItemFunctionType<TankLootFunction> getTankLoot();
-
     Map<Tier, Supplier<? extends BlockTank>> getTankBlockMap();
 
     Map<Tier, ? extends Supplier<? extends ItemReservoir>> getReservoirMap();
@@ -56,11 +53,6 @@ class PlatformTankAccessHolder {
 
         @Override
         public BlockEntityType<? extends TileTank> getVoidType() {
-            return null;
-        }
-
-        @Override
-        public LootItemFunctionType<TankLootFunction> getTankLoot() {
             return null;
         }
 

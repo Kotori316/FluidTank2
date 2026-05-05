@@ -16,7 +16,7 @@ public final class PacketHandler {
     public static class Server {
         public static void initServer() {
             // Register message class in BOTH SIDE
-            PayloadTypeRegistry.playS2C().register(FluidTankContentMessageFabric.TYPE, FluidTankContentMessageFabric.STREAM_CODEC);
+            PayloadTypeRegistry.clientboundPlay().register(FluidTankContentMessageFabric.TYPE, FluidTankContentMessageFabric.STREAM_CODEC);
             // Use ServerPlayNetworking.registerGlobalReceiver
         }
 
@@ -30,7 +30,7 @@ public final class PacketHandler {
     }
 
     public static void sendToClientWorld(@NotNull IMessage<?> message, @NotNull Level level) {
-        for (ServerPlayer player : PlayerLookup.world((ServerLevel) level)) {
+        for (ServerPlayer player : PlayerLookup.level((ServerLevel) level)) {
             ServerPlayNetworking.send(player, message);
         }
     }

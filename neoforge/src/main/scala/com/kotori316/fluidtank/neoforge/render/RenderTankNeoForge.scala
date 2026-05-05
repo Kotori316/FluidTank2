@@ -5,25 +5,19 @@ import com.kotori316.fluidtank.fluids.{FluidLike, VanillaFluid, VanillaPotion}
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter
 import com.kotori316.fluidtank.render.RenderTank
 import com.kotori316.fluidtank.tank.TileTank
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.core.component.DataComponents
+import net.minecraft.core.component.{DataComponentMap, DataComponents}
 import net.minecraft.world.level.material.Fluids
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
-import net.neoforged.neoforge.client.textures.FluidSpriteCache
-import net.neoforged.neoforge.fluids.FluidType
-
-import scala.jdk.OptionConverters.RichOptional
+import net.neoforged.neoforge.client.fluid.FluidTintSources
 
 class RenderTankNeoForge(d: BlockEntityRendererProvider.Context) extends RenderTank(d) {
 
   override def getFluidTexture(tank: Tank[FluidLike], blockEntity: TileTank): TextureAtlasSprite = {
-    val world = getTankWorld(blockEntity)
-    val pos = getTankPos(blockEntity)
     val fluid = FluidLike.asFluid(tank.content.content, Fluids.WATER)
-    val attributes = IClientFluidTypeExtensions.of(fluid)
-    val resource = attributes.getStillTexture(fluid.defaultFluidState(), world, pos)
-    FluidSpriteCache.getSprite(resource)
+    val fluidState = fluid.defaultFluidState
+    Minecraft.getInstance.getModelManager.getFluidStateModelSet.get(fluidState).stillMaterial().sprite()
   }
 
   override def getFluidColor(tank: Tank[FluidLike], blockEntity: TileTank): Int = {
@@ -31,24 +25,13 @@ class RenderTankNeoForge(d: BlockEntityRendererProvider.Context) extends RenderT
 
     fluidAmount.content match {
       case VanillaFluid(fluid) =>
-        val attributes = IClientFluidTypeExtensions.of(fluid)
-        val normal = attributes.getTintColor
-        if (attributes.getClass == classOf[FluidType]) {
-          normal
-        } else {
-          val stackColor = attributes.getTintColor(NeoForgeConverter.toStack(fluidAmount))
-          if (normal == stackColor) {
-            val world = getTankWorld(blockEntity)
-            val pos = getTankPos(blockEntity)
-            val worldColor = attributes.getTintColor(fluid.defaultFluidState, world, pos)
-            worldColor
-          } else {
-            stackColor
-          }
-        }
+        val fluidState = fluid.defaultFluidState
+        val model = Minecraft.getInstance.getModelManager.getFluidStateModelSet.get(fluidState)
+        val tintSource = FluidTintSources.of(model.tintSource())
+        tintSource.colorAsStack(NeoForgeConverter.toStack(fluidAmount))
       case VanillaPotion(_) =>
         fluidAmount.componentPatch
-          .flatMap(_.get(DataComponents.POTION_CONTENTS).toScala)
+          .flatMap(p => Option(p.get(DataComponentMap.EMPTY, DataComponents.POTION_CONTENTS)))
           .map(_.getColor)
           .getOrElse(16253176)
     }

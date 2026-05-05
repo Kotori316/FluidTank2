@@ -19,6 +19,7 @@ import com.kotori316.fluidtank.neoforge.reservoir.ItemReservoirNeoForge;
 import com.kotori316.fluidtank.neoforge.tank.*;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.*;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -28,7 +29,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -85,7 +86,7 @@ public final class FluidTank {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_REGISTER = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, FluidTankCommon.modId);
     private static final DeferredRegister<IngredientType<?>> INGREDIENT_REGISTER = DeferredRegister.create(NeoForgeRegistries.INGREDIENT_TYPES, FluidTankCommon.modId);
     private static final DeferredRegister<CreativeModeTab> CREATIVE_TAB_REGISTER = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB, FluidTankCommon.modId);
-    private static final DeferredRegister<LootItemFunctionType<?>> LOOT_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.LOOT_FUNCTION_TYPE, FluidTankCommon.modId);
+    private static final DeferredRegister<MapCodec<? extends LootItemFunction>> LOOT_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.LOOT_FUNCTION_TYPE, FluidTankCommon.modId);
     private static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPE_REGISTER = DeferredRegister.create(BuiltInRegistries.DATA_COMPONENT_TYPE, FluidTankCommon.modId);
     public static final List<DeferredRegister<?>> REGISTER_LIST = List.of(
         BLOCK_REGISTER, ITEM_REGISTER, BLOCK_ENTITY_REGISTER, RECIPE_REGISTER, INGREDIENT_REGISTER, CREATIVE_TAB_REGISTER, LOOT_TYPE_REGISTER, DATA_COMPONENT_TYPE_REGISTER
@@ -110,7 +111,7 @@ public final class FluidTank {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileVoidTankNeoForge>> TILE_VOID_TANK_TYPE =
         BLOCK_ENTITY_REGISTER.register(TileVoidTank.class.getSimpleName().toLowerCase(Locale.ROOT), () ->
             new BlockEntityType<>(TileVoidTankNeoForge::new, BLOCK_VOID_TANK.get()));
-    public static final DeferredHolder<LootItemFunctionType<?>, LootItemFunctionType<TankLootFunction>> TANK_LOOT_FUNCTION = LOOT_TYPE_REGISTER.register(TankLootFunction.NAME, () -> new LootItemFunctionType<>(TankLootFunction.CODEC));
+    public static final DeferredHolder<MapCodec<? extends LootItemFunction>, MapCodec<TankLootFunction>> TANK_LOOT_FUNCTION = LOOT_TYPE_REGISTER.register(TankLootFunction.NAME, () -> TankLootFunction.CODEC);
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<?>> TIER_RECIPE = RECIPE_REGISTER.register(TierRecipe.Serializer.LOCATION.getPath(), () -> TierRecipe.SERIALIZER);
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_TAB_REGISTER.register("tab", () -> {
         var b = CreativeModeTab.builder();

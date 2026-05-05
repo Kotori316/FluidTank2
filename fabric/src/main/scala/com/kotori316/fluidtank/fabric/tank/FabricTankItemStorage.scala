@@ -19,9 +19,9 @@ import scala.jdk.OptionConverters.RichOptional
 class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c) {
 
   override def getTank: Tank[FluidLike] = {
-    val componentPatch = context.getItemVariant.getComponents
+    val components = context.getItemVariant.getComponents
     val maybeTank = for {
-      blockEntityData <- Option(componentPatch.get(DataComponents.BLOCK_ENTITY_DATA)).flatMap(_.toScala)
+      blockEntityData <- Option(components.get(DataComponents.BLOCK_ENTITY_DATA))
       if blockEntityData.contains(TileTank.KEY_TANK)
       customTag = blockEntityData.copyTagWithoutId()
       tankTag <- customTag.getCompound(TileTank.KEY_TANK).toScala
@@ -32,9 +32,9 @@ class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c
   private def getTier: Tier = context.getItemVariant.getItem.asInstanceOf[ItemBlockTank].blockTank.tier
 
   override def saveTank(newTank: Tank[FluidLike]): ItemVariant = {
-    val componentPatch = this.context.getItemVariant.getComponents
-    val component = Option(componentPatch.get(DataComponents.BLOCK_ENTITY_DATA))
-      .flatMap(_.toScala)
+    val components = this.context.getItemVariant.getComponents
+    val componentPatch = this.context.getItemVariant.getComponentsPatch
+    val component = Option(components.get(DataComponents.BLOCK_ENTITY_DATA))
     val tileTag = component
       .map(_.copyTagWithoutId())
       .getOrElse(new CompoundTag())

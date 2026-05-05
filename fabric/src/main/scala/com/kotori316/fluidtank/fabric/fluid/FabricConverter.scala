@@ -18,6 +18,6 @@ object FabricConverter {
   def fabricAmount(amount: FluidAmount): Long = amount.amount.asFabric
 
   def fromVariant(variant: FluidVariant, fabricAmount: Long): FluidAmount = {
-    FluidAmountUtil.from(variant.getFluid, GenericUnit.fromFabric(fabricAmount), Option(variant.getComponents))
+    FluidAmountUtil.from(variant.getFluid, GenericUnit.fromFabric(fabricAmount), Some(variant.getComponentsPatch))
   }
 }

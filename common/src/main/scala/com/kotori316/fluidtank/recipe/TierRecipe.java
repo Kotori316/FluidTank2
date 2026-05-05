@@ -14,7 +14,6 @@ import com.kotori316.fluidtank.tank.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -22,12 +21,14 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.TagValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,40 +40,40 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public final class TierRecipe extends ShapedRecipe implements CraftingRecipe {
+public final class TierRecipe extends NormalCraftingRecipe implements CraftingRecipe {
     private static final Logger LOGGER = LoggerFactory.getLogger(TierRecipe.class);
-    public static final Serializer SERIALIZER = new Serializer();
+    public static final RecipeSerializer<TierRecipe> SERIALIZER = new RecipeSerializer<>(Serializer.CODEC, Serializer.STREAM_CODEC);
     public static final String TANK_RECIPE_GROUP = FluidTankCommon.modId + "_" + "tank";
 
     final Tier tier;
     final Ingredient tankItem;
     final Ingredient subItem;
-    final ItemStack result;
+    final ItemStackTemplate result;
+    final ShapedRecipePattern pattern;
 
     public TierRecipe(Tier tier, Ingredient tankItem, Ingredient subItem) {
         super(
-            TANK_RECIPE_GROUP,
-            CraftingBookCategory.MISC,
-            ShapedRecipePattern.of(Map.of('t', tankItem, 's', subItem),
-                List.of(
-                    "tst",
-                    "s s",
-                    "tst"
-                )
-            ),
-            new ItemStack(PlatformTankAccess.getInstance().getTankBlockMap().get(tier).get())
+            new Recipe.CommonInfo(false),
+            new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, TANK_RECIPE_GROUP)
         );
         this.tier = tier;
         this.tankItem = tankItem;
         this.subItem = subItem;
-        this.result = new ItemStack(PlatformTankAccess.getInstance().getTankBlockMap().get(tier).get());
+        this.result = new ItemStackTemplate(PlatformTankAccess.getInstance().getTankBlockMap().get(tier).get().asItem());
+        this.pattern = ShapedRecipePattern.of(Map.of('t', tankItem, 's', subItem),
+            List.of(
+                "tst",
+                "s s",
+                "tst"
+            )
+        );
 
         DebugLogging.LOGGER().debug("{} instance created for Tier {}({}).", getClass().getSimpleName(), tier, result);
     }
 
     @Override
     public boolean matches(CraftingInput input, @Nullable Level worldIn) {
-        if (!super.matches(input, worldIn)) {
+        if (!this.pattern.matches(input)) {
             return false;
         }
         // Items are placed correctly.
@@ -94,14 +95,14 @@ public final class TierRecipe extends ShapedRecipe implements CraftingRecipe {
 
     @NotNull
     @Override
-    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider access) {
+    public ItemStack assemble(CraftingInput inv) {
         if (!this.matches(inv, null)) {
             var stacks = inv.items();
             LOGGER.error("Requested to return crafting result for invalid inventory. {}", stacks);
             DebugLogging.LOGGER().error("Requested to return crafting result for invalid inventory. {}", stacks);
             return ItemStack.EMPTY;
         }
-        ItemStack result = super.assemble(inv, access);
+        ItemStack result = this.result.create();
         GenericAmount<FluidLike> fluidAmount = IntStream.range(0, inv.size()).mapToObj(inv::getItem)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
             .map(s -> s.get(DataComponents.BLOCK_ENTITY_DATA))
@@ -115,7 +116,7 @@ public final class TierRecipe extends ShapedRecipe implements CraftingRecipe {
 
         if (fluidAmount.nonEmpty()) {
             try (var reporter = new ProblemReporter.ScopedCollector(LOGGER)) {
-                TagValueOutput tagValueOutput = TagValueOutput.createWithContext(reporter, access);
+                TagValueOutput tagValueOutput = TagValueOutput.createWithoutContext(reporter);
                 var tank = new Tank<>(fluidAmount, GenericUnit.apply(tier.getCapacity()));
                 tagValueOutput.store(TileTank.KEY_TANK(), Tank.codec(FluidAmountUtil.access()), tank);
                 tagValueOutput.putString(TileTank.KEY_TIER(), tier.name());
@@ -131,6 +132,11 @@ public final class TierRecipe extends ShapedRecipe implements CraftingRecipe {
     @Override
     public RecipeSerializer<TierRecipe> getSerializer() {
         return SERIALIZER;
+    }
+
+    @Override
+    protected PlacementInfo createPlacementInfo() {
+        return PlacementInfo.createFromOptionals(this.pattern.ingredients());
     }
 
     @NotNull
@@ -153,50 +159,34 @@ public final class TierRecipe extends ShapedRecipe implements CraftingRecipe {
         return this.subItem;
     }
 
+    @VisibleForTesting
     public ItemStack getResult() {
-        return result.copy();
+        return result.create();
     }
 
     public static final String KEY_TIER = "tier";
     public static final String KEY_SUB_ITEM = "sub_item";
 
-    public static final class Serializer implements RecipeSerializer<TierRecipe> {
+    public static final class Serializer {
         public static final Identifier LOCATION = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "crafting_grade_up");
-        private final MapCodec<TierRecipe> codec;
-        private final StreamCodec<RegistryFriendlyByteBuf, TierRecipe> streamCodec;
+        public static final MapCodec<TierRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
+            instance.group(
+                Codec.STRING.xmap(Tier::valueOfIgnoreCase, Tier::name).fieldOf(KEY_TIER).forGetter(TierRecipe::getTier),
+                Ingredient.CODEC.fieldOf(KEY_SUB_ITEM).forGetter(TierRecipe::getSubItem)
+            ).apply(instance, Serializer::createInstanceInternal)
+        );
+        public static final StreamCodec<RegistryFriendlyByteBuf, TierRecipe> STREAM_CODEC =
+            StreamCodec.ofMember(Serializer::toNetwork, Serializer::fromNetwork);
 
-        public Serializer() {
-            this.codec = RecordCodecBuilder.mapCodec(instance ->
-                instance.group(
-                    Codec.STRING.xmap(Tier::valueOfIgnoreCase, Tier::name).fieldOf(KEY_TIER).forGetter(TierRecipe::getTier),
-                    Ingredient.CODEC.fieldOf(KEY_SUB_ITEM).forGetter(TierRecipe::getSubItem)
-                ).apply(instance, this::createInstanceInternal)
-            );
-            this.streamCodec = StreamCodec.ofMember(this::toNetwork, this::fromNetwork);
-        }
-
-        private TierRecipe createInstance(Tier tier, Ingredient tankItem, Ingredient subItem) {
+        private static TierRecipe createInstance(Tier tier, Ingredient tankItem, Ingredient subItem) {
             return new TierRecipe(tier, tankItem, subItem);
         }
 
-        private TierRecipe createInstanceInternal(Tier tier, Ingredient subItem) {
-            return this.createInstance(tier, getIngredientTankForTier(tier), subItem);
+        private static TierRecipe createInstanceInternal(Tier tier, Ingredient subItem) {
+            return createInstance(tier, getIngredientTankForTier(tier), subItem);
         }
 
-        @NotNull
-        @Override
-        public MapCodec<TierRecipe> codec() {
-            return this.codec;
-        }
-
-        @NotNull
-        @Override
-        @Deprecated
-        public StreamCodec<RegistryFriendlyByteBuf, TierRecipe> streamCodec() {
-            return this.streamCodec;
-        }
-
-        public TierRecipe fromNetwork(RegistryFriendlyByteBuf buffer) {
+        public static TierRecipe fromNetwork(RegistryFriendlyByteBuf buffer) {
             String tierName = buffer.readUtf();
             Tier tier = Tier.valueOf(tierName);
             Ingredient tankItem = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
@@ -206,7 +196,7 @@ public final class TierRecipe extends ShapedRecipe implements CraftingRecipe {
             return createInstance(tier, tankItem, subItem);
         }
 
-        public void toNetwork(TierRecipe recipe, RegistryFriendlyByteBuf buffer) {
+        public static void toNetwork(TierRecipe recipe, RegistryFriendlyByteBuf buffer) {
             buffer.writeUtf(recipe.tier.name());
             Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.tankItem);
             Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.subItem);

@@ -11,7 +11,6 @@ import com.kotori316.fluidtank.fluids.*;
 import com.kotori316.fluidtank.potions.PotionFluidHandler;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
-import com.kotori316.fluidtank.tank.TankLootFunction;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
 import com.mojang.serialization.Codec;
@@ -31,6 +30,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -38,7 +38,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import org.apache.logging.log4j.util.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +57,7 @@ final class FabricPlatformAccess implements PlatformAccess {
 
     @Override
     public @NotNull Fluid getBucketContent(BucketItem bucketItem) {
-        return ((BucketItemAccessor) bucketItem).fabric_getFluid();
+        return ((BucketItemAccessor) bucketItem).fabric_getContent();
     }
 
     @Override
@@ -72,7 +71,7 @@ final class FabricPlatformAccess implements PlatformAccess {
             for (StorageView<FluidVariant> view : storage) {
                 var variant = view.getResource();
                 var amount = view.getAmount();
-                return FluidAmountUtil.from(FluidLike.of(variant.getFluid()), GenericUnit.fromFabric(amount), variant.getComponents());
+                return FluidAmountUtil.from(FluidLike.of(variant.getFluid()), GenericUnit.fromFabric(amount), variant.getComponentsPatch());
             }
         }
         return FluidAmountUtil.EMPTY();
@@ -179,11 +178,6 @@ final class FabricPlatformAccess implements PlatformAccess {
     }
 
     @Override
-    public LootItemFunctionType<TankLootFunction> getTankLoot() {
-        return FluidTank.TANK_LOOT_FUNCTION;
-    }
-
-    @Override
     public Map<Tier, Supplier<? extends BlockTank>> getTankBlockMap() {
         return Stream.concat(FluidTank.TANK_MAP.entrySet().stream(),
                 Stream.of(Map.entry(Tier.CREATIVE, FluidTank.BLOCK_CREATIVE_TANK), Map.entry(Tier.VOID, FluidTank.BLOCK_VOID_TANK)))
@@ -198,8 +192,8 @@ final class FabricPlatformAccess implements PlatformAccess {
     }
 
     @Override
-    public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
-        return stack.getRecipeRemainder();
+    public @Nullable ItemStackTemplate getCraftingRemainingItem(ItemStack stack) {
+        return stack.getCraftingRemainder();
     }
 
     @Override

@@ -43,7 +43,7 @@ public final class TankTierTest implements FluidTankClientGameTest {
             var tankBlock = PlatformTankAccess.getInstance().getTankBlockMap().get(tier).get().defaultBlockState();
             c.placeBlockRelativeOffset(3, BlockPos.ZERO.above(), tankBlock);
         });
-        singlePlayerContext.getClientWorld().waitForChunksRender();
+        singlePlayerContext.getClientLevel().waitForChunksRender();
 
         // Test different fill levels
         var capacity = GenericUnit.asForgeFromBigInt(tier.getCapacity()).toInt();
@@ -61,7 +61,7 @@ public final class TankTierTest implements FluidTankClientGameTest {
             });
 
             context.waitTicks(PACKET_WAIT_TICKS);
-            singlePlayerContext.getClientWorld().waitForChunksRender();
+            singlePlayerContext.getClientLevel().waitForChunksRender();
             testInstance.takeScreenshot(context,
                 s -> s.concat("/").concat(tier.name().toLowerCase(Locale.ROOT)),
                 "%s_%s_level_%d".formatted(fluidName, tier.name().toLowerCase(Locale.ROOT), amount));

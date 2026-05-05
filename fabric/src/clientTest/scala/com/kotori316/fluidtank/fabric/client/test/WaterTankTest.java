@@ -28,7 +28,7 @@ public final class WaterTankTest implements FluidTankClientGameTest {
             c.placeBlock(3, PlatformTankAccess.getInstance().getTankBlockMap().get(Tier.WOOD).get().defaultBlockState());
             c.placeBlockRelativeOffset(3, Vec3i.ZERO.above(), PlatformTankAccess.getInstance().getTankBlockMap().get(Tier.WOOD).get().defaultBlockState());
         });
-        singlePlayerContext.getClientWorld().waitForChunksRender();
+        singlePlayerContext.getClientLevel().waitForChunksRender();
         testInstance.takeScreenshot(context, testName + "_before");
 
         singlePlayerContext.getServer().runOnServer(server -> {
@@ -41,7 +41,7 @@ public final class WaterTankTest implements FluidTankClientGameTest {
             tankTile.getConnection().getHandler().fill(fluid.setAmount(GenericUnit.fromForge(6000)), true);
         });
         context.waitTicks(PACKET_WAIT_TICKS); // wait until packet is sent
-        singlePlayerContext.getClientWorld().waitForChunksRender();
+        singlePlayerContext.getClientLevel().waitForChunksRender();
         testInstance.takeScreenshot(context, testName + "_after");
     }
 }

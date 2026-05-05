@@ -5,7 +5,7 @@ import com.kotori316.fluidtank.fabric.BeforeMC
 import com.kotori316.fluidtank.fabric.fluid.FabricConverter
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.{ItemStack, Items}
@@ -39,7 +39,7 @@ final class ChestAsTankStorageTest extends BeforeMC {
 
   private def fillToBucket(fluid: FluidAmount, filledItem: ItemStack): Unit = {
     val items = new SimpleContainer(Seq.fill(10)(new ItemStack(Items.BUCKET)) *)
-    val handler = new ChestAsTankStorage(InventoryStorage.of(items, null))
+    val handler = new ChestAsTankStorage(ContainerStorage.of(items, null))
 
     Using(Transaction.openOuter()) { tr =>
       val filled = handler.insert(
@@ -55,7 +55,7 @@ final class ChestAsTankStorageTest extends BeforeMC {
 
   private def drainFromBucket1(fluid: FluidAmount, filledItem: ItemStack): Unit = {
     val items = new SimpleContainer(Seq.fill(10)(filledItem.copy().tap(_.setCount(1))) *)
-    val handler = new ChestAsTankStorage(InventoryStorage.of(items, null))
+    val handler = new ChestAsTankStorage(ContainerStorage.of(items, null))
 
     Using(Transaction.openOuter()) { tr =>
       val drained = handler.extract(
@@ -74,7 +74,8 @@ final class ChestAsTankStorageTest extends BeforeMC {
   private def fillStackedBucket(fluid: FluidAmount, filledItem: ItemStack): Unit = {
     val items = new SimpleContainer(2)
     items.setItem(0, new ItemStack(Items.BUCKET, 2))
-    val handler = new ChestAsTankStorage(InventoryStorage.of(items, null))
+    assertEquals(2, items.getItem(0).getCount, "Assumption of item count is wrong")
+    val handler = new ChestAsTankStorage(ContainerStorage.of(items, null))
 
     Using(Transaction.openOuter()) { tr =>
       val filled = handler.insert(
@@ -86,14 +87,14 @@ final class ChestAsTankStorageTest extends BeforeMC {
       tr.commit()
     }
 
-    assertTrue(ItemStack.matches(new ItemStack(Items.BUCKET, 2), items.getItem(0)))
+    assertTrue(ItemStack.matches(new ItemStack(Items.BUCKET, 2), items.getItem(0)), s"Items should be equal, $items")
     assertEquals(0, items.countItem(filledItem.getItem))
   }
 
   private def drainStackedBucket1(fluid: FluidAmount, filledItem: ItemStack): Unit = {
     val items = new SimpleContainer(2)
     items.setItem(1, filledItem.copy().tap(_.setCount(2)))
-    val handler = new ChestAsTankStorage(InventoryStorage.of(items, null))
+    val handler = new ChestAsTankStorage(ContainerStorage.of(items, null))
 
     Using(Transaction.openOuter()) { tr =>
       val drained = handler.extract(

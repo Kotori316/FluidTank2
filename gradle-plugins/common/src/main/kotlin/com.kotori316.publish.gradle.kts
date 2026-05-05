@@ -137,11 +137,7 @@ fun modrinthChangelog(): String {
 }
 
 fun modJarFile(): Provider<RegularFile> {
-    return if (project.name == "fabric") {
-        tasks.named("remapJar", org.gradle.jvm.tasks.Jar::class).flatMap { it.archiveFile }
-    } else {
-        tasks.jar.flatMap { it.archiveFile }
-    }
+    return tasks.jar.flatMap { it.archiveFile }
 }
 
 publishMods {

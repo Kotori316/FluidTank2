@@ -112,28 +112,16 @@ afterEvaluate {
 }
 
 subsystems {
-    parchment {
-        minecraftVersion = project.property("parchment_mapping_mc") as String
-        mappingsVersion = project.property("parchment_mapping_version") as String
-    }
 }
 
 repositories {
-}
-
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "org.ow2.asm" && requested.name.startsWith("asm")) {
-            useVersion("9.7")
-        }
-    }
 }
 
 dependencies {
     implementation("net.neoforged:neoforge:${project.property("neoforge_version")}")
 
     runtimeOnly(
-        "com.kotori316:${"ScalableCatsForce-NeoForge".lowercase()}:${project.property("slp_neoforge_version")}:with-library"
+        "com.kotori316:${"ScalableCatsForce-NeoForge".lowercase()}:${project.property("slp_neoforge_version")}:all"
     ) {
         isTransitive = false
     }

@@ -5,7 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
@@ -28,8 +27,8 @@ public final class TankLootFunction extends LootItemConditionalFunction {
     }
 
     @Override
-    public LootItemFunctionType<TankLootFunction> getType() {
-        return PlatformTankAccess.getInstance().getTankLoot();
+    public MapCodec<TankLootFunction> codec() {
+        return CODEC;
     }
 
     public static LootItemConditionalFunction.Builder<?> builder() {

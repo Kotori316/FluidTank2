@@ -69,10 +69,13 @@ loom {
             property("fabric.client.gametest.disableNetworkSynchronizer", "true")
             runDir = "run-client"
             source(sourceSets["clientTest"])
+            // val openalLib = System.getenv("OPENAL_LIB")
+            // if (!openalLib.isNullOrEmpty()) {
+            //     property("org.lwjgl.openal.libname", openalLib)
+            //     environmentVariables["LD_PRELOAD"] = openalLib
+            // }
         }
     }
-    knownIndyBsms.add("scala/runtime/LambdaDeserialize")
-    knownIndyBsms.add("java/lang/runtime/SwitchBootstraps/typeSwitch")
 }
 
 repositories {
@@ -83,41 +86,35 @@ val minecraftVersion = project.property("minecraft_version") as String
 
 dependencies {
     minecraft("com.mojang:minecraft:${minecraftVersion}")
-    mappings(loom.layered {
-        officialMojangMappings()
-        val parchmentMC = project.property("parchment_mapping_mc")
-        val parchmentDate = project.property("parchment_mapping_version")
-        parchment("org.parchmentmc.data:parchment-$parchmentMC:$parchmentDate@zip")
-    })
 
-    modImplementation(
+    implementation(
         "net.fabricmc:fabric-loader:${project.property("fabric_loader_version")}"
     )
-    modApi(
+    implementation(
         "net.fabricmc.fabric-api:fabric-api:${project.property("fabric_api_version")}"
     )
 
-    modRuntimeOnly(
+    runtimeOnly(
         "com.kotori316:scalable-cats-force-fabric:${project.property("slp_fabric_version")}:dev"
     ) { isTransitive = false }
 
     // Other mods
-    modImplementation(
+    implementation(
         "curse.maven:jade-324717:${project.property("jade_fabric_id")}"
     )
-    /*modRuntimeOnly(
+    /*runtimeOnly(
         group = "mezz.jei",
         name = "jei-${project.property("jei_fabric_repo_version")}-fabric",
         version = project.property("jei_fabric_version").toString()
     )*/
     //noinspection SpellCheckingInspection
-    modImplementation(
+    implementation(
         "teamreborn:energy:${project.property("fabric_energy_version")}"
     )
-    modImplementation("com.kotori316:debug-utility-fabric:${project.property("debug_util_version")}") {
+    implementation("com.kotori316:debug-utility-fabric:${project.property("debug_util_version")}") {
         exclude("net.fabricmc.fabric-api", "fabric-api")
     }
-    modImplementation("com.kotori316:VersionCheckerMod:${project.property("automatic_potato_version")}") {
+    implementation("com.kotori316:VersionCheckerMod:${project.property("automatic_potato_version")}") {
         isTransitive = false
     }
 
@@ -128,15 +125,10 @@ dependencies {
 }
 
 tasks {
-    val jksSignRemapJar = register("jksSignRemapJar", JarSignTask::class) {
-        jarTask = project.tasks.remapJar
+    /*val jksSignJar = register("jksSignJar", JarSignTask::class) {
+        jarTask = project.tasks.jar
     }
-    remapJar.configure {
-        finalizedBy(jksSignRemapJar)
-    }
-}
-
-// Workaround?
-tasks.remapJar {
-    mustRunAfter("compileTestScala")
+    jar.configure {
+        finalizedBy(jksSignJar)
+    }*/
 }

@@ -1,15 +1,15 @@
 modLoader = "kotori_scala"
-loaderVersion = "[3.3.3,)"
+loaderVersion = "[4.0.4,)"
 issueTrackerURL = "https://github.com/Kotori316/FluidTank2/issues"
 license = "All rights reserved"
 
 [[mods]]
 modId = "fluidtank"
-version = "${version}"
+version = "1.0.0" # "${version}"
 displayName = "Fluid Tank"
 displayURL = "https://github.com/Kotori316/FluidTank2"
 modUrl = "https://github.com/Kotori316/FluidTank2"
-updateJSONURL = "${update_url}"
+# updateJSONURL = "${update_url}"
 credits = "Kotori316"
 authors = "Kotori316"
 description = '''
@@ -20,6 +20,6 @@ logoFile = "assets/fluidtank/textures/icon.png"
 [[dependencies.fluidtank]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.11.17-beta, )"
+versionRange = "[26.1.2.1-beta, )"
 ordering = "NONE"
 side = "BOTH"

@@ -17,15 +17,15 @@ public final class RenderItemCodecs {
     public static final Identifier RESERVOIR_MODEL = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir");
     public static final Identifier TANK_MODEL = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "tank");
 
-    public static SpecialModelRenderer.Unbaked reservoirModelUnbaked(FluidRenderHelper helper) {
+    public static SpecialModelRenderer.Unbaked<?> reservoirModelUnbaked(FluidRenderHelper helper) {
         return new RenderReservoirItemUnbaked(helper);
     }
 
-    public static SpecialModelRenderer.Unbaked tankModelUnbaked(FluidRenderHelper helper) {
+    public static SpecialModelRenderer.Unbaked<?> tankModelUnbaked(FluidRenderHelper helper) {
         return new RenderTankItemUnbaked(helper);
     }
 
-    private static class RenderReservoirItemUnbaked implements SpecialModelRenderer.Unbaked {
+    private static class RenderReservoirItemUnbaked implements SpecialModelRenderer.Unbaked<RenderReservoirItem.RenderContext> {
         private final FluidRenderHelper helper;
         private final MapCodec<RenderReservoirItemUnbaked> codec;
 
@@ -35,19 +35,19 @@ public final class RenderItemCodecs {
         }
 
         @Override
-        public SpecialModelRenderer<?> bake(SpecialModelRenderer.BakingContext context) {
+        public SpecialModelRenderer<RenderReservoirItem.RenderContext> bake(SpecialModelRenderer.BakingContext context) {
             var model = new ReservoirModel(context.entityModelSet().bakeLayer(ReservoirModel.LOCATION));
-            return new RenderReservoirItem(model, context.materials(), helper);
+            return new RenderReservoirItem(model, context.sprites(), helper);
         }
 
         @Override
         @NotNull
-        public MapCodec<? extends SpecialModelRenderer.Unbaked> type() {
+        public MapCodec<? extends SpecialModelRenderer.Unbaked<RenderReservoirItem.RenderContext>> type() {
             return this.codec;
         }
     }
 
-    private static class RenderTankItemUnbaked implements SpecialModelRenderer.Unbaked {
+    private static class RenderTankItemUnbaked implements SpecialModelRenderer.Unbaked<RenderItemTank.RenderContext> {
         private final FluidRenderHelper helper;
         private final MapCodec<RenderTankItemUnbaked> codec;
 
@@ -57,19 +57,19 @@ public final class RenderItemCodecs {
         }
 
         @Override
-        public SpecialModelRenderer<?> bake(SpecialModelRenderer.BakingContext context) {
+        public SpecialModelRenderer<RenderItemTank.RenderContext> bake(SpecialModelRenderer.BakingContext context) {
             var model = new TankModel(context.entityModelSet().bakeLayer(TankModel.LOCATION));
             return new RenderItemTank(model, helper);
         }
 
         @Override
         @NotNull
-        public MapCodec<? extends SpecialModelRenderer.Unbaked> type() {
+        public MapCodec<? extends SpecialModelRenderer.Unbaked<RenderItemTank.RenderContext>> type() {
             return codec;
         }
     }
 
-    public static void registerSpecialModelRenderersCodec(FluidRenderHelper helper, BiConsumer<Identifier, MapCodec<? extends SpecialModelRenderer.Unbaked>> registerFunction, Map<Identifier, SpecialModelRenderer.Unbaked> predefined) {
+    public static void registerSpecialModelRenderersCodec(FluidRenderHelper helper, BiConsumer<Identifier, MapCodec<? extends SpecialModelRenderer.Unbaked<?>>> registerFunction, Map<Identifier, SpecialModelRenderer.Unbaked<?>> predefined) {
         // Reservoir
         {
             var unbaked = predefined.getOrDefault(RESERVOIR_MODEL, reservoirModelUnbaked(helper));

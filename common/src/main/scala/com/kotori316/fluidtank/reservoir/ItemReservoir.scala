@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.contents.{GenericUnit, Tank}
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, FluidLike, PlatformFluidAccess, PotionType, VanillaFluid, VanillaPotion}
 import com.kotori316.fluidtank.item.PlatformItemAccess
 import com.kotori316.fluidtank.tank.Tier
-import net.minecraft.core.component.DataComponents
+import net.minecraft.core.component.{DataComponentMap, DataComponents}
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.{Identifier, ResourceKey}
@@ -65,8 +65,8 @@ class ItemReservoir(val tier: Tier) extends Item(new Item.Properties().stacksTo(
     content.content match {
       case _: VanillaPotion if content.hasOneBottle =>
         for {
-          patch <- content.componentPatch.iterator
-          content <- Option(patch.get(DataComponents.POTION_CONTENTS)).flatMap(_.toScala).iterator
+          patch <- content.componentPatch
+          content <- Option(patch.get(DataComponentMap.EMPTY, DataComponents.POTION_CONTENTS))
         } {
           content.applyToLivingEntity(livingEntity, 1)
         }

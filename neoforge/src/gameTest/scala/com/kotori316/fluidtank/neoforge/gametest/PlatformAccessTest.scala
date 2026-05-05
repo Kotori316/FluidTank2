@@ -227,7 +227,7 @@ class PlatformAccessTest {
 
   def serializeTankItem(helper: GameTestHelper): Unit = {
     val stack = RecipeInventoryUtil.getFilledTankStack(Tier.GOLD, FluidAmountUtil.BUCKET_WATER)
-    val result = assertDoesNotThrow(() => ItemStack.STRICT_CODEC.encodeStart(JsonOps.INSTANCE, stack))
+    val result = assertDoesNotThrow(() => ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, stack))
     assertTrue(result.isSuccess)
     helper.succeed()
   }

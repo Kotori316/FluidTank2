@@ -2,9 +2,9 @@ name: Java CI
 
 on:
   push:
-    branches: [ "1.21.11" ]
+    branches: [ "26.1" ]
   pull_request:
-    branches: [ "1.21.11" ]
+    branches: [ "26.1" ]
 
 permissions:
   contents: read
@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
       - run: chmod +x ./gradlew
       - uses: gradle/actions/setup-gradle@v6
         with:
@@ -71,7 +71,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
       - run: chmod +x ./gradlew
       - uses: gradle/actions/setup-gradle@v6
         with:
@@ -134,7 +134,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
       - run: chmod +x ./gradlew
       - uses: gradle/actions/setup-gradle@v6
         with:
@@ -156,8 +156,10 @@ jobs:
         run: git diff --exit-code -- ./common/src/generated
 
   fabric-client-test:
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/devcontainers/java:25
     permissions:
       id-token: write
       contents: read
@@ -172,27 +174,41 @@ jobs:
           fetch-depth: '0'
       - uses: gradle/actions/wrapper-validation@v6
       - name: Setup Java JDK
+        if: false
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
       - run: chmod +x ./gradlew
       - uses: gradle/actions/setup-gradle@v6
         with:
           cache-read-only: true
           add-job-summary: 'on-failure'
-      - run: ./gradlew :fabric:clientTestClasses
-      - run: sudo apt-get update && sudo apt-get install -y xvfb x11-xserver-utils pulseaudio libasound2 libflite1
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y xvfb x11-xserver-utils pulseaudio libflite1 libopenal1
       - name: Start audio server
+        if: false
         run: |
           pulseaudio --start --exit-idle-time=-1
           pactl load-module module-null-sink sink_name=DummyOutput
           pactl set-default-sink DummyOutput
+      - run: |
+          echo "path=$(find /usr/lib -name 'libopenal.so.1' | head -1)" >> $GITHUB_OUTPUT
+        id: openal
       - name: Run client test
         timeout-minutes: 10
-        run: xvfb-run --auto-servernum ./gradlew runGameTestClient
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x720x24" \
+            ./gradlew runGameTestClient --no-daemon
+        env:
+          OPENAL_LIB: ${{ steps.openal.outputs.path }}
+          ALSOFT_DRIVERS: 'null'
+          JAVA_TOOL_OPTIONS: '-Dorg.lwjgl.openal.libname=${{ steps.openal.outputs.path }}'
       - run: ls -R "${SCREENSHOT_DIR}"
       - run: mkdir -p vrt/screenshots
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
       - name: Check screenshots
         run: |
           set -x
@@ -216,6 +232,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           set -eux
+          git config --global --add safe.directory $(pwd)
           git branch -vv
           git fetch
           git switch "${REF_NAME}"

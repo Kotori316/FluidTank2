@@ -2,16 +2,16 @@ package com.kotori316.fluidtank.gametest.reservoir
 
 import cats.implicits.catsSyntaxSemigroup
 import com.kotori316.fluidtank.contents.{GenericUnit, Tank}
-import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, PotionType, VanillaFluid, VanillaPotion}
-import com.kotori316.fluidtank.gametest.GameTestFunctions
+import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil, PotionType}
 import com.kotori316.fluidtank.gametest.GameTestFunctions.{assertEqualStack, create}
+import com.kotori316.fluidtank.gametest.{FluidAmountCase, FluidType, GameTestFunctions}
 import com.kotori316.fluidtank.tank.{PlatformTankAccess, Tier, TileTank}
 import com.kotori316.testutil.common.TestFunction
 import net.minecraft.core.BlockPos
 import net.minecraft.gametest.framework.{GameTestAssertPosException, GameTestHelper}
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -43,17 +43,20 @@ class ReservoirTest {
   }
 
   def fillTank(batch: String, structure: String): Seq[TestFunction] = {
+    val baseTypes: Seq[FluidType] = Seq(
+      FluidType.Fluid(Identifier.withDefaultNamespace("water")),
+      FluidType.Fluid(Identifier.withDefaultNamespace("lava"))
+    ) ++ PotionType.values().map(p => FluidType.Potion(p, Identifier.withDefaultNamespace("poison")))
+
     for {
-      f <- (Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
-        ++ PotionType.values().map(p => FluidAmountUtil.from(p, Potions.POISON, GenericUnit.ONE_BUCKET)))
-      amount <- f.content match {
-        case _: VanillaFluid => Seq(GenericUnit.fromForge(500), GenericUnit.ONE_BUCKET, GenericUnit.fromForge(2000))
-        case _: VanillaPotion => Seq(GenericUnit.ONE_BOTTLE, GenericUnit.ONE_BUCKET, GenericUnit.fromForge(2000))
-      }
-      fluid = f.setAmount(amount)
-      initial <- Seq(FluidAmountUtil.EMPTY, fluid)
+      ft <- baseTypes
+      u <- ft.amounts
+      fluidCase = FluidAmountCase(ft, u)
+      withInitial <- Seq(false, true)
     } yield GameTestFunctions.create(batch, structure,
-      s"ReservoirTestFillTank_${initial.content.getKey.getPath}_${fluid.content.getKey.getPath}_${fluid.amount.asForge}", g => {
+      s"ReservoirTestFillTank_${if (withInitial) fluidCase.keyPath else "empty"}_${fluidCase.keyPath}_${fluidCase.unit.asForge}", g => {
+        val fluid = fluidCase.toFluidAmount
+        val initial = if (withInitial) fluid else FluidAmountUtil.EMPTY
         val basePos = BlockPos.ZERO.above
         val tile = placeTank(g, basePos, Tier.WOOD)
         tile.getConnection.getHandler.fill(initial, execute = true)
@@ -105,12 +108,22 @@ class ReservoirTest {
   }
 
   def fillTankFail(batch: String, structure: String): Seq[TestFunction] = {
+    val fluidCases: Seq[FluidAmountCase] = Seq(
+      FluidAmountCase(FluidType.Fluid(Identifier.withDefaultNamespace("water")), GenericUnit.ONE_BUCKET)
+    ) ++ PotionType.values().map(p => FluidAmountCase(FluidType.Potion(p, Identifier.withDefaultNamespace("poison")), GenericUnit.ONE_BUCKET))
+
+    val initialCases: Seq[FluidAmountCase] = Seq(
+      FluidAmountCase(FluidType.Fluid(Identifier.withDefaultNamespace("lava")), GenericUnit.ONE_BUCKET),
+      FluidAmountCase(FluidType.Potion(PotionType.SPLASH, Identifier.withDefaultNamespace("water")), GenericUnit.ONE_BUCKET)
+    )
+
     for {
-      fluid <- (Seq(FluidAmountUtil.BUCKET_WATER)
-        ++ PotionType.values().map(p => FluidAmountUtil.from(p, Potions.POISON, GenericUnit.ONE_BUCKET)))
-      initial <- Seq(FluidAmountUtil.BUCKET_LAVA, FluidAmountUtil.from(PotionType.SPLASH, Potions.WATER, GenericUnit.ONE_BUCKET))
+      fluidCase <- fluidCases
+      initialCase <- initialCases
     } yield GameTestFunctions.create(batch, structure,
-      s"ReservoirTestFillTankFail_${initial.content.getKey.getPath}_${fluid.content.getKey.getPath}_${fluid.amount.asForge}", g => {
+      s"ReservoirTestFillTankFail_${initialCase.keyPath}_${fluidCase.keyPath}_${fluidCase.unit.asForge}", g => {
+        val fluid = fluidCase.toFluidAmount
+        val initial = initialCase.toFluidAmount
         val basePos = BlockPos.ZERO.above
         val tile = placeTank(g, basePos, Tier.WOOD)
         tile.getConnection.getHandler.fill(initial, execute = true)
@@ -130,16 +143,18 @@ class ReservoirTest {
   }
 
   def drainTank(batch: String, structure: String): Seq[TestFunction] = {
+    val baseTypes: Seq[FluidType] = Seq(
+      FluidType.Fluid(Identifier.withDefaultNamespace("water")),
+      FluidType.Fluid(Identifier.withDefaultNamespace("lava"))
+    ) ++ PotionType.values().map(p => FluidType.Potion(p, Identifier.withDefaultNamespace("poison")))
+
     for {
-      f <- (Seq(FluidAmountUtil.BUCKET_WATER, FluidAmountUtil.BUCKET_LAVA)
-        ++ PotionType.values().map(p => FluidAmountUtil.from(p, Potions.POISON, GenericUnit.ONE_BUCKET)))
-      amount <- f.content match {
-        case _: VanillaFluid => Seq(GenericUnit.fromForge(500), GenericUnit.ONE_BUCKET, GenericUnit.fromForge(2000))
-        case _: VanillaPotion => Seq(GenericUnit.ONE_BOTTLE, GenericUnit.ONE_BUCKET, GenericUnit.fromForge(2000))
-      }
-      fluid = f.setAmount(amount)
+      ft <- baseTypes
+      u <- ft.amounts
+      fluidCase = FluidAmountCase(ft, u)
     } yield GameTestFunctions.create(batch, structure,
-      s"ReservoirTestDrainTank_${fluid.content.getKey.getPath}_${fluid.amount.asForge}", g => {
+      s"ReservoirTestDrainTank_${fluidCase.keyPath}_${fluidCase.unit.asForge}", g => {
+        val fluid = fluidCase.toFluidAmount
         val basePos = BlockPos.ZERO.above
         val tile = placeTank(g, basePos, Tier.WOOD)
         tile.getConnection.getHandler.fill(fluid.setAmount(GenericUnit.fromForge(4000)), execute = true)

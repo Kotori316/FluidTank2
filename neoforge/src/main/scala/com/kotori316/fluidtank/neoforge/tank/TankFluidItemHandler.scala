@@ -7,7 +7,7 @@ import com.kotori316.fluidtank.neoforge.FluidTank
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
 import com.kotori316.fluidtank.neoforge.fluid.TankFluidHandler
 import com.kotori316.fluidtank.tank.{Tier, TileTank}
-import net.minecraft.core.component.DataComponents
+import net.minecraft.core.component.{DataComponentMap, DataComponents}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.ProblemReporter
 import net.minecraft.world.item.ItemStack
@@ -27,7 +27,7 @@ class TankFluidItemHandler(tier: Tier, access: ItemAccess) extends TankFluidHand
   override def getTank: Tank[FluidLike] = {
     val componentPatch = getContainer.getComponentsPatch
     val maybeTank = for {
-      blockEntityData <- Option(componentPatch.get(DataComponents.BLOCK_ENTITY_DATA)).flatMap(_.toScala)
+      blockEntityData <- Option(componentPatch.get(DataComponentMap.EMPTY, DataComponents.BLOCK_ENTITY_DATA))
       if blockEntityData.contains(TileTank.KEY_TANK)
       customTag = blockEntityData.copyTagWithoutId()
       tankTag <- customTag.getCompound(TileTank.KEY_TANK).toScala
@@ -43,8 +43,7 @@ class TankFluidItemHandler(tier: Tier, access: ItemAccess) extends TankFluidHand
       stack.remove(DataComponents.BLOCK_ENTITY_DATA)
     } else {
       val tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING)
-      val tag = Option(stack.getComponentsPatch.get(DataComponents.BLOCK_ENTITY_DATA))
-        .flatMap(_.toScala)
+      val tag = Option(stack.getComponentsPatch.get(DataComponentMap.EMPTY, DataComponents.BLOCK_ENTITY_DATA))
         .map(_.copyTagWithoutId())
         .getOrElse(new CompoundTag())
       tagValueOutput.store(tag)

@@ -9,11 +9,13 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.storage.TagValueOutput;
 import org.apache.logging.log4j.util.Lazy;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface PlatformItemAccess {
     static PlatformItemAccess getInstance() {
@@ -24,8 +26,8 @@ public interface PlatformItemAccess {
         PlatformItemAccessHolder.access = access;
     }
 
-    @NotNull
-    ItemStack getCraftingRemainingItem(ItemStack stack);
+    @Nullable
+    ItemStackTemplate getCraftingRemainingItem(ItemStack stack);
 
     Codec<Ingredient> ingredientCodec();
 
@@ -56,7 +58,7 @@ class PlatformItemAccessHolder {
         });
 
         @Override
-        public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
+        public @Nullable ItemStackTemplate getCraftingRemainingItem(ItemStack stack) {
             return stack.getItem().getCraftingRemainder();
         }
 

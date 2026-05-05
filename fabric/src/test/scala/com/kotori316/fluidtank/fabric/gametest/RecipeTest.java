@@ -18,7 +18,6 @@ import io.netty.buffer.ByteBufAllocator;
 import net.fabricmc.fabric.impl.resource.conditions.ResourceConditionsImpl;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -180,7 +179,7 @@ public final class RecipeTest {
             's', new ItemStack(Items.STONE)
         )));
         assertTrue(recipe.matches(inv, null));
-        var result = recipe.assemble(inv, RegistryAccess.EMPTY);
+        var result = recipe.assemble(inv);
         var contains = RecipeInventoryUtil.getFluidHandler(result).getTank().content();
         assertEquals(amount, contains);
         assertEquals(Tier.STONE.getCapacity(), RecipeInventoryUtil.getFluidHandler(result).getTank().capacity());
@@ -197,7 +196,7 @@ public final class RecipeTest {
             's', new ItemStack(Items.STONE)
         )));
         assertTrue(recipe.matches(inv, null));
-        var result = recipe.assemble(inv, RegistryAccess.EMPTY);
+        var result = recipe.assemble(inv);
         var contains = RecipeInventoryUtil.getFluidHandler(result).getTank().content();
         assertEquals(amount.add(amount), contains);
         assertEquals(Tier.STONE.getCapacity(), RecipeInventoryUtil.getFluidHandler(result).getTank().capacity());
@@ -248,8 +247,8 @@ public final class RecipeTest {
             tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
 
         var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), helper.getLevel().registryAccess());
-        TierRecipe.SERIALIZER.toNetwork(recipe, buffer);
-        var deserialized = TierRecipe.SERIALIZER.fromNetwork(buffer);
+        TierRecipe.Serializer.toNetwork(recipe, buffer);
+        var deserialized = TierRecipe.Serializer.fromNetwork(buffer);
         assertNotNull(deserialized);
         assertAll(
             () -> assertTrue(ItemStack.matches(recipe.getResult(), deserialized.getResult()))

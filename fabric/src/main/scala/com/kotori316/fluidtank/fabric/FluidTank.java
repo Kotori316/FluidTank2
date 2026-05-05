@@ -18,9 +18,10 @@ import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.*;
+import com.mojang.serialization.MapCodec;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
@@ -33,7 +34,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 
 import java.util.Comparator;
 import java.util.Locale;
@@ -72,7 +72,7 @@ public final class FluidTank implements ModInitializer {
         FabricBlockEntityTypeBuilder.create(TileCreativeTankFabric::new, BLOCK_CREATIVE_TANK).build();
     public static final BlockEntityType<TileVoidTank> TILE_VOID_TANK_TYPE =
         FabricBlockEntityTypeBuilder.create(TileVoidTank::new, BLOCK_VOID_TANK).build();
-    public static final LootItemFunctionType<TankLootFunction> TANK_LOOT_FUNCTION = new LootItemFunctionType<>(TankLootFunction.CODEC);
+    public static final MapCodec<TankLootFunction> TANK_LOOT_FUNCTION = TankLootFunction.CODEC;
     public static final RecipeSerializer<TierRecipe> TIER_RECIPE_SERIALIZER = TierRecipe.SERIALIZER;
     public static final BlockChestAsTank BLOCK_CAT = new BlockChestAsTankFabric();
     public static final BlockItem ITEM_CAT = new ItemChestAsTank(BLOCK_CAT);
@@ -93,7 +93,7 @@ public final class FluidTank implements ModInitializer {
         Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME()), BLOCK_CAT);
         Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME()), ITEM_CAT);
         RESERVOIR_MAP.values().forEach(e -> Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir_" + e.tier().name().toLowerCase(Locale.ROOT)), e));
-        var builder = FabricItemGroup.builder();
+        var builder = FabricCreativeModeTab.builder();
         createTab(builder);
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, FluidTankCommon.modId), builder.build());
         Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, Tank.COMPONENT_NAME()), FLUID_TANK_DATA_COMPONENT);

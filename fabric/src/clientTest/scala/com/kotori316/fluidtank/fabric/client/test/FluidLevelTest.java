@@ -31,7 +31,7 @@ public final class FluidLevelTest implements FluidTankClientGameTest {
             c.placeBlock(3, PlatformTankAccess.getInstance().getTankBlockMap().get(Tier.WOOD).get().defaultBlockState());
             c.placeBlockRelativeOffset(3, Vec3i.ZERO.above(), PlatformTankAccess.getInstance().getTankBlockMap().get(Tier.STONE).get().defaultBlockState());
         });
-        singlePlayerContext.getClientWorld().waitForChunksRender();
+        singlePlayerContext.getClientLevel().waitForChunksRender();
 
         // Take screenshots for each fill level
         for (int amount : FILL_LEVELS) {
@@ -47,7 +47,7 @@ public final class FluidLevelTest implements FluidTankClientGameTest {
             });
 
             context.waitTicks(PACKET_WAIT_TICKS); // Wait for packet transmission
-            singlePlayerContext.getClientWorld().waitForChunksRender();
+            singlePlayerContext.getClientLevel().waitForChunksRender();
             testInstance.takeScreenshot(context, s -> s.concat("/").concat(fluidName), "%s_level_%d".formatted(fluidName, amount));
         }
     }

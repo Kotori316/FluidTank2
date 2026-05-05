@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 class ReservoirPotionFluidHandlerTest extends BeforeMC {
   val tankComponent: DataComponentType[Tank[FluidLike]] = PlatformItemAccess.getInstance().fluidTankComponentType()
   val reservoir = new ItemReservoir(Tier.WOOD)
+  BeforeMC.setItemComponent(reservoir)
 
   @Test
   def instance(): Unit = {

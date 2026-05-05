@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.resources.model.sprite.SpriteGetter
 import net.minecraft.core.component.{DataComponentMap, DataComponents}
 import net.minecraft.world.level.material.Fluids
-import net.neoforged.neoforge.client.fluid.FluidTintSources
 
 object FluidRenderHelperNeoForge extends FluidRenderHelper {
 
@@ -28,7 +27,7 @@ object FluidRenderHelperNeoForge extends FluidRenderHelper {
       case VanillaFluid(fluid) =>
         val fluidState = fluid.defaultFluidState
         val model = Minecraft.getInstance.getModelManager.getFluidStateModelSet.get(fluidState)
-        val tintSource = FluidTintSources.of(model.tintSource())
+        val tintSource = model.fluidTintSource()
         tintSource.colorAsStack(NeoForgeConverter.toStack(content))
       case VanillaPotion(_) =>
         val potionColor = for {

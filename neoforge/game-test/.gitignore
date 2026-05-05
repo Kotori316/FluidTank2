@@ -1,5 +1,8 @@
 *
 !.gitignore
 !gameteststructures
-!gameteststructures/*.snbt
+!gameteststructures/data
+!gameteststructures/data/fluidtank
+!gameteststructures/data/fluidtank/structure
+!gameteststructures/data/fluidtank/structure/*.snbt
 !server.properties

@@ -156,7 +156,7 @@ jobs:
         run: git diff --exit-code -- ./common/src/generated
 
   fabric-client-test:
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 15
     permissions:
       id-token: write
@@ -181,8 +181,15 @@ jobs:
         with:
           cache-read-only: true
           add-job-summary: 'on-failure'
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y xvfb x11-xserver-utils pulseaudio libflite1 libopenal1
+      - name: Start Xvfb and configure environment
+        run: |
+          Xvfb :99 -screen 0 1280x720x24 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+          echo "ALSOFT_DRIVERS=null" >> $GITHUB_ENV
+          echo "JAVA_TOOL_OPTIONS=-Dorg.lwjgl.openal.libname=$(find /usr/lib -name 'libopenal.so.1' | head -1)" >> $GITHUB_ENV
       - run: ./gradlew :fabric:clientTestClasses
-      - run: sudo apt-get update && sudo apt-get install -y xvfb x11-xserver-utils pulseaudio libasound2 libflite1
       - name: Start audio server
         run: |
           pulseaudio --start --exit-idle-time=-1
@@ -190,9 +197,7 @@ jobs:
           pactl set-default-sink DummyOutput
       - name: Run client test
         timeout-minutes: 10
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x720x24 -cursor none" ./gradlew runGameTestClient
-        env:
-          ALSOFT_DRIVERS: 'null'
+        run: ./gradlew runGameTestClient
       - run: ls -R "${SCREENSHOT_DIR}"
       - run: mkdir -p vrt/screenshots
       - name: Check screenshots

@@ -28,7 +28,12 @@ object FluidRenderHelperNeoForge extends FluidRenderHelper {
         val fluidState = fluid.defaultFluidState
         val model = Minecraft.getInstance.getModelManager.getFluidStateModelSet.get(fluidState)
         val tintSource = model.fluidTintSource()
-        tintSource.colorAsStack(NeoForgeConverter.toStack(content))
+        if (tintSource == null) {
+          // See net.neoforged.neoforge.client.color.item.FluidContentsTint
+          -1
+        } else {
+          tintSource.colorAsStack(NeoForgeConverter.toStack(content))
+        }
       case VanillaPotion(_) =>
         val potionColor = for {
           c <- content.componentPatch

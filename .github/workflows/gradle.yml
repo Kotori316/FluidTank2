@@ -190,7 +190,9 @@ jobs:
           pactl set-default-sink DummyOutput
       - name: Run client test
         timeout-minutes: 10
-        run: xvfb-run --auto-servernum ./gradlew runGameTestClient
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x720x24 -cursor none" ./gradlew runGameTestClient
+        env:
+          ALSOFT_DRIVERS: 'null'
       - run: ls -R "${SCREENSHOT_DIR}"
       - run: mkdir -p vrt/screenshots
       - name: Check screenshots

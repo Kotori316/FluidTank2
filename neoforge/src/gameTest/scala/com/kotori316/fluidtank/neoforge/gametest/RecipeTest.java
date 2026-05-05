@@ -14,7 +14,6 @@ import com.kotori316.testutil.common.TestFunction;
 import com.mojang.serialization.JsonOps;
 import io.netty.buffer.ByteBufAllocator;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.Identifier;
@@ -150,7 +149,7 @@ final class RecipeTest {
             's', new ItemStack(Items.STONE)
         )));
         assertTrue(recipe.matches(inv, null));
-        var result = recipe.assemble(inv, RegistryAccess.EMPTY);
+        var result = recipe.assemble(inv);
         var contains = RecipeInventoryUtil.getFluidHandler(result).getTank().content();
         assertEquals(amount, contains);
         assertEquals(Tier.STONE.getCapacity(), RecipeInventoryUtil.getFluidHandler(result).getTank().capacity());
@@ -167,7 +166,7 @@ final class RecipeTest {
             's', new ItemStack(Items.STONE)
         )));
         assertTrue(recipe.matches(inv, null));
-        var result = recipe.assemble(inv, RegistryAccess.EMPTY);
+        var result = recipe.assemble(inv);
         var contains = RecipeInventoryUtil.getFluidHandler(result).getTank().content();
         assertEquals(amount.add(amount), contains);
         assertEquals(Tier.STONE.getCapacity(), RecipeInventoryUtil.getFluidHandler(result).getTank().capacity());
@@ -218,7 +217,7 @@ final class RecipeTest {
         var recipe = new TierRecipe(tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
 
         var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), helper.getLevel().registryAccess(), ConnectionType.OTHER);
-        var streamCodec = TierRecipe.SERIALIZER.streamCodec();
+        var streamCodec = TierRecipe.Serializer.STREAM_CODEC;
         streamCodec.encode(buffer, recipe);
         var deserialized = streamCodec.decode(buffer);
         assertNotNull(deserialized);

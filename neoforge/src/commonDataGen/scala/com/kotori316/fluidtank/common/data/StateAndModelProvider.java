@@ -14,6 +14,7 @@ import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
@@ -49,8 +50,8 @@ final class StateAndModelProvider extends ModelProvider {
         return Stream.of();
     }
 
-    private Identifier blockTexture(String name) {
-        return modLocation("block/" + name);
+    private Material blockTexture(String name) {
+        return new Material(modLocation("block/" + name));
     }
 
     @Override
@@ -142,7 +143,6 @@ final class StateAndModelProvider extends ModelProvider {
         var tier = blockTank.tier();
         var blockModel = ExtendedModelTemplateBuilder.builder()
             .parent(templates.tankBlock())
-            .renderType(renderTypeName(ChunkSectionLayer.CUTOUT))
             .build();
 
         var blockModelLocation = blockModel.create(ModelLocationUtils.getModelLocation(blockTank),

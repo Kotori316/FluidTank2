@@ -203,10 +203,13 @@ jobs:
         env:
           OPENAL_LIB: ${{ steps.openal.outputs.path }}
           ALSOFT_DRIVERS: 'null'
-          LD_PRELOAD: ${{ steps.openal.outputs.path }}
+          # LD_PRELOAD: ${{ steps.openal.outputs.path }}
           JAVA_TOOL_OPTIONS: '-Dorg.lwjgl.openal.libname=${{ steps.openal.outputs.path }}'
       - run: ls -R "${SCREENSHOT_DIR}"
       - run: mkdir -p vrt/screenshots
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
       - name: Check screenshots
         run: |
           set -x

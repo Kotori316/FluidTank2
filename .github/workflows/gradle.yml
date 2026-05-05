@@ -158,6 +158,8 @@ jobs:
   fabric-client-test:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/devcontainers/java:25
     permissions:
       id-token: write
       contents: read
@@ -172,6 +174,7 @@ jobs:
           fetch-depth: '0'
       - uses: gradle/actions/wrapper-validation@v6
       - name: Setup Java JDK
+        if: false
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
@@ -184,17 +187,24 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y xvfb x11-xserver-utils pulseaudio libflite1 libopenal1
       - name: Start audio server
+        if: false
         run: |
           pulseaudio --start --exit-idle-time=-1
           pactl load-module module-null-sink sink_name=DummyOutput
           pactl set-default-sink DummyOutput
+      - run: |
+          echo "path=$(find /usr/lib -name 'libopenal.so.1' | head -1)" >> $GITHUB_OUTPUT
+        id: openal
       - name: Run client test
         timeout-minutes: 10
         run: |
-          OPENAL_LIB=$(find /usr/lib -name 'libopenal.so.1' | head -1) \
-            ALSOFT_DRIVERS=null \
-            xvfb-run --auto-servernum --server-args="-screen 0 1280x720x24" \
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x720x24" \
             ./gradlew runGameTestClient --no-daemon
+        env:
+          OPENAL_LIB: ${{ steps.openal.outputs.path }}
+          ALSOFT_DRIVERS: 'null'
+          LD_PRELOAD: ${{ steps.openal.outputs.path }}
+          JAVA_TOOL_OPTIONS: '-Dorg.lwjgl.openal.libname=${{ steps.openal.outputs.path }}'
       - run: ls -R "${SCREENSHOT_DIR}"
       - run: mkdir -p vrt/screenshots
       - name: Check screenshots

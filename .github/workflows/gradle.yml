@@ -183,13 +183,6 @@ jobs:
           add-job-summary: 'on-failure'
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y xvfb x11-xserver-utils pulseaudio libflite1 libopenal1
-      - name: Start Xvfb and configure environment
-        run: |
-          Xvfb :99 -screen 0 1280x720x24 &
-          echo "DISPLAY=:99" >> $GITHUB_ENV
-          echo "ALSOFT_DRIVERS=null" >> $GITHUB_ENV
-          echo "JAVA_TOOL_OPTIONS=-Dorg.lwjgl.openal.libname=$(find /usr/lib -name 'libopenal.so.1' | head -1)" >> $GITHUB_ENV
-      - run: ./gradlew :fabric:clientTestClasses
       - name: Start audio server
         run: |
           pulseaudio --start --exit-idle-time=-1
@@ -197,7 +190,13 @@ jobs:
           pactl set-default-sink DummyOutput
       - name: Run client test
         timeout-minutes: 10
-        run: ./gradlew runGameTestClient
+        run: |
+          ./gradlew --stop
+          OPENAL_LIB=$(find /usr/lib -name 'libopenal.so.1' | head -1)
+          JAVA_TOOL_OPTIONS="-Dorg.lwjgl.openal.libname=${OPENAL_LIB}" \
+            ALSOFT_DRIVERS=null \
+            xvfb-run --auto-servernum --server-args="-screen 0 1280x720x24 -cursor none" \
+            ./gradlew runGameTestClient
       - run: ls -R "${SCREENSHOT_DIR}"
       - run: mkdir -p vrt/screenshots
       - name: Check screenshots

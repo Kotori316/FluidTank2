@@ -144,11 +144,19 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
     public NonNullList<ItemStack> getRemainingItems(CraftingInput inv) {
         return IntStream.range(0, inv.size())
             .mapToObj(inv::getItem)
-            .map(stack -> {
-                if (stack.getItem() instanceof ItemBlockTank) return ItemStack.EMPTY;
-                else return PlatformItemAccess.getInstance().getCraftingRemainingItem(stack);
-            })
+            .map(this::getRemaining)
             .collect(Collectors.toCollection(NonNullList::create));
+    }
+
+    private ItemStack getRemaining(ItemStack stack) {
+        if (stack.getItem() instanceof ItemBlockTank) {
+            return ItemStack.EMPTY;
+        }
+        var template = PlatformItemAccess.getInstance().getCraftingRemainingItem(stack);
+        if (template == null) {
+            return ItemStack.EMPTY;
+        }
+        return template.create();
     }
 
     public Tier getTier() {

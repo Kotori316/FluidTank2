@@ -13,7 +13,6 @@ import com.kotori316.fluidtank.neoforge.integration.neoforge.SingleBucketResourc
 import com.kotori316.fluidtank.potions.PotionFluidHandler;
 import com.kotori316.fluidtank.reservoir.ItemReservoir;
 import com.kotori316.fluidtank.tank.BlockTank;
-import com.kotori316.fluidtank.tank.TankLootFunction;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.fluidtank.tank.TileTank;
 import com.mojang.serialization.Codec;
@@ -25,6 +24,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
@@ -33,7 +33,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.SoundActions;
 import net.neoforged.neoforge.transfer.ResourceHandler;
@@ -185,11 +184,6 @@ final class NeoForgePlatformAccess implements PlatformAccess {
     }
 
     @Override
-    public LootItemFunctionType<TankLootFunction> getTankLoot() {
-        return FluidTank.TANK_LOOT_FUNCTION.get();
-    }
-
-    @Override
     public Map<Tier, Supplier<? extends BlockTank>> getTankBlockMap() {
         return Stream.concat(FluidTank.TANK_MAP.entrySet().stream(), Stream.of(Map.entry(Tier.CREATIVE, FluidTank.BLOCK_CREATIVE_TANK), Map.entry(Tier.VOID, FluidTank.BLOCK_VOID_TANK)))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -201,7 +195,7 @@ final class NeoForgePlatformAccess implements PlatformAccess {
     }
 
     @Override
-    public @NotNull ItemStack getCraftingRemainingItem(ItemStack stack) {
+    public @Nullable ItemStackTemplate getCraftingRemainingItem(ItemStack stack) {
         return stack.getCraftingRemainder();
     }
 

@@ -10,6 +10,7 @@ import com.kotori316.fluidtank.tank.TileTank;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.clock.ClockTimeMarkers;
 import net.minecraft.world.level.block.Blocks;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -18,9 +19,10 @@ public final class LightEmissionTest implements FluidTankClientGameTest {
 
     @Override
     public void runTest(ClientGameTestContext context, TestSingleplayerContext singlePlayerContext) {
-        // Set time to night (18000 is midnight)
+        // Set time to night (18,000 is midnight)
         singlePlayerContext.getServer().runOnServer(server -> {
-            server.overworld().setDayTime(18000);
+            var overworld = server.overworld();
+            overworld.dimensionType().defaultClock().ifPresent(c -> overworld.clockManager().moveToTimeMarker(c, ClockTimeMarkers.MIDNIGHT));
         });
 
         // Test with both water and lava
@@ -39,7 +41,7 @@ public final class LightEmissionTest implements FluidTankClientGameTest {
             var tankBlock = PlatformTankAccess.getInstance().getTankBlockMap().get(Tier.WOOD).get().defaultBlockState();
             c.placeBlockRelativeOffset(3, BlockPos.ZERO.above(), tankBlock);
         });
-        singlePlayerContext.getClientWorld().waitForChunksRender();
+        singlePlayerContext.getClientLevel().waitForChunksRender();
 
         // Take screenshots for each fill level
         for (var ratio : FILL_RATIOS) {
@@ -56,7 +58,7 @@ public final class LightEmissionTest implements FluidTankClientGameTest {
             });
 
             context.waitTicks(PACKET_WAIT_TICKS);
-            singlePlayerContext.getClientWorld().waitForChunksRender();
+            singlePlayerContext.getClientLevel().waitForChunksRender();
             testInstance.takeScreenshot(context,
                 s -> s.concat("/night"),
                 "%s_night_level_%d".formatted(fluidName, amount));

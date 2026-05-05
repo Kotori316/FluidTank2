@@ -24,7 +24,7 @@ public final class DemoStoneTest implements FabricClientGameTest {
                 var pos = player.getOnPos().above();
                 level.setBlock(pos.relative(direction, 3), Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
             });
-            singlePlayerContext.getClientWorld().waitForChunksRender();
+            singlePlayerContext.getClientLevel().waitForChunksRender();
             context.waitTicks(10);
             context.takeScreenshot("demo-stone");
         }

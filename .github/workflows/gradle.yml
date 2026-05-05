@@ -203,7 +203,6 @@ jobs:
         env:
           OPENAL_LIB: ${{ steps.openal.outputs.path }}
           ALSOFT_DRIVERS: 'null'
-          # LD_PRELOAD: ${{ steps.openal.outputs.path }}
           JAVA_TOOL_OPTIONS: '-Dorg.lwjgl.openal.libname=${{ steps.openal.outputs.path }}'
       - run: ls -R "${SCREENSHOT_DIR}"
       - run: mkdir -p vrt/screenshots
@@ -233,6 +232,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           set -eux
+          git config --global --add safe.directory $(pwd)
           git branch -vv
           git fetch
           git switch "${REF_NAME}"

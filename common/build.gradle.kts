@@ -14,13 +14,9 @@ dependencies {
     compileOnly("net.fabricmc:fabric-loader:${project.property("fabric_loader_version")}")
 
     testImplementation(
-        group = "org.mockito",
-        name = "mockito-core",
-        version = project.property("mockitoCoreVersion").toString()
+        "org.mockito:mockito-core:${project.property("mockitoCoreVersion")}"
     )
     testImplementation(
-        group = "org.mockito",
-        name = "mockito-inline",
-        version = project.property("mockitoInlineVersion").toString()
+        "org.mockito:mockito-inline:${project.property("mockitoInlineVersion")}"
     )
 }

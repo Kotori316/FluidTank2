@@ -207,7 +207,7 @@ final class RecipeTest {
             "Loaded recipe is not TierRecipe");
         assertNotNull(deserialized);
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResult(), deserialized.getResult()))
+            () -> assertTrue(ItemStack.matches(recipe.getResultItemStack(), deserialized.getResultItemStack()))
         );
         helper.succeed();
     }
@@ -222,7 +222,7 @@ final class RecipeTest {
         var deserialized = streamCodec.decode(buffer);
         assertNotNull(deserialized);
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResult(), deserialized.getResult()))
+            () -> assertTrue(ItemStack.matches(recipe.getResultItemStack(), deserialized.getResultItemStack()))
         );
         helper.succeed();
     }
@@ -241,7 +241,7 @@ final class RecipeTest {
             Tier.STONE, TierRecipe.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
         assertAll(
-            () -> assertTrue(ItemStack.matches(recipe.getResult(), read.getResult()))
+            () -> assertTrue(ItemStack.matches(recipe.getResultItemStack(), read.getResultItemStack()))
         );
         helper.succeed();
     }

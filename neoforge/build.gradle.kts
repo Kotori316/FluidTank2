@@ -135,9 +135,10 @@ dependencies {
     compileOnly(
         "appeng:appliedenergistics2:${project.property("ae2_neoforge_version")}"
     ) { isTransitive = false }
-    /*implementation(
-        "mezz.jei:jei-${project.property("jei_neoforge_repo_version")}-neoforge:${project.property("jei_neoforge_version")}"
-    ) { isTransitive = false }*/
+    compileOnly("mezz.jei:jei-${project.property("jei_neoforge_repo_version")}-neoforge-api:${project.property("jei_neoforge_version")}")
+    runtimeOnly("mezz.jei:jei-${project.property("jei_neoforge_repo_version")}-neoforge:${project.property("jei_neoforge_version")}") {
+        isTransitive = false
+    }
     // Test Dependencies.
     // Required these libraries to execute the tests.
     // The library will avoid errors of ForgeRegistry and Capability.

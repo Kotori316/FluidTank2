@@ -22,8 +22,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.TagValueOutput;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +52,7 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
     final Tier tier;
     final Ingredient tankItem;
     final Ingredient subItem;
-    final ItemStackTemplate result;
+    public final ItemStackTemplate result;
     final ShapedRecipePattern pattern;
 
     public TierRecipe(Tier tier, Ingredient tankItem, Ingredient subItem) {
@@ -139,6 +143,21 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
         return PlacementInfo.createFromOptionals(this.pattern.ingredients());
     }
 
+    /**
+     * Copied from {@link ShapedRecipe#display()}
+     */
+    @Override
+    public List<RecipeDisplay> display() {
+        return List.of(
+            new ShapedCraftingRecipeDisplay(
+                3, 3,
+                this.pattern.ingredients().stream().map(e -> e.map(Ingredient::display).orElse(SlotDisplay.Empty.INSTANCE)).toList(),
+                new SlotDisplay.ItemStackSlotDisplay(this.result),
+                new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)
+            )
+        );
+    }
+
     @NotNull
     @Override
     public NonNullList<ItemStack> getRemainingItems(CraftingInput inv) {
@@ -163,12 +182,16 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
         return tier;
     }
 
-    private Ingredient getSubItem() {
+    public Ingredient getTankItem() {
+        return tankItem;
+    }
+
+    public Ingredient getSubItem() {
         return this.subItem;
     }
 
     @VisibleForTesting
-    public ItemStack getResult() {
+    public ItemStack getResultItemStack() {
         return result.create();
     }
 

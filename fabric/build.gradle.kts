@@ -102,11 +102,8 @@ dependencies {
     implementation(
         "curse.maven:jade-324717:${project.property("jade_fabric_id")}"
     )
-    /*runtimeOnly(
-        group = "mezz.jei",
-        name = "jei-${project.property("jei_fabric_repo_version")}-fabric",
-        version = project.property("jei_fabric_version").toString()
-    )*/
+    compileOnly("mezz.jei:jei-${project.property("jei_fabric_repo_version")}-fabric-api:${project.property("jei_fabric_version")}")
+    runtimeOnly("mezz.jei:jei-${project.property("jei_fabric_repo_version")}-fabric:${project.property("jei_fabric_version")}")
     //noinspection SpellCheckingInspection
     implementation(
         "teamreborn:energy:${project.property("fabric_energy_version")}"

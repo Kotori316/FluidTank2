@@ -52,7 +52,7 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
     final Tier tier;
     final Ingredient tankItem;
     final Ingredient subItem;
-    final ItemStackTemplate result;
+    public final ItemStackTemplate result;
     final ShapedRecipePattern pattern;
 
     public TierRecipe(Tier tier, Ingredient tankItem, Ingredient subItem) {
@@ -182,12 +182,16 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
         return tier;
     }
 
-    private Ingredient getSubItem() {
+    public Ingredient getTankItem() {
+        return tankItem;
+    }
+
+    public Ingredient getSubItem() {
         return this.subItem;
     }
 
     @VisibleForTesting
-    public ItemStack getResult() {
+    public ItemStack getResultItemStack() {
         return result.create();
     }
 

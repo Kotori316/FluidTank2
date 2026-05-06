@@ -5,11 +5,11 @@ import com.google.gson.JsonObject;
 import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.contents.GenericAmount;
 import com.kotori316.fluidtank.contents.GenericUnit;
-import com.kotori316.fluidtank.fabric.FluidTank;
 import com.kotori316.fluidtank.fabric.recipe.RecipeInventoryUtil;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.gametest.GameTestFunctions;
+import com.kotori316.fluidtank.gametest.recipe.RecipeTestCommon;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.testutil.common.TestFunction;
@@ -27,12 +27,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.*;
 import org.apache.commons.io.FilenameUtils;
-import org.jetbrains.annotations.NotNull;
 import org.junit.platform.commons.function.Try;
 import org.junit.platform.commons.support.ReflectionSupport;
 import scala.jdk.javaapi.CollectionConverters;
@@ -51,7 +47,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("unused")
-public final class RecipeTest {
+public final class RecipeTest extends RecipeTestCommon {
     final Path recipeParent = Path.of("../src/generated/resources", "data/fluidtank/recipe");
 
     public RecipeTest() {
@@ -83,68 +79,8 @@ public final class RecipeTest {
             .map(m -> GameTestFunctions.create("recipe_test", TestFunction.NO_PLACE_STRUCTURE,
                 getClass().getSimpleName() + "_" + m.getName(),
                 g -> ReflectionSupport.invokeMethod(m, this, g)));
-        return Stream.concat(noArgs, withHelper).toList();
-    }
-
-    @NotNull
-    private static TierRecipe getRecipe() {
-        return new TierRecipe(Tier.STONE,
-            Ingredient.of(FluidTank.TANK_MAP.get(Tier.WOOD)), Ingredient.of(Items.STONE)
-        );
-    }
-
-    void createInstance() {
-        TierRecipe recipe = getRecipe();
-        assertNotNull(recipe);
-    }
-
-    void match1() {
-        var recipe = getRecipe();
-        assertTrue(recipe.matches(RecipeInventoryUtil.getInv("tst", "s s", "tst", CollectionConverters.asScala(Map.of(
-            't', new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD)),
-            's', new ItemStack(Items.STONE)
-        ))), null));
-    }
-
-    void match2() {
-        var recipe = getRecipe();
-        var stack = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmountUtil.BUCKET_WATER());
-
-        assertTrue(recipe.matches(RecipeInventoryUtil.getInv("tst", "s s", "tst", CollectionConverters.asScala(Map.of(
-            't', stack,
-            's', new ItemStack(Items.STONE)
-        ))), null));
-    }
-
-    void match3() {
-        var recipe = getRecipe();
-        var stack = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmountUtil.BUCKET_WATER());
-
-        assertTrue(recipe.matches(RecipeInventoryUtil.getInv("tsk", "s s", "kst", CollectionConverters.asScala(Map.of(
-            't', stack,
-            'k', new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD)),
-            's', new ItemStack(Items.STONE)
-        ))), null));
-    }
-
-    void notMatch4() {
-        var recipe = getRecipe();
-        var stack = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmountUtil.BUCKET_WATER());
-        var stack2 = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmountUtil.BUCKET_LAVA());
-
-        assertFalse(recipe.matches(RecipeInventoryUtil.getInv("tsk", "s s", "kst", CollectionConverters.asScala(Map.of(
-            't', stack,
-            'k', stack2,
-            's', new ItemStack(Items.STONE)
-        ))), null));
-    }
-
-    void notMatch5() {
-        var recipe = getRecipe();
-        assertFalse(recipe.matches(RecipeInventoryUtil.getInv("tst", "s s", "ts ", CollectionConverters.asScala(Map.of(
-            't', new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD)),
-            's', new ItemStack(Items.STONE)
-        ))), null));
+        var common = testsInCommon("recipe_test", this);
+        return Stream.of(noArgs, withHelper, common).flatMap(Function.identity()).toList();
     }
 
     public List<TestFunction> combineFluids() {
@@ -170,7 +106,7 @@ public final class RecipeTest {
 
     void combine1(GenericAmount<FluidLike> amount) {
         var filled = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, amount);
-        var empty = new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD));
+        var empty = new ItemStack(getTank(Tier.WOOD));
         var recipe = getRecipe();
 
         var inv = RecipeInventoryUtil.getInv("ksk", "s s", "kst", CollectionConverters.asScala(Map.of(
@@ -187,7 +123,7 @@ public final class RecipeTest {
 
     void combine2(GenericAmount<FluidLike> amount) {
         var filled = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, amount);
-        var empty = new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD));
+        var empty = new ItemStack(getTank(Tier.WOOD));
         var recipe = getRecipe();
 
         var inv = RecipeInventoryUtil.getInv("kst", "s s", "kst", CollectionConverters.asScala(Map.of(
@@ -215,12 +151,16 @@ public final class RecipeTest {
     void serializeJson(GameTestHelper helper, Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
         var recipe = new TierRecipe(
+            new Recipe.CommonInfo(false), new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, TierRecipe.TANK_RECIPE_GROUP),
             tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
         String expected = """
             {
               "type": "%s",
               "tier": "%s",
-              "sub_item": "minecraft:apple"
+              "sub_item": "minecraft:apple",
+              "show_notification":false,
+              "category":"misc",
+              "group":"fluidtank_tank"
             }
             """.formatted(TierRecipe.Serializer.LOCATION.toString(), tier.name());
         var expectedJson = GsonHelper.parse(expected);
@@ -244,6 +184,7 @@ public final class RecipeTest {
     void serializePacket(GameTestHelper helper, Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
         var recipe = new TierRecipe(
+            new Recipe.CommonInfo(false), new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, TierRecipe.TANK_RECIPE_GROUP),
             tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
 
         var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), helper.getLevel().registryAccess());
@@ -267,6 +208,7 @@ public final class RecipeTest {
             """.formatted(TierRecipe.Serializer.LOCATION.toString());
         var read = assertInstanceOf(TierRecipe.class, managerFromJson(Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()));
         var recipe = new TierRecipe(
+            new Recipe.CommonInfo(false), new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, TierRecipe.TANK_RECIPE_GROUP),
             Tier.STONE, TierRecipe.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
         assertAll(

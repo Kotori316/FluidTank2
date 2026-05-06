@@ -23,6 +23,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -90,6 +91,7 @@ public final class FluidTank implements ModInitializer {
             .forEach((c, t) -> Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, c.getSimpleName().toLowerCase(Locale.ROOT)), t));
         Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, TankLootFunction.NAME), TANK_LOOT_FUNCTION);
         Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, TierRecipe.Serializer.LOCATION, TIER_RECIPE_SERIALIZER);
+        RecipeSynchronization.synchronizeRecipeSerializer(TIER_RECIPE_SERIALIZER);
         Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME()), BLOCK_CAT);
         Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME()), ITEM_CAT);
         RESERVOIR_MAP.values().forEach(e -> Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "reservoir_" + e.tier().name().toLowerCase(Locale.ROOT)), e));

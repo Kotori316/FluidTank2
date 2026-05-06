@@ -9,6 +9,8 @@
     }
   ],
   "type": "fluidtank:crafting_grade_up",
+  "category": "misc",
+  "group": "fluidtank_tank",
   "sub_item": "#c:ingots/silver",
   "tier": "SILVER"
 }

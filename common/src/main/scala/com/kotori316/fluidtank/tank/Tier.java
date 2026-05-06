@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.tank;
 import com.google.common.base.CaseFormat;
 import com.kotori316.fluidtank.config.PlatformConfigAccess;
 import com.kotori316.fluidtank.contents.GenericUnit;
+import com.mojang.serialization.Codec;
 import org.jetbrains.annotations.NotNull;
 import scala.math.BigInt;
 
@@ -27,6 +28,8 @@ public enum Tier {
     LEAD(3),
     SILVER(3),
     ;
+
+    public static final Codec<Tier> CODEC = Codec.STRING.xmap(Tier::valueOfIgnoreCase, Tier::name);
 
     private final int rank;
     private final String blockName;

@@ -21,6 +21,8 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.neoforged.neoforge.common.conditions.WithConditions;
@@ -64,7 +66,9 @@ final class RecipeTest {
 
     @NotNull
     private static TierRecipe getRecipe() {
-        return new TierRecipe(Tier.STONE,
+        return new TierRecipe(
+            new Recipe.CommonInfo(false), new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, TierRecipe.TANK_RECIPE_GROUP),
+            Tier.STONE,
             Ingredient.of(FluidTank.TANK_MAP.get(Tier.WOOD).get()), Ingredient.of(Items.STONE)
         );
     }
@@ -186,6 +190,7 @@ final class RecipeTest {
         var subItem = Ingredient.of(Items.APPLE);
         var id = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "test_" + tier.name().toLowerCase(Locale.ROOT));
         var recipe = new TierRecipe(
+            new Recipe.CommonInfo(false), new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, TierRecipe.TANK_RECIPE_GROUP),
             tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
         String expected = """
             {
@@ -214,7 +219,9 @@ final class RecipeTest {
 
     void serializePacket(GameTestHelper helper, Tier tier) {
         var subItem = Ingredient.of(Items.APPLE);
-        var recipe = new TierRecipe(tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
+        var recipe = new TierRecipe(
+            new Recipe.CommonInfo(false), new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, TierRecipe.TANK_RECIPE_GROUP),
+            tier, TierRecipe.Serializer.getIngredientTankForTier(tier), subItem);
 
         var buffer = new RegistryFriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer(), helper.getLevel().registryAccess(), ConnectionType.OTHER);
         var streamCodec = TierRecipe.Serializer.STREAM_CODEC;
@@ -238,6 +245,7 @@ final class RecipeTest {
             """.formatted(TierRecipe.Serializer.LOCATION.toString());
         var read = assertInstanceOf(TierRecipe.class, managerFromJson(Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "test_serialize"), GsonHelper.parse(jsonString), helper.getLevel().registryAccess()).orElseThrow());
         var recipe = new TierRecipe(
+            new Recipe.CommonInfo(false), new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, TierRecipe.TANK_RECIPE_GROUP),
             Tier.STONE, TierRecipe.Serializer.getIngredientTankForTier(Tier.STONE), Ingredient.of(Items.DIAMOND));
 
         assertAll(

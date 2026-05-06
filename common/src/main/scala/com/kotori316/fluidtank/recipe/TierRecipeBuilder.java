@@ -10,6 +10,8 @@ import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +25,7 @@ public final class TierRecipeBuilder implements RecipeBuilder {
     private final TierRecipe recipe;
 
     public TierRecipeBuilder(Tier tier, Ingredient tankItem, Ingredient subItem) {
-        this.recipe = new TierRecipe(tier, tankItem, subItem);
+        this.recipe = new TierRecipe(new Recipe.CommonInfo(true), new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, TierRecipe.TANK_RECIPE_GROUP), tier, tankItem, subItem);
     }
 
     @Override

@@ -55,11 +55,8 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
     public final ItemStackTemplate result;
     final ShapedRecipePattern pattern;
 
-    public TierRecipe(Tier tier, Ingredient tankItem, Ingredient subItem) {
-        super(
-            new Recipe.CommonInfo(false),
-            new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, TANK_RECIPE_GROUP)
-        );
+    public TierRecipe(Recipe.CommonInfo info, CraftingRecipe.CraftingBookInfo bookInfo, Tier tier, Ingredient tankItem, Ingredient subItem) {
+        super(info, bookInfo);
         this.tier = tier;
         this.tankItem = tankItem;
         this.subItem = subItem;
@@ -202,6 +199,8 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
         public static final Identifier LOCATION = Identifier.fromNamespaceAndPath(FluidTankCommon.modId, "crafting_grade_up");
         public static final MapCodec<TierRecipe> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
+                Recipe.CommonInfo.MAP_CODEC.forGetter(o -> o.commonInfo),
+                CraftingRecipe.CraftingBookInfo.MAP_CODEC.forGetter(o -> o.bookInfo),
                 Codec.STRING.xmap(Tier::valueOfIgnoreCase, Tier::name).fieldOf(KEY_TIER).forGetter(TierRecipe::getTier),
                 Ingredient.CODEC.fieldOf(KEY_SUB_ITEM).forGetter(TierRecipe::getSubItem)
             ).apply(instance, Serializer::createInstanceInternal)
@@ -209,25 +208,25 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
         public static final StreamCodec<RegistryFriendlyByteBuf, TierRecipe> STREAM_CODEC =
             StreamCodec.ofMember(Serializer::toNetwork, Serializer::fromNetwork);
 
-        private static TierRecipe createInstance(Tier tier, Ingredient tankItem, Ingredient subItem) {
-            return new TierRecipe(tier, tankItem, subItem);
-        }
-
-        private static TierRecipe createInstanceInternal(Tier tier, Ingredient subItem) {
-            return createInstance(tier, getIngredientTankForTier(tier), subItem);
+        private static TierRecipe createInstanceInternal(Recipe.CommonInfo info, CraftingRecipe.CraftingBookInfo bookInfo, Tier tier, Ingredient subItem) {
+            return new TierRecipe(info, bookInfo, tier, getIngredientTankForTier(tier), subItem);
         }
 
         public static TierRecipe fromNetwork(RegistryFriendlyByteBuf buffer) {
+            var info = Recipe.CommonInfo.STREAM_CODEC.decode(buffer);
+            var bookInfo = CraftingRecipe.CraftingBookInfo.STREAM_CODEC.decode(buffer);
             String tierName = buffer.readUtf();
             Tier tier = Tier.valueOf(tierName);
             Ingredient tankItem = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
             Ingredient subItem = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
 
             DebugLogging.LOGGER().debug("Serializer loaded from packet for tier {}, sub {}.", tier, PlatformItemAccess.convertIngredientToString(subItem));
-            return createInstance(tier, tankItem, subItem);
+            return new TierRecipe(info, bookInfo, tier, tankItem, subItem);
         }
 
         public static void toNetwork(TierRecipe recipe, RegistryFriendlyByteBuf buffer) {
+            Recipe.CommonInfo.STREAM_CODEC.encode(buffer, recipe.commonInfo);
+            CraftingRecipe.CraftingBookInfo.STREAM_CODEC.encode(buffer, recipe.bookInfo);
             buffer.writeUtf(recipe.tier.name());
             Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.tankItem);
             Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.subItem);

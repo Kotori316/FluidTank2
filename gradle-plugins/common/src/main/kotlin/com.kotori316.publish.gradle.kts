@@ -121,9 +121,9 @@ fun curseChangelog(): String {
 
 fun curseProjectId(platform: String): String {
     return when (platform) {
-        "forge" -> "291006"
-        "fabric" -> "411564"
-        "neoforge" -> "291006"
+        "forge" -> project.property("forgeCurseProjectId").toString()
+        "fabric" -> project.property("fabricCurseProjectId").toString()
+        "neoforge" -> project.property("forgeCurseProjectId").toString()
         else -> throw IllegalArgumentException("Unknown platform $platform")
     }
 }
@@ -146,6 +146,7 @@ publishMods {
     file = provider { modJarFile() }.flatMap { it }
     modLoaders = listOf(project.name)
     displayName = "${project.version}-${project.name}"
+    version = "${project.version}-${project.name}"
 
     curseforge {
         accessToken = (
@@ -167,7 +168,7 @@ publishMods {
 
     modrinth {
         accessToken = (project.findProperty("modrinthToken") ?: System.getenv("MODRINTH_TOKEN") ?: "") as String
-        projectId = "uMlJQMHT"
+        projectId = project.property("modrinthProjectId").toString()
         minecraftVersions = listOf(minecraftVersion)
         changelog = provider { modrinthChangelog() }
         requires {

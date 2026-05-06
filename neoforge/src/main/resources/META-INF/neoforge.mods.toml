@@ -5,11 +5,11 @@ license = "All rights reserved"
 
 [[mods]]
 modId = "fluidtank"
-version = "1.0.0" # "${version}"
+version = "${version}"
 displayName = "Fluid Tank"
 displayURL = "https://github.com/Kotori316/FluidTank2"
 modUrl = "https://github.com/Kotori316/FluidTank2"
-# updateJSONURL = "${update_url}"
+updateJSONURL = "${update_url}"
 credits = "Kotori316"
 authors = "Kotori316"
 description = '''

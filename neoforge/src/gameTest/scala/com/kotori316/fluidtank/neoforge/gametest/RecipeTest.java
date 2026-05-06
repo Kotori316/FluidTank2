@@ -7,7 +7,7 @@ import com.kotori316.fluidtank.contents.GenericUnit;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
 import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.gametest.GameTestFunctions;
-import com.kotori316.fluidtank.neoforge.FluidTank;
+import com.kotori316.fluidtank.gametest.recipe.RecipeTestCommon;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.Tier;
 import com.kotori316.testutil.common.TestFunction;
@@ -28,7 +28,6 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.neoforged.neoforge.common.conditions.WithConditions;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.apache.commons.io.FilenameUtils;
-import org.jetbrains.annotations.NotNull;
 import scala.jdk.javaapi.CollectionConverters;
 
 import java.io.IOException;
@@ -43,7 +42,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("unused")
-final class RecipeTest {
+final class RecipeTest extends RecipeTestCommon {
     final Path recipeParent = Path.of("../src/generated/resources", "data/fluidtank/recipe");
 
     public RecipeTest() {
@@ -61,70 +60,11 @@ final class RecipeTest {
     }
 
     List<TestFunction> generator() {
-        return GetGameTestMethods.getTests(getClass(), this, "recipe_test");
-    }
-
-    @NotNull
-    private static TierRecipe getRecipe() {
-        return new TierRecipe(
-            new Recipe.CommonInfo(false), new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, TierRecipe.TANK_RECIPE_GROUP),
-            Tier.STONE,
-            Ingredient.of(FluidTank.TANK_MAP.get(Tier.WOOD).get()), Ingredient.of(Items.STONE)
-        );
-    }
-
-    void createInstance() {
-        TierRecipe recipe = getRecipe();
-        assertNotNull(recipe);
-    }
-
-    void match1() {
-        var recipe = getRecipe();
-        assertTrue(recipe.matches(RecipeInventoryUtil.getInv("tst", "s s", "tst", CollectionConverters.<Character, ItemStack>asScala(Map.of(
-            't', new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD).get()),
-            's', new ItemStack(Items.STONE)
-        ))), null));
-    }
-
-    void match2() {
-        var recipe = getRecipe();
-        var stack = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmountUtil.BUCKET_WATER());
-
-        assertTrue(recipe.matches(RecipeInventoryUtil.getInv("tst", "s s", "tst", CollectionConverters.<Character, ItemStack>asScala(Map.of(
-            't', stack,
-            's', new ItemStack(Items.STONE)
-        ))), null));
-    }
-
-    void match3() {
-        var recipe = getRecipe();
-        var stack = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmountUtil.BUCKET_WATER());
-
-        assertTrue(recipe.matches(RecipeInventoryUtil.getInv("tsk", "s s", "kst", CollectionConverters.<Character, ItemStack>asScala(Map.of(
-            't', stack,
-            'k', new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD).get()),
-            's', new ItemStack(Items.STONE)
-        ))), null));
-    }
-
-    void notMatch4() {
-        var recipe = getRecipe();
-        var stack = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmountUtil.BUCKET_WATER());
-        var stack2 = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmountUtil.BUCKET_LAVA());
-
-        assertFalse(recipe.matches(RecipeInventoryUtil.getInv("tsk", "s s", "kst", CollectionConverters.<Character, ItemStack>asScala(Map.of(
-            't', stack,
-            'k', stack2,
-            's', new ItemStack(Items.STONE)
-        ))), null));
-    }
-
-    void notMatch5() {
-        var recipe = getRecipe();
-        assertFalse(recipe.matches(RecipeInventoryUtil.getInv("tst", "s s", "ts ", CollectionConverters.<Character, ItemStack>asScala(Map.of(
-            't', new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD).get()),
-            's', new ItemStack(Items.STONE)
-        ))), null));
+        var common = testsInCommon("recipe_test", this);
+        return Stream.concat(
+            GetGameTestMethods.getTests(getClass(), this, "recipe_test").stream(),
+            common
+        ).toList();
     }
 
     List<TestFunction> combineFluids() {
@@ -144,7 +84,7 @@ final class RecipeTest {
 
     void combine1(GenericAmount<FluidLike> amount) {
         var filled = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, amount);
-        var empty = new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD).get());
+        var empty = new ItemStack(getTank(Tier.WOOD));
         var recipe = getRecipe();
 
         var inv = RecipeInventoryUtil.getInv("ksk", "s s", "kst", CollectionConverters.<Character, ItemStack>asScala(Map.of(
@@ -161,7 +101,7 @@ final class RecipeTest {
 
     void combine2(GenericAmount<FluidLike> amount) {
         var filled = RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, amount);
-        var empty = new ItemStack(FluidTank.TANK_MAP.get(Tier.WOOD).get());
+        var empty = new ItemStack(getTank(Tier.WOOD));
         var recipe = getRecipe();
 
         var inv = RecipeInventoryUtil.getInv("kst", "s s", "kst", CollectionConverters.<Character, ItemStack>asScala(Map.of(

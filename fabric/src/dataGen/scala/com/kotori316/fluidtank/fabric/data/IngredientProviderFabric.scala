@@ -9,7 +9,7 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.data.recipes.RecipeOutput
 import net.minecraft.resources.Identifier
 import net.minecraft.tags.{ItemTags, TagKey}
-import net.minecraft.world.item.{Item, Items}
+import net.minecraft.world.item.Item
 
 class IngredientProviderFabric(i: HolderGetter[Item], withCondition: (RecipeOutput, Seq[ResourceCondition]) => RecipeOutput) extends IngredientProvider {
   override given itemRegistry: HolderGetter[Item] = i
@@ -31,7 +31,7 @@ class IngredientProviderFabric(i: HolderGetter[Item], withCondition: (RecipeOutp
       case Tier.GOLD => TankSubitem(ConventionalItemTags.GOLD_INGOTS)
       case Tier.DIAMOND => TankSubitem(ConventionalItemTags.DIAMOND_GEMS)
       case Tier.EMERALD => TankSubitem(ConventionalItemTags.EMERALD_GEMS)
-      case Tier.STAR => TankSubitem(Items.NETHER_STAR)
+      case Tier.STAR => TankSubitem(ConventionalItemTags.NETHER_STARS)
       case Tier.VOID => TankSubitem(obsidianTag)
       case Tier.COPPER => TankSubitem(ConventionalItemTags.COPPER_INGOTS)
       case Tier.TIN => TankSubitem(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(TagUtil.C_TAG_NAMESPACE, "ingots/tin")))

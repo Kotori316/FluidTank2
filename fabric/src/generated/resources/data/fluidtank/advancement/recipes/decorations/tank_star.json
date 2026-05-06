@@ -1,11 +1,20 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:nether_stars"
+      ]
+    }
+  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_ingredient": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:nether_star"
+            "items": "#c:nether_stars"
           }
         ]
       },

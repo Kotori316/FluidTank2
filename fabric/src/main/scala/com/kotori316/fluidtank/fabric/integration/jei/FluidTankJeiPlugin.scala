@@ -6,11 +6,12 @@ import com.kotori316.fluidtank.recipe.TierRecipe
 import mezz.jei.api.constants.RecipeTypes
 import mezz.jei.api.registration.{IRecipeRegistration, IVanillaCategoryExtensionRegistration}
 import mezz.jei.api.{IModPlugin, JeiPlugin}
-import net.minecraft.client.Minecraft
+import net.fabricmc.fabric.api.client.recipe.v1.sync.ClientRecipeSynchronizedEvent
+import net.fabricmc.fabric.api.recipe.v1.sync.SynchronizedRecipes
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.{Identifier, ResourceKey}
 import net.minecraft.world.item.crafting.display.SlotDisplay
-import net.minecraft.world.item.crafting.{CraftingRecipe, RecipeHolder}
+import net.minecraft.world.item.crafting.{CraftingRecipe, RecipeHolder, RecipeType}
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters.{CollectionHasAsScala, SeqHasAsJava}
@@ -18,6 +19,9 @@ import scala.jdk.CollectionConverters.{CollectionHasAsScala, SeqHasAsJava}
 @JeiPlugin
 class FluidTankJeiPlugin extends IModPlugin {
   private val LOGGER = LoggerFactory.getLogger(classOf[FluidTankJeiPlugin])
+
+  private var recipeMap: Option[SynchronizedRecipes] = None
+  ClientRecipeSynchronizedEvent.EVENT.register((client, recipes) => recipeMap = Option(recipes))
 
   override def getPluginUid: Identifier = JeiPluginConstant.pluginUid
 
@@ -29,13 +33,12 @@ class FluidTankJeiPlugin extends IModPlugin {
 
   override def registerRecipes(registration: IRecipeRegistration): Unit = {
     super.registerRecipes(registration)
-
-    // TODO how to get TierRecipes in delegated server?
-    val tierRecipes = for {
-      server <- Option(Minecraft.getInstance().getSingleplayerServer).iterator.to(IndexedSeq)
-      recipeHolder <- server.getRecipeManager.getRecipes.asScala
-      recipe <- Option(recipeHolder.value()).collect { case r: TierRecipe => r }
-    } yield createJeiShapedRecipe(registration, recipe)
+    val tierRecipes = this.recipeMap.iterator
+      .flatMap(_.getAllOfType(RecipeType.CRAFTING).asScala)
+      .map(_.value())
+      .collect { case r: TierRecipe => r }
+      .map(createJeiShapedRecipe(registration, _))
+      .toSeq
 
     LOGGER.info("Registering TierRecipe recipes for JEI with Fabric, count: {}", tierRecipes.size)
     registration.addRecipes(RecipeTypes.CRAFTING, tierRecipes.asJava)

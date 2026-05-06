@@ -11,7 +11,6 @@ import com.kotori316.fluidtank.fluids.FluidLike;
 import com.kotori316.fluidtank.fluids.FluidLikeKey;
 import com.kotori316.fluidtank.item.PlatformItemAccess;
 import com.kotori316.fluidtank.tank.*;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.NonNullList;
@@ -52,7 +51,7 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
     final Tier tier;
     final Ingredient tankItem;
     final Ingredient subItem;
-    public final ItemStackTemplate result;
+    final ItemStackTemplate result;
     final ShapedRecipePattern pattern;
 
     public TierRecipe(Recipe.CommonInfo info, CraftingRecipe.CraftingBookInfo bookInfo, Tier tier, Ingredient tankItem, Ingredient subItem) {
@@ -175,18 +174,6 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
         return template.create();
     }
 
-    public Tier getTier() {
-        return tier;
-    }
-
-    public Ingredient getTankItem() {
-        return tankItem;
-    }
-
-    public Ingredient getSubItem() {
-        return this.subItem;
-    }
-
     @VisibleForTesting
     public ItemStack getResultItemStack() {
         return result.create();
@@ -201,8 +188,8 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
             instance.group(
                 Recipe.CommonInfo.MAP_CODEC.forGetter(o -> o.commonInfo),
                 CraftingRecipe.CraftingBookInfo.MAP_CODEC.forGetter(o -> o.bookInfo),
-                Codec.STRING.xmap(Tier::valueOfIgnoreCase, Tier::name).fieldOf(KEY_TIER).forGetter(TierRecipe::getTier),
-                Ingredient.CODEC.fieldOf(KEY_SUB_ITEM).forGetter(TierRecipe::getSubItem)
+                Tier.CODEC.fieldOf(KEY_TIER).forGetter(o -> o.tier),
+                Ingredient.CODEC.fieldOf(KEY_SUB_ITEM).forGetter(o -> o.subItem)
             ).apply(instance, Serializer::createInstanceInternal)
         );
         public static final StreamCodec<RegistryFriendlyByteBuf, TierRecipe> STREAM_CODEC =

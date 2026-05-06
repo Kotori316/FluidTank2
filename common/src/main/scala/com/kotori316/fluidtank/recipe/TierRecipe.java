@@ -22,8 +22,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.TagValueOutput;
 import org.jetbrains.annotations.NotNull;
@@ -137,6 +141,21 @@ public final class TierRecipe extends NormalCraftingRecipe implements CraftingRe
     @Override
     protected PlacementInfo createPlacementInfo() {
         return PlacementInfo.createFromOptionals(this.pattern.ingredients());
+    }
+
+    /**
+     * Copied from {@link ShapedRecipe#display()}
+     */
+    @Override
+    public List<RecipeDisplay> display() {
+        return List.of(
+            new ShapedCraftingRecipeDisplay(
+                3, 3,
+                this.pattern.ingredients().stream().map(e -> e.map(Ingredient::display).orElse(SlotDisplay.Empty.INSTANCE)).toList(),
+                new SlotDisplay.ItemStackSlotDisplay(this.result),
+                new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)
+            )
+        );
     }
 
     @NotNull

@@ -196,7 +196,10 @@ final class RecipeTest {
             {
               "type": "%s",
               "tier": "%s",
-              "sub_item": "minecraft:apple"
+              "sub_item": "minecraft:apple",
+              "show_notification":false,
+              "category":"misc",
+              "group":"fluidtank_tank"
             }
             """.formatted(TierRecipe.Serializer.LOCATION.toString(), tier.name());
         var expectedJson = GsonHelper.parse(expected);

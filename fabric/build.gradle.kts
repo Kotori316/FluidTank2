@@ -28,51 +28,51 @@ fabricApi {
 loom {
     runs {
         named("client") {
-            configName = "Fabric Client"
-            runDir = "run"
-            source(sourceSets["test"])
+            displayName = "Fabric Client"
+            runDirectory = file("run")
+            sourceSet = sourceSets["test"].name
         }
         named("server") {
-            configName = "Fabric Server"
-            runDir = "run-server"
+            displayName = "Fabric Server"
+            runDirectory = file("run-server")
         }
 
         create("gameTestServer") {
-            name("Fabric GameTest")
+            displayName = "Fabric GameTest"
             server()
-            vmArg("-ea")
-            property("fabric-api.GameTest".lowercase())
-            property("fabric-api.GameTest.report-file".lowercase(), "game-test/test-results/game_test.xml")
-            property("fabric-tag-conventions-v2.missingTagTranslationWarning", "VERBOSE")
-            property("mixin.debug.export", "true")
-            runDir = "game-test"
-            source(sourceSets["test"])
+            jvmArguments.add("-ea")
+            systemProperties.put("fabric-api.GameTest".lowercase(), "")
+            systemProperties.put("fabric-api.GameTest.report-file".lowercase(), "game-test/test-results/game_test.xml")
+            systemProperties.put("fabric-tag-conventions-v2.missingTagTranslationWarning", "VERBOSE")
+            systemProperties.put("mixin.debug.export", "true")
+            runDirectory = file("game-test")
+            sourceSet = sourceSets["test"].name
         }
 
         create("data") {
             client()
-            configName = "Data"
-            runDir = "build/dataGen"
-            property("fabric-api.DataGen".lowercase())
-            property("fabric-api.DataGen.output-dir".lowercase(), "${file("src/generated/resources")}")
-            property("fabric-api.DataGen.strict-validation".lowercase())
-            property("fabric-api.DataGen.ModId".lowercase(), "fluidtank_data")
+            displayName = "Data"
+            runDirectory = file("build/dataGen")
+            systemProperties.put("fabric-api.DataGen".lowercase(), "")
+            systemProperties.put("fabric-api.DataGen.output-dir".lowercase(), "${file("src/generated/resources")}")
+            systemProperties.put("fabric-api.DataGen.strict-validation".lowercase(), "")
+            systemProperties.put("fabric-api.DataGen.ModId".lowercase(), "fluidtank_data")
 
-            isIdeConfigGenerated = true
-            source(sourceSets["dataGen"])
+            generateRunConfig = true
+            sourceSet = sourceSets["dataGen"].name
         }
 
         create("gameTestClient") {
             client()
-            name("Fabric Client GameTest")
-            property("fabric.client.gametest")
-            property("fabric.client.gametest.disableNetworkSynchronizer", "true")
-            runDir = "run-client"
-            source(sourceSets["clientTest"])
+            displayName = "Fabric Client GameTest"
+            systemProperties.put("fabric.client.gametest", "")
+            systemProperties.put("fabric.client.gametest.disableNetworkSynchronizer", "true")
+            runDirectory = file("run-client")
+            sourceSet = sourceSets["clientTest"].name
             // val openalLib = System.getenv("OPENAL_LIB")
             // if (!openalLib.isNullOrEmpty()) {
-            //     property("org.lwjgl.openal.libname", openalLib)
-            //     environmentVariables["LD_PRELOAD"] = openalLib
+            //     systemProperties.put("org.lwjgl.openal.libname", openalLib)
+            //     environmentVars.put("LD_PRELOAD", openalLib)
             // }
         }
     }

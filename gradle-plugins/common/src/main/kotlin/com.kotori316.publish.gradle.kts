@@ -155,6 +155,8 @@ publishMods {
                     ?: "") as String
         projectId = curseProjectId(project.name)
         minecraftVersions = listOf(minecraftVersion)
+        client = true
+        server = true
         changelog = provider { curseChangelog() }
         requires {
             slug = "scalable-cats-force"

@@ -68,13 +68,11 @@ object Connection {
   (tankSeq: Seq[TankType])(implicit helper: ConnectionHelper.Aux[TankType, ContentType, HandlerType]): Unit = {
     if (tankSeq.nonEmpty) {
       val sorted = tankSeq.sortBy(_.getPos.getY)
-      val kind = sorted.flatMap(_.getContent).find(_.nonEmpty).getOrElse(helper.defaultAmount)
+      val kind = sorted.flatMap(helper.getContent).find(_.nonEmpty).getOrElse(helper.defaultAmount)
       val (s1, s2) = sorted.span { t =>
-        val c = t.getContent
-        // c is option, so empty tank is ignored in this context
-        c.forall(t => t.contentEqual(kind))
+        // getContent is an option, so empty tank is ignored in this context
+        helper.getContent(t).forall(c => c.contentEqual(kind))
       }
-      require(s1.map(_.getContent).forall(c => c.forall(t => t.contentEqual(kind))))
       val connection = helper.createConnection(s1)
       // Safe cast
       val contentType = kind.setAmount(GenericUnit.MAX).asInstanceOf[GenericAmount[connection.helper.Content]]

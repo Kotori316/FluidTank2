@@ -56,13 +56,6 @@ object ConnectionHelper {
 
     def isVoid: Boolean = helper.isVoid(t)
 
-    /**
-     * @param h implicit parameter of the connection helper, required to get the type of content type.
-     *          [[helper]] doesn't have the concrete type info.
-     * @return Some(content) if the tank contains valid amount. None if it contains nothing or invalid(amount <= 0) amount.
-     */
-    def getContent[C](implicit h: ConnectionHelper.Aux[T, C, ?]): Option[GenericAmount[C]] = h.getContent(t)
-
     def getAmount: GenericUnit = helper.getContentRaw(t).amount
   }
 }

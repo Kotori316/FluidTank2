@@ -235,6 +235,9 @@ class ConnectionTest {
       assertNotEquals(c1.get.getContent, c2.get.getContent)
       assertEquals(1, c1.get.getTiles.size)
       assertEquals(1, c2.get.getTiles.size)
+
+      assertEquals("a", c1.get.contentType.content)
+      assertEquals("b", c2.get.contentType.content)
     }
 
     @Test
@@ -263,6 +266,8 @@ class ConnectionTest {
       assertEquals(2, c1.getTiles.size)
       assertNotEquals(c1.getContent, c2.getContent)
       assertEquals(1, c2.getTiles.size)
+
+      assertEquals("a", c1.contentType.content)
     }
 
     @Test

@@ -25,7 +25,7 @@ abstract class Connection[TileType] protected(protected val sortedTanks: Seq[Til
   def getTiles: Seq[TileType] = this.sortedTanks
 
   // Assuming head or last tank contains the content.
-  protected def contentType: GenericAmount[helper.Content] =
+  protected[connection] def contentType: GenericAmount[helper.Content] =
     this.sortedTanks.headOption.flatMap(t => helper.getContent(t))
       .orElse(this.sortedTanks.lastOption.flatMap(t => helper.getContent(t)))
       .getOrElse(helper.defaultAmount)

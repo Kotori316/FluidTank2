@@ -39,7 +39,11 @@ public interface FluidTankClientGameTest extends FabricClientGameTest {
     @Override
     default void runTest(ClientGameTestContext context) {
         LOGGER.info("Running test: {}", getClass().getSimpleName());
-        context.runOnClient(i -> i.options.hideGui = true);
+        context.runOnClient(i -> {
+            if (!i.gui.hud.isHidden()) {
+                i.gui.hud.toggle();
+            }
+        });
         try (var singlePlayerContext = context.worldBuilder()
             .adjustSettings(FluidTankClientGameTest::setWorldNameByTime)
             .adjustSettings(FluidTankClientGameTest::setFlatWorldSetting)

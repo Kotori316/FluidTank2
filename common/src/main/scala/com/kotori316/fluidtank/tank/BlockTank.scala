@@ -115,7 +115,7 @@ abstract class BlockTank(val tier: Tier) extends Block(
       case tank: TileTank =>
         if (!tank.getTank.isEmpty) {
           val valueOutput = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, provider)
-          tank.saveWithId(valueOutput)
+          tank.saveCustomOnly(valueOutput)
           PlatformItemAccess.setTileTag(stack, valueOutput, tank.getType)
         }
         if (tank.hasCustomName) stack.set(DataComponents.CUSTOM_NAME, tank.getCustomName)

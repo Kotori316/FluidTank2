@@ -272,5 +272,29 @@ final class FabricTankItemStorageTest extends BeforeMC {
       assertEquals(FluidVariant.of(Fluids.WATER), handler.getResource)
       assertEquals(FluidAmountUtil.BUCKET_WATER, handler.getTank.content)
     }
+
+    @Test
+    def drainFullBecomesStackableWithFresh(): Unit = {
+      val tier = Tier.WOOD
+      val stack = RecipeInventoryUtil.getFilledTankStack(tier, FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit(tier.getCapacity)))
+      val handler = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
+      assertEquals(4 * FluidConstants.BUCKET, handler.getAmount)
+
+      Using(Transaction.openOuter()) { transaction =>
+        assertEquals(FluidVariant.of(Fluids.WATER), handler.getResource)
+        val drained = handler.extract(FluidVariant.of(Fluids.WATER), 4 * FluidConstants.BUCKET, transaction)
+        assertEquals(4 * FluidConstants.BUCKET, drained)
+        transaction.commit()
+      }
+
+      assertTrue(handler.getTank.isEmpty, "Tank: " + handler.getTank)
+
+      val drainedStack = handler.getStack
+      val freshStack = new ItemStack(FluidTank.TANK_MAP.get(tier))
+      assertTrue(
+        ItemStack.isSameItemSameComponents(freshStack, drainedStack),
+        s"fresh=${freshStack.getComponents}, drained=${drainedStack.getComponents}"
+      )
+    }
   }
 }

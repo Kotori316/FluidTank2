@@ -36,7 +36,7 @@ class RenderItemTank(model: TankModel, renderHelper: FluidRenderHelper) extends 
       tileTank.loadAdditional(TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), d))
       if (tileTank.getTank.hasContent) {
         val dispatcher = Minecraft.getInstance.getBlockEntityRenderDispatcher
-        val stateForTile: TankRenderState = dispatcher.tryExtractRenderState(tileTank, 0, null)
+        val stateForTile: TankRenderState = dispatcher.tryExtractRenderState(tileTank, 0, null, false)
         if (stateForTile != null) {
           dispatcher.submit(
             stateForTile, poseStack, nodeCollector, new CameraRenderState()

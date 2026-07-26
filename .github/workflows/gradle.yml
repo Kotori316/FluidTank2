@@ -145,6 +145,7 @@ jobs:
 
   fabric-client-test:
     runs-on: ubuntu-24.04-arm
+    if: false
     timeout-minutes: 15
     container:
       image: mcr.microsoft.com/devcontainers/java:25

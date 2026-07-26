@@ -5,7 +5,7 @@ import com.kotori316.fluidtank.cat.PlatformChestAsTankAccess
 import com.kotori316.fluidtank.recipe.{TierRecipe, TierRecipeBuilder}
 import com.kotori316.fluidtank.reservoir.ReservoirRecipeConstant
 import com.kotori316.fluidtank.tank.{PlatformTankAccess, Tier}
-import net.minecraft.advancements.criterion.InventoryChangeTrigger
+import net.minecraft.advancements.triggers.InventoryChangeTrigger
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
 import net.minecraft.data.recipes.{RecipeCategory, RecipeOutput, RecipeProvider, ShapedRecipeBuilder, ShapelessRecipeBuilder}

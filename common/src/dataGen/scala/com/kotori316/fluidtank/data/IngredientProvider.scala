@@ -1,8 +1,8 @@
 package com.kotori316.fluidtank.data
 
 import com.kotori316.fluidtank.tank.Tier
-import net.minecraft.advancements.Criterion
-import net.minecraft.advancements.criterion.{InventoryChangeTrigger, ItemPredicate}
+import net.minecraft.advancements.triggers.{Criterion, InventoryChangeTrigger}
+import net.minecraft.advancements.predicates.ItemPredicate
 import net.minecraft.core.HolderGetter
 import net.minecraft.data.recipes.RecipeOutput
 import net.minecraft.tags.TagKey

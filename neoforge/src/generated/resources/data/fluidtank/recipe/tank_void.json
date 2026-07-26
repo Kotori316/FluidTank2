@@ -9,7 +9,6 @@
     }
   ],
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "group": "fluidtank_tank",
   "key": {
     "o": "#c:obsidians",

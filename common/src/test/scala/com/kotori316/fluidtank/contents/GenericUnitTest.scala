@@ -93,6 +93,21 @@ class GenericUnitTest {
       val genericUnit = GenericUnit(BigInt(amount))
       Assertions.assertEquals(genericUnit, GenericUnit.fromByteArray(genericUnit.asByteArray))
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = Array(
+      "0", "100", "1000000000000000000000000000"
+    ))
+    def rotationByteFromString(amount: String): Unit = {
+      val genericUnit = GenericUnit(BigInt(amount))
+      Assertions.assertEquals(genericUnit, GenericUnit.fromByteArray(genericUnit.asByteArray))
+    }
+  }
+
+  @Test
+  def fromEmptyArray(): Unit = {
+    val genericUnit = GenericUnit.fromByteArray(Array())
+    Assertions.assertEquals(GenericUnit.ZERO, genericUnit)
   }
 
   @Nested

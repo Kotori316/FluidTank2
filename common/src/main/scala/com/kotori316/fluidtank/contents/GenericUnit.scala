@@ -62,7 +62,9 @@ object GenericUnit {
   @inline
   def asForgeFromBigInt(value: BigInt): BigInt = value / 81
 
-  def fromByteArray(value: Array[Byte]): GenericUnit = new GenericUnit(BigInt(value))
+  def fromByteArray(value: Array[Byte]): GenericUnit =
+    if (value.isEmpty) GenericUnit.ZERO
+    else new GenericUnit(BigInt(value))
 
   /**
    * Get [[GenericUnit]] from [[BigInt]]

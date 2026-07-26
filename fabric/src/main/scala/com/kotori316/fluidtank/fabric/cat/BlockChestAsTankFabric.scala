@@ -28,6 +28,7 @@ class BlockChestAsTankFabric extends BlockChestAsTank {
       for {
         toFill <- Option(PlatformFluidAccess.getInstance().getFluidContained(stack))
         if toFill.nonEmpty
+        if !FabricConverter.toVariant(toFill, Fluids.EMPTY).isBlank
         fillSimulate <- Using(Transaction.openOuter()) { tr =>
           storage.insert(FabricConverter.toVariant(toFill, Fluids.EMPTY), FabricConverter.fabricAmount(toFill), tr)
         }.toOption

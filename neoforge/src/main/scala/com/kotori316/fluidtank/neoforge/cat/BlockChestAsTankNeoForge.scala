@@ -56,6 +56,7 @@ class BlockChestAsTankNeoForge extends BlockChestAsTank {
       for {
         toFill <- Option(PlatformFluidAccess.getInstance().getFluidContained(stack))
         if toFill.nonEmpty
+        if !toFill.asVariant.isEmpty
         canDrainFromItem <- fillSimulate(storage, toFill, stack, player, hand)
         if canDrainFromItem.moved().nonEmpty
         transferStack <- fill(storage, toFill, canDrainFromItem.moved(), stack, player, hand)

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(TextureAtlasSprite.class)
 public abstract class MixinTextureAtlasSprite {
     @Inject(method = "createAnimationState", at = @At("HEAD"), cancellable = true)
-    private void createTicker(GpuBufferSlice buffer, int size, CallbackInfoReturnable<SpriteContents.AnimationState> cir) {
+    private void createTicker(GpuBufferSlice uboSlice, int spriteUboSize, CallbackInfoReturnable<SpriteContents.AnimationState> cir) {
         cir.setReturnValue(null);
     }
 

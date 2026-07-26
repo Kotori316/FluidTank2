@@ -5,7 +5,8 @@
     ":rebaseStalePrs",
   ],
   "baseBranches": [
-    "$default"
+    "$default",
+    "26.1",
   ],
   "packageRules": [
     {

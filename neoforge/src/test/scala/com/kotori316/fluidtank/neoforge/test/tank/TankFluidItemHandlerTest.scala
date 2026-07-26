@@ -12,7 +12,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.ProblemReporter
 import net.minecraft.world.item.component.TypedEntityData
 import net.minecraft.world.item.{Item, ItemStack, Items}
-import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.entity.{BlockEntityType, BlockEntityTypes}
 import net.minecraft.world.level.storage.TagValueOutput
 import net.neoforged.neoforge.transfer.access.ItemAccess
 import net.neoforged.neoforge.transfer.fluid.FluidResource
@@ -48,7 +48,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
     tagValueOutput.store(TileTank.KEY_TANK, Tank.codec, tank)
     tagValueOutput.putString(TileTank.KEY_TIER, Tier.STONE.name())
     val stack = new ItemStack(ITEM)
-    PlatformItemAccess.setTileTag(stack, tagValueOutput, BlockEntityType.TEST_BLOCK)
+    PlatformItemAccess.setTileTag(stack, tagValueOutput, BlockEntityTypes.TEST_BLOCK)
 
     val handler = new TankFluidItemHandler(Tier.STONE, ItemAccess.forStack(stack))
     assertEquals(tank, handler.getTank)
@@ -224,7 +224,7 @@ class TankFluidItemHandlerTest extends BeforeMC {
       val stack = new ItemStack(ITEM)
       val handler = new TankFluidItemHandler(Tier.WOOD, ItemAccess.forStack(stack))
       handler.setTank(Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit.fromForge(4000)))
-      stack.update[TypedEntityData[BlockEntityType[?]]](DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(BlockEntityType.TEST_BLOCK, new CompoundTag()), data => {
+      stack.update[TypedEntityData[BlockEntityType[?]]](DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(BlockEntityTypes.TEST_BLOCK, new CompoundTag()), data => {
         TypedEntityData.of(data.`type`(), data.copyTagWithoutId().tap(_.putString("unknownTag", "unknownTag")))
       })
       Using.resource(Transaction.openRoot()) { tx =>

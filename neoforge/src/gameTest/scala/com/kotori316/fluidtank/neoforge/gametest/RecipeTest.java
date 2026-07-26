@@ -138,7 +138,6 @@ final class RecipeTest extends RecipeTestCommon {
               "tier": "%s",
               "sub_item": "minecraft:apple",
               "show_notification":false,
-              "category":"misc",
               "group":"fluidtank_tank"
             }
             """.formatted(TierRecipe.Serializer.LOCATION.toString(), tier.name());

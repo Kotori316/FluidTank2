@@ -14,7 +14,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.ProblemReporter
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.TypedEntityData
-import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.entity.{BlockEntityType, BlockEntityTypes}
 import net.minecraft.world.level.material.Fluids
 import net.minecraft.world.level.storage.TagValueOutput
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertFalse, assertNotEquals, assertNotNull, assertNull, assertTrue}
@@ -47,7 +47,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
     tagValueOutput.putString(TileTank.KEY_TIER, Tier.WOOD.name)
     val tank = Tank(FluidAmountUtil.BUCKET_WATER, GenericUnit(Tier.WOOD.getCapacity))
     tagValueOutput.store(TileTank.KEY_TANK, Tank.codec, tank)
-    PlatformItemAccess.setTileTag(stack, tagValueOutput, BlockEntityType.TEST_BLOCK)
+    PlatformItemAccess.setTileTag(stack, tagValueOutput, BlockEntityTypes.TEST_BLOCK)
     val storage = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
     assertAll(
       () => assertEquals(FluidConstants.BUCKET, storage.getAmount),
@@ -66,7 +66,7 @@ final class FabricTankItemStorageTest extends BeforeMC {
     tagValueOutput.putString(TileTank.KEY_TIER, tier.name)
     val tank = Tank.apply(FluidAmountUtil.BUCKET_LAVA.setAmount(GenericUnit.fromForge(3000)), GenericUnit(tier.getCapacity))
     tagValueOutput.store(TileTank.KEY_TANK, Tank.codec, tank)
-    PlatformItemAccess.setTileTag(stack, tagValueOutput, BlockEntityType.TEST_BLOCK)
+    PlatformItemAccess.setTileTag(stack, tagValueOutput, BlockEntityTypes.TEST_BLOCK)
     val handler = new FabricTankItemStorage(ModifiableSingleItemStorage.getContext(stack))
     assertAll(
       () => assertEquals(FluidConstants.BUCKET * 3, handler.getAmount),

@@ -58,12 +58,13 @@ runs {
     create("server") {
         workingDirectory = project.file("run-server")
     }
+    val junitConfiguration = project.configurations["junit"]
     create("gameTestServer") {
         jvmArgument("-ea")
         workingDirectory = project.file("game-test")
         modSources.add("${modId}_gametest", sourceSets["gameTest"])
         dependencies {
-            runtime(project.configurations["junit"])
+            runtime(junitConfiguration)
         }
     }
     create("clientData") {

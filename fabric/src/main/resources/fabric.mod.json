@@ -30,7 +30,7 @@
     ]
   },
   "depends": {
-    "fabric-api": ">=0.147.0+26.1.2",
+    "fabric-api": ">=0.154.0+26.2",
     "minecraft": ">=${mc_version}",
     "kotori_scala": ">=5.0.0"
   },

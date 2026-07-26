@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.gametest.cat;
 
 import com.kotori316.fluidtank.cat.PlatformChestAsTankAccess;
 import com.kotori316.fluidtank.fluids.FluidAmountUtil;
+import com.kotori316.fluidtank.fluids.PlatformFluidAccess;
 import com.kotori316.fluidtank.gametest.GameTestFunctions;
 import com.kotori316.testutil.common.TestFunction;
 import net.minecraft.core.BlockPos;
@@ -12,6 +13,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
@@ -30,6 +33,7 @@ public final class CatGameTest {
                 CatEmptyTest.class,
                 CatFillCatTest.class,
                 CatFillItemTest.class,
+                CatPotionTest.class,
                 CatGameTest.class
             ), 10),
             placeTest(batchName, structureName)
@@ -137,6 +141,30 @@ public final class CatGameTest {
 
             var replaced = player.getItemInHand(InteractionHand.MAIN_HAND);
             assertEquals(Items.BUCKET, replaced.getItem(), "Lava Bucket should be replaced to Empty Bucket");
+
+            helper.succeed();
+        }
+    }
+
+    private static class CatPotionTest {
+        public static void interactWithPotionDoesNothing(GameTestHelper helper) {
+            Direction direction = Direction.NORTH;
+            var basePos = new BlockPos(3, 3, 3);
+            var relative = basePos.relative(direction);
+            setBlocks(helper, basePos, direction, Items.BUCKET);
+
+            var potion = PotionContents.createItemStack(Items.POTION, Potions.HEALING);
+            assertTrue(PlatformFluidAccess.getInstance().isFluidContainer(potion), "Potion must be a fluid container");
+
+            var player = helper.makeMockPlayer(GameType.SURVIVAL);
+            player.setItemInHand(InteractionHand.MAIN_HAND, potion);
+            helper.useBlock(relative, player);
+
+            var fluids = PlatformChestAsTankAccess.getInstance().getCATFluids(helper.getLevel(), helper.absolutePos(relative));
+            assertTrue(fluids.isEmpty(), "CAT must stay empty");
+
+            var replaced = player.getItemInHand(InteractionHand.MAIN_HAND);
+            assertEquals(Items.POTION, replaced.getItem(), "Potion must be unchanged");
 
             helper.succeed();
         }

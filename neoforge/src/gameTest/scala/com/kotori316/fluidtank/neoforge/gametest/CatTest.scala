@@ -3,16 +3,21 @@ package com.kotori316.fluidtank.neoforge.gametest
 import com.kotori316.fluidtank.contents.GenericUnit
 import com.kotori316.fluidtank.fluids.{FluidAmount, FluidAmountUtil}
 import com.kotori316.fluidtank.gametest.GameTestFunctions
+import com.kotori316.fluidtank.neoforge.FluidTank
 import com.kotori316.fluidtank.neoforge.cat.EntityChestAsTank
 import com.kotori316.fluidtank.neoforge.fluid.NeoForgeConverter.*
+import com.kotori316.fluidtank.neoforge.tank.TankFluidItemHandler
+import com.kotori316.fluidtank.tank.Tier
 import com.kotori316.testutil.common.TestFunction
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.gametest.framework.GameTestHelper
-import net.minecraft.world.item.{Item, Items}
-import net.minecraft.world.level.block.Rotation
+import net.minecraft.world.item.{Item, ItemStack, Items}
+import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.entity.HopperBlockEntity
+import net.minecraft.world.level.block.{Block, Rotation}
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.transfer.ResourceHandler
+import net.neoforged.neoforge.transfer.access.ItemAccess
 import net.neoforged.neoforge.transfer.fluid.FluidResource
 import net.neoforged.neoforge.transfer.transaction.Transaction
 import org.junit.jupiter.api.Assertions.{assertDoesNotThrow, assertEquals, assertNotNull, assertTrue}
@@ -27,8 +32,66 @@ class CatTest {
   private final val BATCH = GetGameTestMethods.DEFAULT_BATCH
 
   def tests(): java.util.List[TestFunction] = {
-    val all = generator().asScala ++ fillMore() ++ fillFail() ++ drainWater()
+    val all = generator().asScala ++ fillMore() ++ fillFail() ++ drainWater() ++ drainClonedTank() ++ drainDroppedTank()
     all.asJava
+  }
+
+  private def drainClonedTank(): Seq[TestFunction] = {
+    Seq(GameTestFunctions.create(BATCH, TestFunction.EMPTY_STRUCTURE, "cat_test_drain_cloned_tank", g => drainClonedTank(g)))
+  }
+
+  private def drainDroppedTank(): Seq[TestFunction] = {
+    Seq(GameTestFunctions.create(BATCH, TestFunction.EMPTY_STRUCTURE, "cat_test_drain_dropped_tank", g => drainDroppedTank(g)))
+  }
+
+  private def drainClonedTank(helper: GameTestHelper): Unit = {
+    val tier = Tier.WOOD
+    val pos = BlockPos.ZERO.above()
+    val toDrain = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit(tier.getCapacity))
+    val tankTile = TankTest.placeTank(helper, pos, tier)
+    tankTile.getConnection.getHandler.fill(toDrain, execute = true)
+    val stack = helper.getBlockState(pos).getCloneItemStack(helper.absolutePos(pos), helper.getLevel, true, helper.makeMockPlayer(GameType.CREATIVE))
+    val handler = new TankFluidItemHandler(tier, ItemAccess.forStack(stack))
+    assertEquals(toDrain.amount.asForge, handler.getTank.amount.asForge)
+    Using.resource(Transaction.openRoot()) { tx =>
+      val drained = handler.extract(toDrain.asVariant, toDrain.amount.asForge, tx)
+      assertEquals(toDrain.amount.asForge, drained)
+      tx.commit()
+    }
+    val drainedStack = handler.getContainer
+    val freshStack = new ItemStack(FluidTank.TANK_MAP.get(tier).get())
+    assertTrue(handler.getTank.isEmpty, s"Tank should be empty but ${handler.getTank}")
+    assertTrue(
+      ItemStack.isSameItemSameComponents(freshStack, drainedStack),
+      s"Drained tank must stack with a fresh tank. fresh=${freshStack.getComponents}, drained=${drainedStack.getComponents}"
+    )
+    helper.succeed()
+  }
+
+  private def drainDroppedTank(helper: GameTestHelper): Unit = {
+    val tier = Tier.WOOD
+    val pos = BlockPos.ZERO.above()
+    val toDrain = FluidAmountUtil.BUCKET_WATER.setAmount(GenericUnit(tier.getCapacity))
+    val tankTile = TankTest.placeTank(helper, pos, tier)
+    tankTile.getConnection.getHandler.fill(toDrain, execute = true)
+    val drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel, helper.absolutePos(pos), tankTile, helper.makeMockPlayer(GameType.CREATIVE), ItemStack.EMPTY)
+    assertEquals(1, drops.size, s"Drop was $drops")
+    val stack = drops.get(0)
+    val handler = new TankFluidItemHandler(tier, ItemAccess.forStack(stack))
+    assertEquals(toDrain.amount.asForge, handler.getTank.amount.asForge)
+    Using.resource(Transaction.openRoot()) { tx =>
+      val drained = handler.extract(toDrain.asVariant, toDrain.amount.asForge, tx)
+      assertEquals(toDrain.amount.asForge, drained)
+      tx.commit()
+    }
+    val drainedStack = handler.getContainer
+    val freshStack = new ItemStack(FluidTank.TANK_MAP.get(tier).get())
+    assertTrue(handler.getTank.isEmpty, s"Tank should be empty but ${handler.getTank}")
+    assertTrue(
+      ItemStack.isSameItemSameComponents(freshStack, drainedStack),
+      s"Drained tank must stack with a fresh tank. fresh=${freshStack.getComponents}, drained=${drainedStack.getComponents}"
+    )
+    helper.succeed()
   }
 
   def generator(): java.util.List[TestFunction] = {

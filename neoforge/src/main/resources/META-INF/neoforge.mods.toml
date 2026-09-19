@@ -15,7 +15,7 @@ authors = "Kotori316"
 description = '''
 FluidTank
 '''
-logoFile = "assets/fluidtank/textures/icon.png"
+bannerFile = "assets/fluidtank/textures/icon.png"
 
 [[dependencies.fluidtank]]
 modId = "neoforge"

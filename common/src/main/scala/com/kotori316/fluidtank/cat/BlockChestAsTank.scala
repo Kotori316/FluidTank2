@@ -22,7 +22,7 @@ import net.minecraft.world.{InteractionHand, InteractionResult}
 import scala.jdk.javaapi.CollectionConverters
 
 abstract class BlockChestAsTank extends Block(BlockBehaviour.Properties.of()
-  .strength(0.7f).pushReaction(PushReaction.BLOCK).forceSolidOn()
+  .strength(0.7f).pushReaction(PushReaction.IMMOVEABLE).forceSolidOn()
   .setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, BlockChestAsTank.NAME)))
 )
   with EntityBlock {

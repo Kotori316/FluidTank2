@@ -24,7 +24,7 @@ final class RenderReservoirItem(protected val model: ReservoirModel, protected v
     poseStack.scale(1.0F, 1.0F, 1.0F)
     poseStack.translate(0, 0, 0.5f)
     // RenderSystem.enableCull()
-    nodeCollector.submitModel(this.model, UtilUnit.INSTANCE, poseStack, this.model.renderType(RenderReservoirItem.textureNameMap(patterns.tier)), packedLight, packedOverlay, outlineColor, null)
+    nodeCollector.submitModel(this.model, UtilUnit.INSTANCE, poseStack, this.model.renderType(RenderReservoirItem.textureNameMap(patterns.tier)), packedLight, packedOverlay, outlineColor)
 
     val tank = patterns.tank
     if (tank.hasContent) {

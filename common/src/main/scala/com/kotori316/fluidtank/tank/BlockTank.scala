@@ -6,7 +6,6 @@ import com.kotori316.fluidtank.MCImplicits.showPos
 import com.kotori316.fluidtank.MacroHelper.getCallerMethod
 import com.kotori316.fluidtank.fluids.{PlatformFluidAccess, TransferFluid}
 import com.kotori316.fluidtank.item.PlatformItemAccess
-import com.mojang.serialization.MapCodec
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.core.{BlockPos, Direction, HolderLookup}
@@ -27,7 +26,7 @@ import net.minecraft.world.{InteractionHand, InteractionResult}
 import org.jetbrains.annotations.Nullable
 
 abstract class BlockTank(val tier: Tier) extends Block(
-  BlockBehaviour.Properties.of().strength(1f).dynamicShape().pushReaction(PushReaction.BLOCK).forceSolidOn()
+  BlockBehaviour.Properties.of().strength(1f).dynamicShape().pushReaction(PushReaction.IMMOVEABLE).forceSolidOn()
     .setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(FluidTankCommon.modId, tier.getBlockName)))
 ) with EntityBlock {
 
@@ -35,10 +34,6 @@ abstract class BlockTank(val tier: Tier) extends Block(
   final val itemBlock: ItemBlockTank = createTankItem()
 
   protected def createTankItem(): ItemBlockTank = new ItemBlockTank(this)
-
-  protected def createBlockInstance(): BlockTank
-
-  override protected final val codec: MapCodec[BlockTank] = BlockBehaviour.simpleCodec(_ => createBlockInstance())
 
   override final def asItem(): Item = itemBlock
 

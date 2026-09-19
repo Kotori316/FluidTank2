@@ -2,24 +2,26 @@ package com.kotori316.fluidtank.tank;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
-import java.util.List;
+import java.util.Optional;
 
 public final class TankLootFunction extends LootItemConditionalFunction {
     public static final String NAME = "content_tank";
 
-    public TankLootFunction(List<LootItemCondition> conditions) {
-        super(conditions);
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public TankLootFunction(Optional<Holder<LootItemCondition>> condition) {
+        super(condition);
     }
 
     @Override
     protected ItemStack run(ItemStack stack, LootContext context) {
-        var tile = context.getParameter(LootContextParams.BLOCK_ENTITY);
+        var tile = context.getOptional(LootContextParams.BLOCK_ENTITY);
         if (stack.getItem() instanceof ItemBlockTank tank) {
             tank.blockTank().saveTankNBT(tile, stack, context.getLevel().registryAccess());
         }

@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.fluids
 import com.kotori316.fluidtank.config.PlatformConfigAccess
 import net.minecraft.core.BlockPos
 import net.minecraft.sounds.{SoundEvent, SoundSource}
+import net.minecraft.util.Prediction
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
@@ -58,7 +59,7 @@ object TransferFluid {
         // give
         player.getItemInHand(hand).shrink(1)
         if (!player.addItem(result.stack)) {
-          player.drop(result.stack, false)
+          player.drop(result.stack, false, Prediction.SERVER_ONLY)
         }
       }
     }

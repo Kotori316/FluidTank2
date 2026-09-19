@@ -12,9 +12,4 @@ abstract class BlockCreativeTank extends BlockTank(Tier.CREATIVE) {
 
   // Do nothing for Creative Tank
   override def saveTankNBT(tileEntity: BlockEntity, stack: ItemStack, provider: HolderLookup.Provider): Unit = ()
-
-  override protected def createBlockInstance(): BlockTank = {
-    val constructor = getClass.getConstructor()
-    constructor.newInstance()
-  }
 }

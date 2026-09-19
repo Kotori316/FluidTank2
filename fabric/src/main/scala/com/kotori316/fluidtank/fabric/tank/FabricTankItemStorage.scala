@@ -49,9 +49,9 @@ class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c
       tileTag.putString("id", TileTank.registryName)
     }
     val componentBuilder = DataComponentPatch.builder()
-    componentPatch.entrySet().asScala
-      .flatMap(e => e.getValue.toScala.map(v => e.getKey.asInstanceOf[DataComponentType[AnyRef]] -> v.asInstanceOf[AnyRef]))
-      .foreach { case (k, v) => componentBuilder.set(k, v) }
+    val splitPatch = componentPatch.split()
+    componentBuilder.set(splitPatch.added())
+    splitPatch.removed().asScala.foreach(t => componentBuilder.remove(t.asInstanceOf[DataComponentType[AnyRef]]))
     if (tileTag.isEmpty) {
       componentBuilder.remove(DataComponents.BLOCK_ENTITY_DATA)
     } else {

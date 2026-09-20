@@ -8,7 +8,7 @@ import com.kotori316.fluidtank.tank.{ItemBlockTank, PlatformTankAccess, Tier, Ti
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
-import net.minecraft.core.component.{DataComponentPatch, DataComponentType, DataComponents}
+import net.minecraft.core.component.{DataComponentPatch, DataComponents}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.component.TypedEntityData
 
@@ -51,7 +51,7 @@ class FabricTankItemStorage(c: ContainerItemContext) extends FabricTankStorage(c
     val componentBuilder = DataComponentPatch.builder()
     val splitPatch = componentPatch.split()
     componentBuilder.set(splitPatch.added())
-    splitPatch.removed().asScala.foreach(t => componentBuilder.remove(t.asInstanceOf[DataComponentType[AnyRef]]))
+    splitPatch.removed().forEach(componentBuilder.remove)
     if (tileTag.isEmpty) {
       componentBuilder.remove(DataComponents.BLOCK_ENTITY_DATA)
     } else {

@@ -240,6 +240,7 @@ public final class RecipeTest extends RecipeTestCommon {
     // just for test
     @SuppressWarnings("UnstableApiUsage")
     private static boolean checkCondition(GameTestHelper helper, JsonObject read) {
+
         return ResourceConditionsImpl.applyResourceConditions(read, "TEST", Identifier.fromNamespaceAndPath(FluidTankCommon.modId, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "checkCondition")),
             new RegistryOps.RegistryInfoLookup() {
                 @Override

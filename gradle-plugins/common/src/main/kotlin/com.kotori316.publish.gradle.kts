@@ -142,7 +142,7 @@ fun modJarFile(): Provider<RegularFile> {
 
 publishMods {
     dryRun = releaseDebug
-    type = STABLE
+    type = if (project.version.toString().contains("SNAPSHOT")) BETA else STABLE
     file = provider { modJarFile() }.flatMap { it }
     modLoaders = listOf(project.name)
     displayName = "${project.version}-${project.name}"

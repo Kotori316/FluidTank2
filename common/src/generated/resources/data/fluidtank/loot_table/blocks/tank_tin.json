@@ -1,24 +1,20 @@
 {
   "type": "minecraft:block",
-  "functions": [
-    {
-      "function": "fluidtank:content_tank"
-    }
-  ],
+  "modifier": {
+    "type": "fluidtank:content_tank"
+  },
   "pools": [
     {
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
-      ],
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
       "entries": [
         {
           "type": "minecraft:item",
           "name": "fluidtank:tank_tin"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ],
   "random_sequence": "fluidtank:blocks/tank_tin"

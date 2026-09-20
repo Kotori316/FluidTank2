@@ -32,7 +32,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fluidtank:tank_stone"
+        "recipes": "fluidtank:tank_stone"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -32,7 +32,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fluidtank:tank_star"
+        "recipes": "fluidtank:tank_star"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

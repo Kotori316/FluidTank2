@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fluidtank:reservoir_wood"
+        "recipes": "fluidtank:reservoir_wood"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

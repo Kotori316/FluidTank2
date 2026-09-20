@@ -25,7 +25,7 @@ import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.neoforged.neoforge.common.conditions.WithConditions;
+import net.neoforged.neoforge.common.conditions.ConditionalOps;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.apache.commons.io.FilenameUtils;
 import scala.jdk.javaapi.CollectionConverters;
@@ -144,12 +144,12 @@ final class RecipeTest extends RecipeTestCommon {
         var expectedJson = GsonHelper.parse(expected);
 
         var codec = helper.getLevel().registryAccess().createSerializationContext(JsonOps.INSTANCE);
-        var fromSerializer = assertDoesNotThrow(() -> Recipe.CODEC.encodeStart(codec, recipe).getOrThrow());
+        var fromSerializer = assertDoesNotThrow(() -> Recipe.DIRECT_CODEC.encodeStart(codec, recipe).getOrThrow());
         assertEquals(expectedJson, fromSerializer);
 
         var deserialized = assertInstanceOf(TierRecipe.class,
             assertDoesNotThrow(() ->
-                    Recipe.CODEC.parse(codec, fromSerializer).getOrThrow(),
+                    Recipe.DIRECT_CODEC.parse(codec, fromSerializer).getOrThrow(),
                 "Failed to parse recipe for %s".formatted(tier)),
             "Loaded recipe is not TierRecipe");
         assertNotNull(deserialized);
@@ -226,8 +226,8 @@ final class RecipeTest extends RecipeTestCommon {
     }
 
     private static Optional<Recipe<?>> managerFromJson(Identifier location, JsonObject jsonObject, HolderLookup.Provider provider) {
-        return Recipe.CONDITIONAL_CODEC.parse(RegistryOps.create(JsonOps.INSTANCE, provider), jsonObject)
-            .getOrThrow()
-            .map(WithConditions::carrier);
+        return ConditionalOps.createConditionalCodec(Recipe.DIRECT_CODEC)
+            .parse(RegistryOps.create(JsonOps.INSTANCE, provider), jsonObject)
+            .getOrThrow();
     }
 }

@@ -215,9 +215,6 @@ class TileTankTest extends BeforeMC {
 object TileTankTest {
 
   class BlockTankForTest extends BlockTank(Tier.WOOD) {
-
-    override protected def createBlockInstance(): BlockTank = throw new UnsupportedOperationException("BlockTankForTest#createBlockInstance")
-
     override def newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = new TileTankForTest(this.tier, null, pos, state)
   }
 

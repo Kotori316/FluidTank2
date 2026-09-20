@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fluidtank:chest_as_tank"
+        "recipes": "fluidtank:chest_as_tank"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -41,7 +41,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fluidtank:tank_gold"
+        "recipes": "fluidtank:tank_gold"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

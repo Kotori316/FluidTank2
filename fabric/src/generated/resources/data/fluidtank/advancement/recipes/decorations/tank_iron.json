@@ -38,7 +38,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fluidtank:tank_iron"
+        "recipes": "fluidtank:tank_iron"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

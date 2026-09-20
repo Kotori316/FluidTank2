@@ -22,7 +22,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fluidtank:tank_wood"
+        "recipes": "fluidtank:tank_wood"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

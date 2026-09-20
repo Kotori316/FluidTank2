@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fluidtank:reservoir_stone"
+        "recipes": "fluidtank:reservoir_stone"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

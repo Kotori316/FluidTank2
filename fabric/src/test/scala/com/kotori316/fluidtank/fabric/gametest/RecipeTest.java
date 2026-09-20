@@ -16,9 +16,9 @@ import com.kotori316.testutil.common.TestFunction;
 import com.mojang.serialization.JsonOps;
 import io.netty.buffer.ByteBufAllocator;
 import net.fabricmc.fabric.impl.resource.conditions.ResourceConditionsImpl;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.Identifier;
@@ -27,9 +27,11 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import org.apache.commons.io.FilenameUtils;
-import org.junit.platform.commons.function.Try;
 import org.junit.platform.commons.support.ReflectionSupport;
 import scala.jdk.javaapi.CollectionConverters;
 
@@ -165,12 +167,12 @@ public final class RecipeTest extends RecipeTestCommon {
         var expectedJson = GsonHelper.parse(expected);
 
         var codec = helper.getLevel().registryAccess().createSerializationContext(JsonOps.INSTANCE);
-        var fromSerializer = assertDoesNotThrow(() -> Recipe.CODEC.encodeStart(codec, recipe).getOrThrow());
+        var fromSerializer = assertDoesNotThrow(() -> Recipe.DIRECT_CODEC.encodeStart(codec, recipe).getOrThrow());
         assertEquals(expectedJson, fromSerializer);
 
         var deserialized = assertInstanceOf(TierRecipe.class,
             assertDoesNotThrow(() ->
-                    Recipe.CODEC.parse(codec, fromSerializer).getOrThrow(),
+                    Recipe.DIRECT_CODEC.parse(codec, fromSerializer).getOrThrow(),
                 "Failed to parse recipe for %s".formatted(tier)),
             "Loaded recipe is not TierRecipe");
         assertNotNull(deserialized);
@@ -241,9 +243,8 @@ public final class RecipeTest extends RecipeTestCommon {
         return ResourceConditionsImpl.applyResourceConditions(read, "TEST", Identifier.fromNamespaceAndPath(FluidTankCommon.modId, CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, "checkCondition")),
             new RegistryOps.RegistryInfoLookup() {
                 @Override
-                public <T> Optional<RegistryOps.RegistryInfo<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
-                    var r = helper.getLevel().registryAccess().lookupOrThrow(key);
-                    return Optional.of(RegistryOps.RegistryInfo.fromRegistryLookup(r));
+                public <T> Optional<HolderGetter<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
+                    return Optional.of(helper.getLevel().registryAccess().lookupOrThrow(key));
                 }
             });
     }
@@ -264,11 +265,7 @@ public final class RecipeTest extends RecipeTestCommon {
     }
 
     private static Recipe<?> managerFromJson(Identifier location, JsonObject jsonObject, HolderLookup.Provider provider) {
-        return Try.call(() -> RecipeManager.class.getDeclaredMethod("fromJson", ResourceKey.class, JsonObject.class, HolderLookup.Provider.class))
-            .andThenTry(m -> ReflectionSupport.invokeMethod(m, null, ResourceKey.create(Registries.RECIPE, location), jsonObject, provider))
-            .andThenTry(RecipeHolder.class::cast)
-            .andThenTry(RecipeHolder::value)
-            .andThenTry(Recipe.class::cast)
-            .getOrThrow(RuntimeException::new);
+        var ops = provider.createSerializationContext(JsonOps.INSTANCE);
+        return Recipe.DIRECT_CODEC.parse(ops, jsonObject).getOrThrow();
     }
 }

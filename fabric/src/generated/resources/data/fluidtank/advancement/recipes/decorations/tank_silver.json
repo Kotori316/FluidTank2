@@ -38,7 +38,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fluidtank:tank_silver"
+        "recipes": "fluidtank:tank_silver"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

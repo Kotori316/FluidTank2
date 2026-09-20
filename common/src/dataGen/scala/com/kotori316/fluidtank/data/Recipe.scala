@@ -5,28 +5,32 @@ import com.kotori316.fluidtank.cat.PlatformChestAsTankAccess
 import com.kotori316.fluidtank.recipe.{TierRecipe, TierRecipeBuilder}
 import com.kotori316.fluidtank.reservoir.ReservoirRecipeConstant
 import com.kotori316.fluidtank.tank.{PlatformTankAccess, Tier}
+import net.minecraft.advancements.Advancement
 import net.minecraft.advancements.triggers.InventoryChangeTrigger
-import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
 import net.minecraft.data.recipes.{RecipeCategory, RecipeOutput, RecipeProvider, ShapedRecipeBuilder, ShapelessRecipeBuilder}
+import net.minecraft.data.worldgen.BootstrapContext
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Items
-import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.crafting.{Ingredient, Recipe as MCRecipe}
 import net.minecraft.world.level.ItemLike
 
 import scala.jdk.StreamConverters.StreamHasToScala
 
-class Recipe(ip: IngredientProvider, recipeOutput: RecipeOutput, registries: HolderLookup.Provider)
-  extends RecipeProvider(registries, recipeOutput) {
+class Recipe(ip: IngredientProvider, recipeBootstrap: BootstrapContext[MCRecipe[?]], advancementBootstrap: BootstrapContext[Advancement])
+  extends RecipeProvider(recipeBootstrap, advancementBootstrap) {
 
-  given HolderLookup.Provider = registries
+  given BootstrapContext[MCRecipe[?]] = recipeBootstrap
 
-  given RecipeOutput = recipeOutput
+  given BootstrapContext[Advancement] = advancementBootstrap
+
+  given RecipeOutput = this.output
 
   override def buildRecipes(): Unit = {
+    val recipeOutput = this.output
     val woodTankBlock = PlatformTankAccess.getInstance().getTankBlockMap.get(Tier.WOOD).get()
     val voidTankBlock = PlatformTankAccess.getInstance().getTankBlockMap.get(Tier.VOID).get()
-    val items = registries.lookupOrThrow(Registries.ITEM)
+    val items = recipeBootstrap.lookup(Registries.ITEM)
     ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, woodTankBlock)
       .define('x', ip.glass)
       .define('p', ItemTags.LOGS)

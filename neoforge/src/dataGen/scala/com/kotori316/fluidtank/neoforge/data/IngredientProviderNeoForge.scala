@@ -2,8 +2,8 @@ package com.kotori316.fluidtank.neoforge.data
 
 import com.kotori316.fluidtank.data.{IngredientProvider, TankSubitem}
 import com.kotori316.fluidtank.tank.Tier
+import net.minecraft.core.HolderGetter
 import net.minecraft.core.registries.Registries
-import net.minecraft.core.{HolderGetter, HolderLookup}
 import net.minecraft.data.recipes.RecipeOutput
 import net.minecraft.resources.Identifier
 import net.minecraft.tags.{ItemTags, TagKey}
@@ -11,9 +11,9 @@ import net.minecraft.world.item.Item
 import net.neoforged.neoforge.common.Tags
 import net.neoforged.neoforge.common.conditions.{NotCondition, TagEmptyCondition}
 
-class IngredientProviderNeoForge(provider: HolderLookup.Provider) extends IngredientProvider {
+class IngredientProviderNeoForge(i: HolderGetter[Item]) extends IngredientProvider {
 
-  override given itemRegistry: HolderGetter[Item] = provider.lookupOrThrow(Registries.ITEM)
+  override given itemRegistry: HolderGetter[Item] = i
 
   override def glassTag: TagKey[Item] = Tags.Items.GLASS_BLOCKS
 

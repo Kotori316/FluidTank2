@@ -4,8 +4,8 @@ import com.kotori316.fluidtank.FluidTankCommon;
 import com.kotori316.fluidtank.neoforge.FluidTank;
 import com.kotori316.fluidtank.tank.BlockTank;
 import com.kotori316.fluidtank.tank.TankLootFunction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
+import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -16,8 +16,8 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 final class LootSubProvider extends BlockLootSubProvider {
-    LootSubProvider(HolderLookup.Provider provider) {
-        super(Set.of(), FeatureFlags.DEFAULT_FLAGS, provider);
+    LootSubProvider(LootTableSubProvider.Context context) {
+        super(Set.of(), FeatureFlags.DEFAULT_FLAGS, context);
     }
 
     @Override

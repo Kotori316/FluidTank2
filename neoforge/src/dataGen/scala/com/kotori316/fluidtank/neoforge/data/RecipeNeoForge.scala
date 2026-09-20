@@ -1,18 +1,20 @@
 package com.kotori316.fluidtank.neoforge.data
 
 import com.kotori316.fluidtank.data.Recipe
-import net.minecraft.core.HolderLookup
-import net.minecraft.data.PackOutput
-import net.minecraft.data.recipes.{RecipeOutput, RecipeProvider}
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.{MultiRegistryBootstrap, Registries}
+import net.minecraft.resources.ResourceKey
 
-import java.util.concurrent.CompletableFuture
+import java.util.Set as JSet
 
-class RecipeNeoForge(output: PackOutput, p: CompletableFuture[HolderLookup.Provider]) extends RecipeProvider.Runner(output, p) {
+object RecipeNeoForge extends MultiRegistryBootstrap {
+  override def requestedRegistries(): JSet[ResourceKey[? <: Registry[?]]] =
+    JSet.of(Registries.RECIPE, Registries.ADVANCEMENT)
 
-  override def createRecipeProvider(provider: HolderLookup.Provider, recipeOutput: RecipeOutput): RecipeProvider = {
-    val ip = new IngredientProviderNeoForge(provider)
-    new Recipe(ip, recipeOutput, provider)
+  override def run(registries: MultiRegistryBootstrap.BootstrapGetter): Unit = {
+    val recipeBootstrap = registries.get(Registries.RECIPE)
+    val advancementBootstrap = registries.get(Registries.ADVANCEMENT)
+    val ip = new IngredientProviderNeoForge(recipeBootstrap.lookup(Registries.ITEM))
+    new Recipe(ip, recipeBootstrap, advancementBootstrap).buildRecipes()
   }
-
-  override def getName: String = getClass.getSimpleName
 }

@@ -3,6 +3,8 @@ package com.kotori316.fluidtank.common.data
 import com.kotori316.fluidtank.FluidTankCommon
 import com.kotori316.fluidtank.config.{ConfigData, PlatformConfigAccess}
 import net.minecraft.DetectedVersion
+import net.minecraft.core.RegistrySetBuilder
+import net.minecraft.core.registries.Registries
 import net.minecraft.data.loot.LootTableProvider
 import net.minecraft.data.metadata.PackMetadataGenerator
 import net.minecraft.network.chat.Component
@@ -13,7 +15,7 @@ import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.{EventBusSubscriber, Mod}
 import net.neoforged.neoforge.data.event.GatherDataEvent
 
-import java.util.Collections
+import java.util.Set as JSet
 import scala.annotation.static
 import scala.jdk.javaapi.CollectionConverters
 
@@ -24,10 +26,10 @@ object FluidTankCommonDataProvider {
     PlatformConfigAccess.setInstance(() => ConfigData.FOR_TEST)
     FluidTankCommon.LOGGER.info("Start NeoForge common data generation")
 
-    event.addProvider(new LootTableProvider(event.getGenerator.getPackOutput, Collections.emptySet(),
-      CollectionConverters.asJava(Seq(new LootTableProvider.SubProviderEntry(r => new LootSubProvider(r), LootContextParamSets.BLOCK))),
-      event.getLookupProvider
-    ))
+    val lootTableProvider = new LootTableProvider(JSet.of(),
+      CollectionConverters.asJava(Seq(new LootTableProvider.SubProviderEntry(r => new LootSubProvider(r), LootContextParamSets.BLOCK))))
+    event.createReloadableRegistryObjects(new RegistrySetBuilder().add(Registries.LOOT_TABLE, lootTableProvider), JSet.of(FluidTankCommon.modId)) // manually set the target mod id
+
     event.addProvider(StateAndModelProvider(event.getGenerator.getPackOutput))
     event.addProvider(PackMetadataGenerator(event.getGenerator.getPackOutput)
       .add(PackMetadataSection.CLIENT_TYPE, PackMetadataSection(Component.literal("FluidTank Resources"), DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES).minorRange()))

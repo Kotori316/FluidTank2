@@ -4,14 +4,20 @@ import cats.data.NonEmptyChain
 import cats.kernel.Eq
 import com.google.gson.{GsonBuilder, JsonObject}
 import com.kotori316.fluidtank.tank.Tier
+import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.api.{Assertions, Nested, Test}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 import java.nio.file.Files
+import java.util.Locale
+import scala.jdk.CollectionConverters.*
 
 class FluidTankConfigTest {
   private final val gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create()
+
+  private def capacityMapOf(value: BigInt): Map[Tier, BigInt] =
+    Tier.values().filter(_.isNormalTankTier).map(t => t -> value).toMap ++ FluidTankConfig.builtinTierMap
 
   @Test
   def loadFromJson(): Unit = {
@@ -23,7 +29,6 @@ class FluidTankConfigTest {
         |  "debug": false,
         |  "changeItemInCreative": true,
         |  "capacities": {
-        |    "invalid": "162000",
         |    "wood": "162000",
         |    "stone": "162000",
         |    "iron": "162000",
@@ -31,8 +36,6 @@ class FluidTankConfigTest {
         |    "diamond": "162000",
         |    "emerald": "162000",
         |    "star": "162000",
-        |    "creative": "162000",
-        |    "void": "162000",
         |    "copper": "162000",
         |    "tin": "162000",
         |    "bronze": "162000",
@@ -45,7 +48,7 @@ class FluidTankConfigTest {
     val config = FluidTankConfig.getConfigDataFromJson(json)
     Assertions.assertTrue(config.isRight, s"Result: $config")
 
-    val expected = ConfigData(Tier.values().map(t => t -> BigInt(162000)).toMap, 0.2, 0.8, debug = false, changeItemInCreative = true)
+    val expected = ConfigData(capacityMapOf(BigInt(162000)), 0.2, 0.8, debug = false, changeItemInCreative = true)
     Assertions.assertEquals(expected, config.getOrElse(null))
   }
 
@@ -82,7 +85,7 @@ class FluidTankConfigTest {
     Assertions.assertTrue(config.isRight, s"Result: $config")
 
     val expected = ConfigData.DEFAULT.copy(
-      Tier.values().map(t => t -> BigInt(162000)).toMap, 0.2, 0.8, debug = true)
+      capacityMapOf(BigInt(162000)), 0.2, 0.8, debug = true)
     Assertions.assertEquals(expected, config.getOrElse(null))
   }
 
@@ -125,8 +128,6 @@ class FluidTankConfigTest {
           |    "gold": "162000",
           |    "diamond": "162000",
           |    "emerald": "162000",
-          |    "creative": "162000",
-          |    "void": "162000",
           |    "copper": "162000",
           |    "tin": "162000",
           |    "lead": "162000",
@@ -138,7 +139,6 @@ class FluidTankConfigTest {
       val config = FluidTankConfig.getConfigDataFromJson(json)
 
       val expected = NonEmptyChain(
-        FluidTankConfig.KeyNotFound("capacities.invalid"),
         FluidTankConfig.KeyNotFound("capacities.stone"),
         FluidTankConfig.KeyNotFound("capacities.star"),
         FluidTankConfig.KeyNotFound("capacities.bronze"),
@@ -156,7 +156,6 @@ class FluidTankConfigTest {
         """{
           |  "changeItemInCreative": false,
           |  "capacities": {
-          |    "invalid": "162000",
           |    "wood": "162000",
           |    "stone": "162000",
           |    "iron": "162000",
@@ -164,8 +163,6 @@ class FluidTankConfigTest {
           |    "diamond": "162000",
           |    "emerald": "162000",
           |    "star": "162000",
-          |    "creative": "162000",
-          |    "void": "162000",
           |    "copper": "162000",
           |    "tin": "162000",
           |    "bronze": "162000",
@@ -215,7 +212,6 @@ class FluidTankConfigTest {
           |  "debug": true,
           |  "changeItemInCreative": false,
           |  "capacities": {
-          |    "invalid": "162000",
           |    "wood": "162000",
           |    "stone": "162000",
           |    "iron": "162000",
@@ -223,8 +219,6 @@ class FluidTankConfigTest {
           |    "diamond": "162000",
           |    "emerald": "162000",
           |    "star": "162000",
-          |    "creative": "162000",
-          |    "void": "162000",
           |    "copper": "162000",
           |    "tin": "162000",
           |    "bronze": "162000",
@@ -256,7 +250,6 @@ class FluidTankConfigTest {
           |  "renderUpperBound": "0.9",
           |  "debug": "2",
           |  "capacities": {
-          |    "invalid": "162000",
           |    "wood": "162000",
           |    "stone": "162000",
           |    "iron": "162000",
@@ -264,8 +257,6 @@ class FluidTankConfigTest {
           |    "diamond": "162000",
           |    "emerald": "162000",
           |    "star": "162000",
-          |    "creative": "162000",
-          |    "void": "162000",
           |    "copper": "162000",
           |    "tin": 162000,
           |    "bronze": "162000",
@@ -279,7 +270,7 @@ class FluidTankConfigTest {
 
       // For boolean, getAsBoolean returns `false` for non boolean values.
       val expected = ConfigData.DEFAULT.copy(
-        Tier.values().map(t => t -> BigInt(162000)).toMap, 0.1, 0.9, debug = false)
+        capacityMapOf(BigInt(162000)), 0.1, 0.9, debug = false)
       config.right match {
         case Some(e) =>
           Assertions.assertEquals(expected, e)
@@ -297,16 +288,13 @@ class FluidTankConfigTest {
           |  "debug": true,
           |  "changeItemInCreative": false,
           |  "capacities": {
-          |    "invalid": "test",
           |    "wood": "1.6",
-          |    "stone": "162000",
+          |    "stone": "test",
           |    "iron": "162000",
           |    "gold": "162000",
           |    "diamond": "162000",
           |    "emerald": "162000",
           |    "star": "162000",
-          |    "creative": "162000",
-          |    "void": "162000",
           |    "copper": "162000",
           |    "tin": "162000",
           |    "bronze": "162000",
@@ -319,8 +307,8 @@ class FluidTankConfigTest {
       val config = FluidTankConfig.getConfigDataFromJson(json)
 
       val expected: NonEmptyChain[FluidTankConfig.LoadError] = NonEmptyChain(
-        FluidTankConfig.Other("capacities.invalid", new NumberFormatException()),
-        FluidTankConfig.Other("capacities.wood", new NumberFormatException())
+        FluidTankConfig.Other("capacities.wood", new NumberFormatException()),
+        FluidTankConfig.Other("capacities.stone", new NumberFormatException()),
       )
       config.left match {
         case Some(e) =>
@@ -343,7 +331,6 @@ class FluidTankConfigTest {
           |  "debug": true,
           |  "changeItemInCreative": false,
           |  "capacities": {
-          |    "invalid": "162000",
           |    "wood": "162000",
           |    "stone": "162000",
           |    "iron": "162000",
@@ -351,8 +338,6 @@ class FluidTankConfigTest {
           |    "diamond": "162000",
           |    "emerald": "162000",
           |    "star": "162000",
-          |    "creative": "162000",
-          |    "void": "162000",
           |    "copper": "162000",
           |    "tin": "162000",
           |    "bronze": "162000",
@@ -387,7 +372,6 @@ class FluidTankConfigTest {
           |  "debug": true,
           |  "changeItemInCreative": false,
           |  "capacities": {
-          |    "invalid": "162000",
           |    "wood": -1,
           |    "stone": "162000",
           |    "iron": "162000",
@@ -395,8 +379,6 @@ class FluidTankConfigTest {
           |    "diamond": "162000",
           |    "emerald": "162000",
           |    "star": "162000",
-          |    "creative": "162000",
-          |    "void": "162000",
           |    "copper": "162000",
           |    "tin": "162000",
           |    "bronze": "162000",
@@ -429,6 +411,19 @@ class FluidTankConfigTest {
     }
 
     @Test
+    def capacityKeysInJson(): Unit = {
+      val json = ConfigData.DEFAULT.createJson
+      val keys = json.getAsJsonObject("capacities").keySet().asScala.toSet
+      val expected = Tier.values().filter(_.isNormalTankTier).map(_.name().toLowerCase(Locale.ROOT)).toSet
+      Assertions.assertEquals(expected, keys)
+      Assertions.assertAll(
+        Seq(Tier.INVALID, Tier.VOID, Tier.CREATIVE).map { t =>
+          (() => Assertions.assertFalse(keys.contains(t.name().toLowerCase(Locale.ROOT)), s"$t must not be saved")): Executable
+        } *
+      )
+    }
+
+    @Test
     def migrationDebug(): Unit = {
       // language=json
       val jsonString =
@@ -437,7 +432,6 @@ class FluidTankConfigTest {
           |  "renderUpperBound": 0.8,
           |  "changeItemInCreative": false,
           |  "capacities": {
-          |    "invalid": "162000",
           |    "wood": "162000",
           |    "stone": "162000",
           |    "iron": "162000",
@@ -445,8 +439,6 @@ class FluidTankConfigTest {
           |    "diamond": "162000",
           |    "emerald": "162000",
           |    "star": "162000",
-          |    "creative": "162000",
-          |    "void": "162000",
           |    "copper": "162000",
           |    "tin": "162000",
           |    "bronze": "162000",
@@ -465,7 +457,7 @@ class FluidTankConfigTest {
       )
       Assertions.assertEquals(config.left, Option(errorExpected))
       val expected = ConfigData.DEFAULT.copy(
-        Tier.values().map(t => t -> BigInt(162000)).toMap, 0.2, 0.8, debug = false)
+        capacityMapOf(BigInt(162000)), 0.2, 0.8, debug = false)
       Assertions.assertEquals(config.right, Option(expected))
 
       FluidTankConfig.createFile(tempDir, "migrationDebug.json", config.right.get)

@@ -16,6 +16,7 @@ description = '''
 FluidTank
 '''
 bannerFile = "assets/fluidtank/textures/icon.png"
+iconFile = "assets/fluidtank/textures/icon.png"
 
 [[dependencies.fluidtank]]
 modId = "neoforge"

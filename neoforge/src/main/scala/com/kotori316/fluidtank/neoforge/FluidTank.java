@@ -143,7 +143,7 @@ public final class FluidTank {
     private static void createTab(CreativeModeTab.Builder builder) {
         builder.icon(() -> new ItemStack(TANK_MAP.get(Tier.WOOD).get()));
         builder.title(Component.translatable("itemGroup.fluidtank"));
-        builder.displayItems((parameters, output) -> {
+        builder.displayItems((_, output) -> {
             // Tanks
             TANK_ITEM_MAP.values().stream().map(DeferredHolder::get).sorted(Comparator.comparing(i -> i.blockTank().tier()))
                 .forEach(output::accept);

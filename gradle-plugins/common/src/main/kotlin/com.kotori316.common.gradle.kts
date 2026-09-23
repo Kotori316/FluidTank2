@@ -64,6 +64,9 @@ repositories {
     maven {
         name = "MavenTestGCP"
         url = uri("https://storage.googleapis.com/kotori316-maven-test-storage/maven/")
+        content {
+            includeGroup("com.kotori316")
+        }
     }
     mavenLocal()
 }

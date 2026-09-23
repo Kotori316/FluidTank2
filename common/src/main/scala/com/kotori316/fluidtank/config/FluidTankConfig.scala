@@ -82,7 +82,7 @@ object FluidTankConfig {
     getValue(json, key, e => BigInt(e.getAsString), defaultValue, keyPrefix)
   }
 
-  final val builtinTierMap = Tier.values()
+  def builtinTierMap: Map[Tier, BigInt] = Tier.values()
     .filterNot(_.isNormalTankTier)
     .map(t => t -> Tier.getDefaultCapacityMap.get(t))
     .toMap

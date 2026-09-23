@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.neoforge.config
 
-import com.kotori316.fluidtank.config.{ConfigData, FluidTankConfig as VanillaConfig}
+import com.kotori316.fluidtank.config.ConfigData
 import com.kotori316.fluidtank.tank.Tier
 import net.neoforged.fml.loading.FMLEnvironment
 import net.neoforged.neoforge.common.ModConfigSpec
@@ -47,9 +47,15 @@ class FluidTankConfig(builder: ModConfigSpec.Builder) {
 
   builder.pop()
 
+  // Here because IDE highlighting is wrong
+  private def builtinTierMap: Map[Tier, BigInt] = Tier.values()
+    .filterNot(_.isNormalTankTier)
+    .map(t => t -> Tier.getDefaultCapacityMap.get(t))
+    .toMap
+
   def createConfigData: ConfigData = {
     ConfigData(
-      capacityMap = this.capacities.map { case (tier, value) => tier -> BigInt(value.get()) } ++ VanillaConfig.builtinTierMap,
+      capacityMap = this.capacities.map { case (tier, value) => tier -> BigInt(value.get()) } ++ builtinTierMap,
       renderLowerBound = this.renderLowerBound.get(),
       renderUpperBound = this.renderUpperBound.get(),
       debug = this.debug.get(),

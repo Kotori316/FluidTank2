@@ -22,7 +22,7 @@ case class ConfigData
     json.addProperty("changeItemInCreative", changeItemInCreative)
 
     val capacities = new JsonObject
-    capacityMap.foreach { case (tier, int) =>
+    capacityMap.filter { case (tier, _) => tier.isNormalTankTier }.foreach { case (tier, int) =>
       capacities.addProperty(tier.name().toLowerCase(Locale.ROOT), int.toString())
     }
     json.add("capacities", capacities)

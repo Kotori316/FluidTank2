@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.neoforge.config
 
-import com.kotori316.fluidtank.config.ConfigData
+import com.kotori316.fluidtank.config.{ConfigData, FluidTankConfig as VanillaConfig}
 import com.kotori316.fluidtank.tank.Tier
 import net.neoforged.fml.loading.FMLEnvironment
 import net.neoforged.neoforge.common.ModConfigSpec
@@ -22,15 +22,19 @@ class FluidTankConfig(builder: ModConfigSpec.Builder) {
   builder.push("tank")
   builder.comment("The capacity of each tanks", "Unit is fabric one, 81000 unit is 1000 mB.").push("capacity")
 
-  private final val capacities: Map[Tier, ModConfigSpec.ConfigValue[String]] = Tier.values().toSeq.map { t =>
-    val defaultCapacity = ConfigData.DEFAULT.capacityMap(t)
-    t -> builder.comment(s"Capacity of $t", s"Default: $defaultCapacity unit(= ${defaultCapacity / 81} mB)")
-      .define[String](t.name().toLowerCase(Locale.ROOT), defaultCapacity.toString(),
-        FunctionConverters.asJavaPredicate[AnyRef] {
-          case s: String => Try(BigInt(s)).isSuccess
-          case _ => false
-        })
-  }.toMap
+  private final val capacities: Map[Tier, ModConfigSpec.ConfigValue[String]] = Tier.values()
+    .toSeq
+    .filter(t => t.isNormalTankTier)
+    .map { t =>
+      val defaultCapacity = ConfigData.DEFAULT.capacityMap(t)
+      t -> builder.comment(s"Capacity of $t tank", s"Default: $defaultCapacity unit(= ${defaultCapacity / 81} mB)")
+        .define[String](t.name().toLowerCase(Locale.ROOT), defaultCapacity.toString(),
+          FunctionConverters.asJavaPredicate[AnyRef] {
+            case s: String => Try(BigInt(s)).isSuccess
+            case _ => false
+          })
+    }
+    .toMap
 
   builder.pop()
 
@@ -45,7 +49,7 @@ class FluidTankConfig(builder: ModConfigSpec.Builder) {
 
   def createConfigData: ConfigData = {
     ConfigData(
-      capacityMap = this.capacities.map { case (tier, value) => tier -> BigInt(value.get()) },
+      capacityMap = this.capacities.map { case (tier, value) => tier -> BigInt(value.get()) } ++ VanillaConfig.builtinTierMap,
       renderLowerBound = this.renderLowerBound.get(),
       renderUpperBound = this.renderUpperBound.get(),
       debug = this.debug.get(),

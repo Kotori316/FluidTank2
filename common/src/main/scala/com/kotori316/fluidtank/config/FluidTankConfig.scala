@@ -82,6 +82,11 @@ object FluidTankConfig {
     getValue(json, key, e => BigInt(e.getAsString), defaultValue, keyPrefix)
   }
 
+  final val builtinTierMap = Tier.values()
+    .filterNot(_.isNormalTankTier)
+    .map(t => t -> Tier.getDefaultCapacityMap.get(t))
+    .toMap
+
   private def getCapacity(jsonObject: JsonObject): IorNec[E, Map[Tier, BigInt]] = {
     val defaultValues = ConfigData.DEFAULT.capacityMap
     val capacityMap = getValue(jsonObject, "capacities", _.getAsJsonObject, new JsonObject, Seq.empty)
@@ -89,11 +94,13 @@ object FluidTankConfig {
     capacityMap match {
       case r@Ior.Right(_) => capacityMap.flatMap(j =>
         Tier.values().toSeq
+          .filter(_.isNormalTankTier)
           .map(t => getBigInt(j, t.name().toLowerCase(Locale.ROOT), defaultValues(t), Seq("capacities"))
             .flatMap(rangeChecker("capacities." + t.name().toLowerCase(Locale.ROOT), min = Option(BigInt(0))))
             .map(b => Seq(t -> b)))
           .reduce((a, b) => a.product(b).map { case (a, b) => a ++ b })
           .map(_.toMap)
+          .map(_ ++ builtinTierMap)
       )
       case _ =>
         capacityMap.map(_ => defaultValues)

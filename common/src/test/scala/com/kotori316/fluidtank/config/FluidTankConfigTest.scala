@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.{EnumSource, ValueSource}
 
 import java.nio.file.Files
 import java.util.Locale
+import scala.jdk.CollectionConverters.SetHasAsScala
 
 class FluidTankConfigTest {
   private final val gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create()
@@ -414,8 +415,8 @@ class FluidTankConfigTest {
     @Test
     def capacityKeysInJson(): Unit = {
       val json = ConfigData.DEFAULT.createJson
-      val keys = json.getAsJsonObject("capacities").keySet()
-      val expected = Tier.values().filter(_.isNormalTankTier).map(_.name().toLowerCase(Locale.ROOT)).toSet
+      val keys: Set[String] = json.getAsJsonObject("capacities").keySet().asScala.toSet
+      val expected: Set[String] = Tier.values().filter(_.isNormalTankTier).map(_.name().toLowerCase(Locale.ROOT)).toSet
       Assertions.assertEquals(expected, keys)
       Assertions.assertAll(
         Seq(Tier.INVALID, Tier.VOID, Tier.CREATIVE).map(t =>

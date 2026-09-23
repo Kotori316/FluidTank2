@@ -7,17 +7,18 @@ import com.kotori316.fluidtank.tank.Tier
 import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.api.{Assertions, Nested, Test}
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
+import org.junit.jupiter.params.provider.{EnumSource, ValueSource}
 
 import java.nio.file.Files
 import java.util.Locale
-import scala.jdk.CollectionConverters.*
 
 class FluidTankConfigTest {
   private final val gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create()
 
   private def capacityMapOf(value: BigInt): Map[Tier, BigInt] =
     Tier.values().filter(_.isNormalTankTier).map(t => t -> value).toMap ++ FluidTankConfig.builtinTierMap
+
+  def exec(test: () => Unit): Executable = () => test()
 
   @Test
   def loadFromJson(): Unit = {
@@ -413,13 +414,13 @@ class FluidTankConfigTest {
     @Test
     def capacityKeysInJson(): Unit = {
       val json = ConfigData.DEFAULT.createJson
-      val keys = json.getAsJsonObject("capacities").keySet().asScala.toSet
+      val keys = json.getAsJsonObject("capacities").keySet()
       val expected = Tier.values().filter(_.isNormalTankTier).map(_.name().toLowerCase(Locale.ROOT)).toSet
       Assertions.assertEquals(expected, keys)
       Assertions.assertAll(
-        Seq(Tier.INVALID, Tier.VOID, Tier.CREATIVE).map { t =>
-          (() => Assertions.assertFalse(keys.contains(t.name().toLowerCase(Locale.ROOT)), s"$t must not be saved")): Executable
-        } *
+        Seq(Tier.INVALID, Tier.VOID, Tier.CREATIVE).map(t =>
+          exec(() => Assertions.assertFalse(keys.contains(t.name().toLowerCase(Locale.ROOT)), s"$t must not be saved"))
+        ) *
       )
     }
 
@@ -538,6 +539,20 @@ class FluidTankConfigTest {
       val result1 = checker(value)
       Assertions.assertTrue(result1.isRight)
       Assertions.assertEquals(value, result1.getOrElse(Assertions.fail()))
+    }
+  }
+
+  @Nested
+  class BuiltinTierTest {
+    @ParameterizedTest
+    @EnumSource(value = classOf[Tier], names = Array("INVALID", "VOID", "CREATIVE"))
+    def key(tier: Tier): Unit = {
+      Assertions.assertTrue(FluidTankConfig.builtinTierMap.contains(tier))
+    }
+
+    @Test
+    def normal(): Unit = {
+      Assertions.assertFalse(FluidTankConfig.builtinTierMap.contains(Tier.BRONZE))
     }
   }
 }

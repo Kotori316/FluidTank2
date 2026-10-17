@@ -6,6 +6,7 @@
   ],
   "baseBranches": [
     "$default",
+    "26.2",
     "26.1",
   ],
   "packageRules": [
@@ -31,3 +32,4 @@
     }
   ]
 }
+

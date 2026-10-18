@@ -75,9 +75,10 @@ public final class FluidTank {
     private static void setupConfig(IEventBus modBus, ModContainer container) {
         var config = new NeoForgePlatformConfigAccess();
         modBus.register(config);
-        var builder = config.setupConfig();
+        var tankConfig = config.setupConfig();
         PlatformConfigAccess.setInstance(config);
-        container.registerConfig(ModConfig.Type.SYNCED, builder.build());
+        container.registerConfig(ModConfig.Type.SYNCED, tankConfig.serverSpec());
+        container.registerConfig(ModConfig.Type.CLIENT, tankConfig.clientSpec());
     }
 
     private static final DeferredRegister.Blocks BLOCK_REGISTER = DeferredRegister.createBlocks(FluidTankCommon.modId);

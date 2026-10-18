@@ -14,10 +14,9 @@ public class NeoForgePlatformConfigAccess implements PlatformConfigAccess {
     public NeoForgePlatformConfigAccess() {
     }
 
-    public ModConfigSpec.Builder setupConfig() {
-        var builder = new ModConfigSpec.Builder();
-        this.tankConfig = new FluidTankConfig(builder);
-        return builder;
+    public FluidTankConfig setupConfig() {
+        this.tankConfig = new FluidTankConfig(new ModConfigSpec.Builder(), new ModConfigSpec.Builder());
+        return this.tankConfig;
     }
 
     @Override
@@ -29,12 +28,26 @@ public class NeoForgePlatformConfigAccess implements PlatformConfigAccess {
     }
 
     @SubscribeEvent
-    public void onReload(ModConfigEvent.Reloading event) {
+    public void onConfigLoad(ModConfigEvent.Loading event) {
+        invalidate("Load", event);
+    }
+
+    @SubscribeEvent
+    public void onConfigReload(ModConfigEvent.Reloading event) {
+        invalidate("Reload", event);
+    }
+
+    @SubscribeEvent
+    public void onConfigUnload(ModConfigEvent.Unloading event) {
+        invalidate("Unload", event);
+    }
+
+    private void invalidate(String action, ModConfigEvent event) {
         if (cached != null) {
             // ignore changes in initial setup
-            FluidTankCommon.LOGGER.debug("Reload FluidTank config {}",
-                event.getConfig().getFileName());
+            FluidTankCommon.LOGGER.debug("{} FluidTank config {}",
+                action, event.getConfig().getFileName());
         }
-        cached = tankConfig.createConfigData();
+        cached = null;
     }
 }

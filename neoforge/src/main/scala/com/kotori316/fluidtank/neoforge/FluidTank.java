@@ -77,7 +77,7 @@ public final class FluidTank {
         modBus.register(config);
         var builder = config.setupConfig();
         PlatformConfigAccess.setInstance(config);
-        container.registerConfig(ModConfig.Type.COMMON, builder.build());
+        container.registerConfig(ModConfig.Type.SYNCED, builder.build());
     }
 
     private static final DeferredRegister.Blocks BLOCK_REGISTER = DeferredRegister.createBlocks(FluidTankCommon.modId);

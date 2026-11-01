@@ -15,9 +15,9 @@ class IngredientProviderNeoForge(i: HolderGetter[Item]) extends IngredientProvid
 
   override given itemRegistry: HolderGetter[Item] = i
 
-  override def glassTag: TagKey[Item] = Tags.Items.GLASS_BLOCKS
+  override def glassTag: TagKey[Item] = Tags.BlockItems.GLASS_BLOCKS.item()
 
-  override def obsidianTag: TagKey[Item] = Tags.Items.OBSIDIANS
+  override def obsidianTag: TagKey[Item] = Tags.BlockItems.OBSIDIANS.item()
 
   override def tagCondition(recipeOutput: RecipeOutput, tagKey: TagKey[Item]): RecipeOutput = {
     recipeOutput.withConditions(NotCondition(TagEmptyCondition(tagKey)))
@@ -28,7 +28,7 @@ class IngredientProviderNeoForge(i: HolderGetter[Item]) extends IngredientProvid
   override def subItemOfTank(tier: Tier): TankSubitem = {
     tier match {
       case Tier.WOOD => TankSubitem(ItemTags.LOGS)
-      case Tier.STONE => TankSubitem(Tags.Items.STONES)
+      case Tier.STONE => TankSubitem(Tags.BlockItems.STONES.item())
       case Tier.IRON => TankSubitem(Tags.Items.INGOTS_IRON)
       case Tier.GOLD => TankSubitem(Tags.Items.INGOTS_GOLD)
       case Tier.DIAMOND => TankSubitem(Tags.Items.GEMS_DIAMOND)

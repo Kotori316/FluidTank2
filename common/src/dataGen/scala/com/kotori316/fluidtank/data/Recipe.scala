@@ -1,6 +1,5 @@
 package com.kotori316.fluidtank.data
 
-import com.kotori316.fluidtank.PlatformBaseAccess
 import com.kotori316.fluidtank.cat.PlatformChestAsTankAccess
 import com.kotori316.fluidtank.recipe.{TierRecipe, TierRecipeBuilder}
 import com.kotori316.fluidtank.reservoir.ReservoirRecipeConstant
@@ -77,16 +76,13 @@ class Recipe(ip: IngredientProvider, recipeBootstrap: BootstrapContext[MCRecipe[
         .save(recipeOutput)
     }
 
-    if (PlatformBaseAccess.getInstance().getPlatform != PlatformBaseAccess.Platforms.NEOFORGE) {
-      // TODO currently cats in NeoForge is disabled
-      ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, PlatformChestAsTankAccess.getInstance().getCATBlock.get())
-        .define('p', Ingredient.of(Items.CHEST, Items.BARREL))
-        .define('x', woodTankBlock)
-        .pattern("x x")
-        .pattern("xpx")
-        .pattern("xxx")
-        .unlockedBy(woodTankBlock)
-        .save(recipeOutput)
-    }
+    ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, PlatformChestAsTankAccess.getInstance().getCATBlock.get())
+      .define('p', Ingredient.of(Items.CHEST, Items.BARREL))
+      .define('x', woodTankBlock)
+      .pattern("x x")
+      .pattern("xpx")
+      .pattern("xxx")
+      .unlockedBy(woodTankBlock)
+      .save(recipeOutput)
   }
 }

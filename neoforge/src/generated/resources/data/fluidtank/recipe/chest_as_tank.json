@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "p": [
+      "minecraft:chest",
+      "minecraft:barrel"
+    ],
+    "x": "fluidtank:tank_wood"
+  },
+  "pattern": [
+    "x x",
+    "xpx",
+    "xxx"
+  ],
+  "result": {
+    "id": "fluidtank:chest_as_tank"
+  }
+}
